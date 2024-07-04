@@ -8,6 +8,9 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from launch.actions import SetEnvironmentVariable
+
+
 
 
 def generate_launch_description():
@@ -19,6 +22,9 @@ def generate_launch_description():
     x_pose = LaunchConfiguration('x_pose', default='0.0')
     y_pose = LaunchConfiguration('y_pose', default='0.0')
 
+    #gazebo_env = SetEnvironmentVariable("GAZEBO_MODEL_PATH", get_package_share_directory("mab_description"))
+
+
     world = os.path.join(
         get_package_share_directory('mab_gazebo'),
         'worlds',
@@ -29,7 +35,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')
         ),
-        launch_arguments={'world': world}.items()
+        launch_arguments={'world': world, 'verbose': 'true'}.items()
     )
 
     gzclient_cmd = IncludeLaunchDescription(
@@ -55,7 +61,9 @@ def generate_launch_description():
         }.items()
     )
 
+    #ld = LaunchDescription([gazebo_env])
     ld = LaunchDescription()
+
 
     # Add the commands to the launch description
     ld.add_action(gzserver_cmd)

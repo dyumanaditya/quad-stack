@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     robot_type = 'silver_badger' # TODO FIX THIS AND PARAMETRIZE 
-    urdf_file_name = robot_type + '.urdf'
+    urdf_file_name = robot_type + '.urdf.xacro'
 
     urdf = os.path.join(
         get_package_share_directory('mab_description'),
