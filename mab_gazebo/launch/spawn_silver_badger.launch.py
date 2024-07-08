@@ -1,23 +1,18 @@
-#!/usr/bin/env python3
-
 import os
-
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable
 from launch_ros.actions import Node
-
+from launch.substitutions import LaunchConfiguration, Command
+from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
-
-    robot_type = 'silver_badger' # TODO FIX THIS AND PARAMETRIZE 
-    urdf_file_name = robot_type + '.urdf.xacro'
-
-    urdf = os.path.join(
-        get_package_share_directory('mab_description'),
-        'urdf',
-        urdf_file_name)
+    # Get the package directory
+    package_name = 'mab_description'  # Change this to your actual package name
+    pkg_share = get_package_share_directory(package_name)
+    
+    # Set the path to the Xacro file
+    xacro_file = os.path.join(pkg_share, 'urdf', 'silver_badger.urdf.xacro')
 
     # Launch configuration variables specific to simulation
     x_pose = LaunchConfiguration('x_pose', default='0.0')
@@ -32,26 +27,37 @@ def generate_launch_description():
         'y_pose', default_value='0.0',
         description='Specify namespace of the robot')
 
-    start_gazebo_ros_spawner_cmd = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        arguments=[
-            '-entity', robot_type,
-            '-file', urdf,
-            '-x', x_pose,
-            '-y', y_pose,
-            '-z', '0.2'
-        ],
-        output='screen',
-    )
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            name='use_sim_time',
+            default_value='false',
+            description='Use simulation (Gazebo) clock if true'
+        ),
+        # SetEnvironmentVariable(
+        #     'GAZEBO_MODEL_PATH', 
+        #     [os.path.join(pkg_share)]
+        # ),
+        ExecuteProcess(
+            cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+            output='screen'
+        ),
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            output='screen',
+            parameters=[{
+                'use_sim_time': LaunchConfiguration('use_sim_time'), 
+                'robot_description': ParameterValue(Command(['xacro ', xacro_file]), value_type=str)
+            }]
+        ),
+        Node(
+            package='gazebo_ros',
+            executable='spawn_entity.py',
+            arguments=['-entity', 'silver_badger', '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', '0.0'],
+            output='screen'
+        )
+    ])
 
-    ld = LaunchDescription()
-
-    # Declare the launch options
-    ld.add_action(declare_x_position_cmd)
-    ld.add_action(declare_y_position_cmd)
-
-    # Add any conditioned actions
-    ld.add_action(start_gazebo_ros_spawner_cmd)
-
-    return ld
+if __name__ == '__main__':
+    generate_launch_description()

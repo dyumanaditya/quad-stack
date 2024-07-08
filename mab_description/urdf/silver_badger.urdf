@@ -33,7 +33,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/body.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/body.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -54,7 +54,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/rear.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/rear.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -91,7 +91,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -105,7 +105,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -125,7 +125,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -173,7 +173,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -187,7 +187,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -207,7 +207,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -255,7 +255,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -269,7 +269,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -289,7 +289,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -337,7 +337,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -351,7 +351,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -371,7 +371,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>

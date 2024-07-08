@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Include materials-->
+  <!-- <xacro:include filename="$(find mab_description)/urdf/materials.xacro"/> -->
+
+  <!-- <xacro:macro name="silver_badger_gazebo"> -->
+
+    <gazebo reference="base_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="body">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="rear">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="fr_l0">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fr_l1">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+    
+    <gazebo reference="fr_l2">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fr_foot">
+      <material>Gazebo/Black</material>
+    </gazebo>
+    
+    <gazebo reference="fl_l0">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fl_l1">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+    
+    <gazebo reference="fl_l2">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fl_foot">
+      <material>Gazebo/Black</material>
+    </gazebo>
+    
+    <gazebo reference="rl_l0">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rl_l1">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <gazebo reference="rl_l2">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rl_foot">
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="rr_l0">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rr_l1">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <gazebo reference="rr_l2">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rr_foot">
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <!-- </xacro:macro> -->
+</robot>

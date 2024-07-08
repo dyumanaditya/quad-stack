@@ -1,16 +1,23 @@
 <?xml version="1.0" ?>
-<robot name="intention" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="intention">
   <mujoco>
     <compiler balanceinertia="false" discardvisual="false"/>
   </mujoco>
-
-  
-  <!-- Include gazebo elements and colors-->
-  <xacro:include filename="$(find mab_description)/urdf/silver_badger.gazebo.xacro" />
-  
-  <!-- Import Rviz colors -->
-  <xacro:include filename="$(find mab_description)/urdf/materials.xacro" />
-
+  <material name="silver">
+    <color rgba="0.600 0.600 0.600 1.000"/>
+  </material>
+  <material name="black">
+    <color rgba="0.1 0.1 0.1 1.000"/>
+  </material>
+  <material name="red">
+    <color rgba="1.0 0 0 1.000"/>
+  </material>
+  <material name="orange">
+    <color rgba="1.0 0.41 0 1.000"/>
+  </material>
+  <material name="invisible">
+    <color rgba="0 0 0 0"/>
+  </material>
   <!--
   ##########################################################
   ###########             BODY              ################
@@ -26,7 +33,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/body.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/body.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -47,7 +54,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/rear.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/rear.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -84,7 +91,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -98,7 +105,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -111,14 +118,14 @@
   </link>
   <link name="fr_l2">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.001 -0.104 -0.003"/>
+      <origin rpy="0 0 0" xyz="0.001 0.104 -0.003"/>
       <mass value="0.118"/>
       <inertia ixx="0.0213" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0212"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -166,7 +173,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -180,7 +187,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -200,7 +207,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -248,7 +255,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -262,7 +269,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -282,7 +289,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -330,7 +337,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -344,7 +351,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -357,14 +364,14 @@
   </link>
   <link name="rr_l2">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.001 -0.104 -0.003"/>
+      <origin rpy="0 0 0" xyz="0.001 0.104 -0.003"/>
       <mass value="0.118"/>
       <inertia ixx="0.0213" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0212"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
