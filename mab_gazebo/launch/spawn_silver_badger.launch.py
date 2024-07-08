@@ -23,55 +23,67 @@ def generate_launch_description():
     # Controller configuration
     controller_config = os.path.join(gazebo_pkg_share, 'config', 'silver_badger_controller.yaml')
 
+    # Declare the launch options
+    use_sim_time = DeclareLaunchArgument(
+        name='use_sim_time',
+        default_value='false',
+        description='Use simulation (Gazebo) clock if true'
+    )
+    gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
+    gazebo = ExecuteProcess(
+        cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+        output='screen'
+    )
+    gazebo_ros_robot = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=['-entity', 'silver_badger', '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', '0.0'],
+        output='screen'
+    )
+
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'use_sim_time': LaunchConfiguration('use_sim_time'), 
+            'robot_description': ParameterValue(Command(['xacro ', xacro_file]), value_type=str)
+        }]
+    )
+
+    controller_manager = Node(
+        package='controller_manager',
+        executable='ros2_control_node',
+        name='controller_manager',
+        output='screen',
+        parameters=[controller_config]
+    )
+
+    joint_state_broadcaster = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
+        output='screen'
+    )
+
+    joint_trajectory_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_trajectory_controller', '--controller-manager', '/controller_manager'],
+        output='screen'
+    )
+
+
     return LaunchDescription([
-        DeclareLaunchArgument(
-            name='use_sim_time',
-            default_value='false',
-            description='Use simulation (Gazebo) clock if true'
-        ),
-        # SetEnvironmentVariable(
-        #     'GAZEBO_MODEL_PATH', 
-        #     [os.path.join(description_pkg_share)]
-        # ),
-        ExecuteProcess(
-            cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
-            output='screen'
-        ),
-        Node(
-            package='robot_state_publisher',
-            executable='robot_state_publisher',
-            name='robot_state_publisher',
-            output='screen',
-            parameters=[{
-                'use_sim_time': LaunchConfiguration('use_sim_time'), 
-                'robot_description': ParameterValue(Command(['xacro ', xacro_file]), value_type=str)
-            }]
-        ),
-        Node(
-            package='gazebo_ros',
-            executable='spawn_entity.py',
-            arguments=['-entity', 'silver_badger', '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', '0.0'],
-            output='screen'
-        ),
-        Node(
-            package='controller_manager',
-            executable='ros2_control_node',
-            name='controller_manager',
-            output='screen',
-            parameters=[controller_config]
-        ),
-        Node(
-            package='controller_manager',
-            executable='spawner',
-            arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
-            output='screen'
-        ),
-        Node(
-            package='controller_manager',
-            executable='spawner',
-            arguments=['joint_trajectory_controller', '--controller-manager', '/controller_manager'],
-            output='screen'
-        ),
+        use_sim_time,
+        gazebo,
+        gazebo_ros_robot,
+        robot_state_publisher,
+        controller_manager,
+        joint_state_broadcaster,
+        joint_trajectory_controller,
     ])
 
 if __name__ == '__main__':
