@@ -1,8 +1,9 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, TimerAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, TimerAction, RegisterEventHandler
 from launch_ros.actions import Node
+from launch.event_handlers import OnProcessExit
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -14,7 +15,7 @@ def generate_launch_description():
     gazebo_pkg_share = get_package_share_directory(gazebo_package_name)
     
     # Set the path to the Xacro file
-    xacro_file = os.path.join(description_pkg_share, 'urdf', 'silver_badger.urdf.xacro')
+    xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
 
     # Launch configuration variables specific to simulation
     x_pose = LaunchConfiguration('x_pose', default='0.0')
@@ -53,6 +54,7 @@ def generate_launch_description():
         }]
     )
 
+    # Not used -- happens in gazebo xacro file
     controller_manager = Node(
         package='controller_manager',
         executable='ros2_control_node',
@@ -75,15 +77,22 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster,
+            on_exit=[joint_trajectory_controller],
+        )
+    )
 
     return LaunchDescription([
         use_sim_time,
         gazebo,
         gazebo_ros_robot,
         robot_state_publisher,
-        controller_manager,
         joint_state_broadcaster,
-        joint_trajectory_controller,
+        # joint_trajectory_controller,
+        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
     ])
 
 if __name__ == '__main__':

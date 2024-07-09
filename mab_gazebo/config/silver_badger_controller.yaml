@@ -6,19 +6,33 @@ controller_manager:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     joint_trajectory_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-      joints:
-        - fr_j0
-        - fr_j1
-        - fl_j0
-        - fl_j1
-        - rl_j0
-        - rl_j1
-        - rr_j0
-        - rr_j1
+      type: effort_controllers/JointGroupEffortController
 
-      state_publish_rate: 25
-      command_interfaces: 
-        - position
-      state_interfaces:
-        - position
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - sp_j0
+      - fl_j0
+      - fr_j0
+      - fl_j1
+      - fl_j2
+      - fr_j1
+      - rl_j0
+      - rl_j1
+      - rl_j2
+      - fr_j2
+      - rr_j0
+      - rr_j1
+      - rr_j2
+
+    command_interfaces:
+      - effort
+      - position
+
+    state_interfaces:
+      - position
+      - effort
+
+    allow_partial_joints_goal: true
+
+   # state_publish_rate: 500.0

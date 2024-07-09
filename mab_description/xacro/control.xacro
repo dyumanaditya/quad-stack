@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="silver_badger_ros2_control">
+
+        <!-- Include limits-->
+        <xacro:include filename="$(find mab_description)/xacro/limits.xacro" />
+
+        <ros2_control name="silver_badger_joint_trajectory_control" type="system">
+            <hardware>
+                <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+            </hardware>
+            <joint name="sp_j0">
+                <command_interface name="effort">
+                    <param name="min">${-sp_j0_max_effort}</param>
+                    <param name="max">${sp_j0_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="fr_j0">
+                <command_interface name="effort">
+                    <param name="min">${-fr_j0_max_effort}</param>
+                    <param name="max">${fr_j0_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="fr_j1">
+                <command_interface name="effort">
+                    <param name="min">${-fr_j1_max_effort}</param>
+                    <param name="max">${fr_j1_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="fr_j2">
+                <command_interface name="effort">
+                    <param name="min">${-fr_j2_max_effort}</param>
+                    <param name="max">${fr_j2_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="fl_j0">
+                <command_interface name="effort">
+                    <param name="min">${-fl_j0_max_effort}</param>
+                    <param name="max">${fl_j0_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="fl_j1">
+                <command_interface name="effort">
+                    <param name="min">${-fl_j1_max_effort}</param>
+                    <param name="max">${fl_j1_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="fl_j2">
+                <command_interface name="effort">
+                    <param name="min">${-fl_j2_max_effort}</param>
+                    <param name="max">${fl_j2_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="rl_j0">
+                <command_interface name="effort">
+                    <param name="min">${-rl_j0_max_effort}</param>
+                    <param name="max">${rl_j0_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="rl_j1">
+                <command_interface name="effort">
+                    <param name="min">${-rl_j1_max_effort}</param>
+                    <param name="max">${rl_j1_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="rl_j2">
+                <command_interface name="effort">
+                    <param name="min">${-rl_j2_max_effort}</param>
+                    <param name="max">${rl_j2_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="rr_j0">
+                <command_interface name="effort">
+                    <param name="min">${-rr_j0_max_effort}</param>
+                    <param name="max">${rr_j0_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="rr_j1">
+                <command_interface name="effort">
+                    <param name="min">${-rr_j1_max_effort}</param>
+                    <param name="max">${rr_j1_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+            <joint name="rr_j2">
+                <command_interface name="effort">
+                    <param name="min">${-rr_j2_max_effort}</param>
+                    <param name="max">${rr_j2_max_effort}</param>
+                </command_interface>
+                <state_interface name="position"/>
+                <state_interface name="effort"/>
+            </joint>
+
+        </ros2_control>
+    </xacro:macro>
+</robot>
