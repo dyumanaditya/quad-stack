@@ -1,106 +1,81 @@
 import rclpy
-import numpy as np
 from rclpy.node import Node
-from sensor_msgs.msg import JointState
-from std_msgs.msg import Float64MultiArray
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+import numpy as np
 
-class MABStandController(Node):
+class JointTrajectoryPublisher(Node):
+    """NOT TESTED YET
+
+    :param Node: _description_
+    """
 
     def __init__(self):
-        super().__init__('quadruped_stand_controller')
+        super().__init__('mab_stand')
         
-        # Declare each joint angle parameter individually
-        self.declare_parameter('sp_j0', 0.0)
-        self.declare_parameter('fl_j0', 0.0)
-        self.declare_parameter('fr_j0', 0.0)
-        self.declare_parameter('fl_j1', 0.0)
-        self.declare_parameter('fl_j2', 1.1)
-        self.declare_parameter('fr_j1', 0.0)
-        self.declare_parameter('rl_j0', 0.0)
-        self.declare_parameter('rl_j1', 0.0)
-        self.declare_parameter('rl_j2', 0.95)
-        self.declare_parameter('fr_j2', -1.1)
-        self.declare_parameter('rr_j0', 0.0)
-        self.declare_parameter('rr_j1', 0.0)
-        self.declare_parameter('rr_j2', -0.95)
+        self.joint_trajectory_publisher = self.create_publisher(JointTrajectory, '/joint_trajectory_controller/joint_trajectory', 10)
+        self.timer = self.create_timer(1.0, self.publish_joint_trajectory)
 
-        self.standing_pose = {
-            'sp_j0': self.get_parameter('sp_j0').value,
-            'fr_j0': self.get_parameter('fr_j0').value,
-            'fr_j1': self.get_parameter('fr_j1').value,
-            'fr_j2': self.get_parameter('fr_j2').value,
-            'fl_j0': self.get_parameter('fl_j0').value,
-            'fl_j1': self.get_parameter('fl_j1').value,
-            'fl_j2': self.get_parameter('fl_j2').value,
-            'rl_j0': self.get_parameter('rl_j0').value,
-            'rl_j1': self.get_parameter('rl_j1').value,
-            'rl_j2': self.get_parameter('rl_j2').value,
-            'rr_j0': self.get_parameter('rr_j0').value,
-            'rr_j1': self.get_parameter('rr_j1').value,
-            'rr_j2': self.get_parameter('rr_j2').value,
+        # Define target joint positions for standing
+        self.target_positions = {
+            'sp_j0': 0.0,
+            'fr_j0': -0.1,
+            'fr_j1': 0.8,
+            'fr_j2': -1.5,
+            'fl_j0': 0.1,
+            'fl_j1': -0.8,
+            'fl_j2': 1.5,
+            'rl_j0': -0.1,
+            'rl_j1': -1.0,
+            'rl_j2': 1.5,
+            'rr_j0': 0.1,
+            'rr_j1': 1.0,
+            'rr_j2': -1.5,
         }
 
-        self.joint_state_subscriber = self.create_subscription(JointState, '/joint_states', self.joint_state_callback, 10)
-        self.effort_publisher = self.create_publisher(Float64MultiArray, '/joint_trajectory_controller/commands', 10)
+        self.num_points = 50  # Number of points for interpolation
+        self.duration = 5.0   # Duration of the trajectory in seconds
 
-        self.current_joint_states = None
-        self.error_sum = {name: 0.0 for name in self.standing_pose.keys()}
-        self.previous_time = self.get_clock().now()
+        self.joint_names = list(self.target_positions.keys())
+        self.start_positions = [0.0] * len(self.joint_names)
 
-    def joint_state_callback(self, msg):
-        self.current_joint_states = msg
+    def interpolate_trajectory(self, start_positions, target_positions, num_points, duration):
+        times = np.linspace(0, duration, num_points)
+        trajectory_points = []
 
-    def calculate_efforts(self):
-        if self.current_joint_states is None:
-            return
+        for t in times:
+            positions = [
+                start + (target - start) * (t / duration)
+                for start, target in zip(start_positions, target_positions)
+            ]
 
-        current_time = self.get_clock().now()
-        dt = (current_time - self.previous_time).nanoseconds / 1e9  # Convert nanoseconds to seconds
-        self.previous_time = current_time
+            point = JointTrajectoryPoint()
+            point.positions = positions
+            point.time_from_start = rclpy.time.Duration(seconds=t).to_msg()
+            trajectory_points.append(point)
 
-        # PI-controller to calculate efforts
-        efforts = []
-        k_p = 2.0  # Proportional gain
-        k_i = 1.0   # Integral gain
+        return trajectory_points
 
-        for name in self.current_joint_states.name:
-            if name in self.standing_pose:
-                target_angle = self.standing_pose[name]
-                current_state_idx = self.current_joint_states.name.index(name)
-                current_angle = self.current_joint_states.position[current_state_idx]
-                error = target_angle - current_angle
-                
-                # Proportional term
-                p_term = k_p * error
-                
-                # Integral term
-                self.error_sum[name] += error * dt
-                i_term = k_i * self.error_sum[name]
-                
-                # Total effort
-                effort = p_term + i_term
-                effort = np.clip(effort, -16.0, 16.0)
-                if name == 'sp_j0':
-                    effort *= 2.0
-                efforts.append(effort)
-            else:
-                efforts.append(0.0)
-        
-        effort_msg = Float64MultiArray()
-        effort_msg.data = efforts
-        self.effort_publisher.publish(effort_msg)
+    def publish_joint_trajectory(self):
+        joint_trajectory_msg = JointTrajectory()
+        joint_trajectory_msg.joint_names = self.joint_names
+
+        target_positions = [self.target_positions[name] for name in self.joint_names]
+        joint_trajectory_msg.points = self.interpolate_trajectory(
+            self.start_positions, target_positions, self.num_points, self.duration
+        )
+
+        self.joint_trajectory_publisher.publish(joint_trajectory_msg)
+        self.get_logger().info('Published joint trajectory')
 
 def main(args=None):
     rclpy.init(args=args)
-    node = MABStandController()
-    
+    node = JointTrajectoryPublisher()
+
     try:
-        while rclpy.ok():
-            rclpy.spin_once(node)
-            node.calculate_efforts()
+        rclpy.spin(node)
     except KeyboardInterrupt:
         pass
-    
+
     node.destroy_node()
     rclpy.shutdown()
 

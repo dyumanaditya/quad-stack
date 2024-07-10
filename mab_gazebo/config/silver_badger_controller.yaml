@@ -1,12 +1,12 @@
 controller_manager:
   ros__parameters:
-    update_rate: 50
+    update_rate: 1000
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     joint_trajectory_controller:
-      type: effort_controllers/JointGroupEffortController
+      type: joint_trajectory_controller/JointTrajectoryController
 
 joint_trajectory_controller:
   ros__parameters:
@@ -27,12 +27,26 @@ joint_trajectory_controller:
 
     command_interfaces:
       - effort
-      - position
 
     state_interfaces:
       - position
-      - effort
+      - velocity
+
+    gains:
+      sp_j0: {p: 30.0, d: 1.0, i: 0.01}
+      fl_j0: {p: 30.0, d: 1.0, i: 0.01}
+      fr_j0: {p: 30.0, d: 1.0, i: 0.01}
+      fl_j1: {p: 30.0, d: 1.0, i: 0.01}
+      fl_j2: {p: 30.0, d: 1.0, i: 0.01}
+      fr_j1: {p: 30.0, d: 1.0, i: 0.01}
+      rl_j0: {p: 30.0, d: 1.0, i: 0.01}
+      rl_j1: {p: 30.0, d: 1.0, i: 0.01}
+      rl_j2: {p: 30.0, d: 1.0, i: 0.01}
+      fr_j2: {p: 30.0, d: 1.0, i: 0.01}
+      rr_j0: {p: 30.0, d: 1.0, i: 0.01}
+      rr_j1: {p: 30.0, d: 1.0, i: 0.01}
+      rr_j2: {p: 30.0, d: 1.0, i: 0.01}
 
     allow_partial_joints_goal: true
 
-   # state_publish_rate: 500.0
+    state_publish_rate: 1000.0

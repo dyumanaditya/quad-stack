@@ -16,6 +16,10 @@ def generate_launch_description():
     
     # Set the path to the Xacro file
     xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
+    urdf_file = os.path.join(description_pkg_share, 'urdf', 'silver_badger.urdf')
+
+    with open(urdf_file, 'r') as infp:
+        urdf = infp.read()
 
     # Launch configuration variables specific to simulation
     x_pose = LaunchConfiguration('x_pose', default='0.0')
@@ -51,7 +55,9 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': LaunchConfiguration('use_sim_time'), 
             'robot_description': ParameterValue(Command(['xacro ', xacro_file]), value_type=str)
-        }]
+            # 'robot_description': urdf
+        }],
+        # arguments=[urdf_file]
     )
 
     # Not used -- happens in gazebo xacro file
