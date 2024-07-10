@@ -3,17 +3,16 @@ from rclpy.node import Node
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 import numpy as np
 
-class JointTrajectoryPublisher(Node):
-    """NOT TESTED YET
 
-    :param Node: _description_
-    """
+
+class MABStand(Node):
 
     def __init__(self):
         super().__init__('mab_stand')
         
         self.joint_trajectory_publisher = self.create_publisher(JointTrajectory, '/joint_trajectory_controller/joint_trajectory', 10)
-        self.timer = self.create_timer(1.0, self.publish_joint_trajectory)
+        self.timer = self.create_timer(1.0, self.publish_trajectory_once)
+        self.already_published = False
 
         # Define target joint positions for standing
         self.target_positions = {
@@ -33,7 +32,7 @@ class JointTrajectoryPublisher(Node):
         }
 
         self.num_points = 50  # Number of points for interpolation
-        self.duration = 5.0   # Duration of the trajectory in seconds
+        self.duration = 2.0   # Duration of the trajectory in seconds
 
         self.joint_names = list(self.target_positions.keys())
         self.start_positions = [0.0] * len(self.joint_names)
@@ -55,7 +54,10 @@ class JointTrajectoryPublisher(Node):
 
         return trajectory_points
 
-    def publish_joint_trajectory(self):
+    def publish_trajectory_once(self):
+        if self.already_published:
+            return
+        
         joint_trajectory_msg = JointTrajectory()
         joint_trajectory_msg.joint_names = self.joint_names
 
@@ -65,17 +67,15 @@ class JointTrajectoryPublisher(Node):
         )
 
         self.joint_trajectory_publisher.publish(joint_trajectory_msg)
-        self.get_logger().info('Published joint trajectory')
+        self.get_logger().info('Published joint trajectory to stand')
+        
+        self.already_published = True
+        self.timer.cancel()
 
 def main(args=None):
     rclpy.init(args=args)
-    node = JointTrajectoryPublisher()
-
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-
+    node = MABStand()
+    rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
 
