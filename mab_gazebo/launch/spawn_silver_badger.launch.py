@@ -1,7 +1,7 @@
 import os
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, TimerAction, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, RegisterEventHandler
 from launch_ros.actions import Node
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import LaunchConfiguration, Command
@@ -9,10 +9,13 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
     # Get the package directory
+    use_ros_control = False
     description_package_name = 'mab_description'
     gazebo_package_name = 'mab_gazebo'
+    plugin_package_name = 'mab_gazebo_plugin'
     description_pkg_share = get_package_share_directory(description_package_name)
     gazebo_pkg_share = get_package_share_directory(gazebo_package_name)
+    gazebo_pkg_prefix = get_package_prefix(plugin_package_name)
     
     # Set the path to the Xacro file
     xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
@@ -35,9 +38,12 @@ def generate_launch_description():
         description='Use simulation (Gazebo) clock if true'
     )
     gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
+    gazebo_plugin_path = os.path.join(gazebo_pkg_prefix, 'lib', 'mab_gazebo_plugin')
+    os.environ['GAZEBO_PLUGIN_PATH'] = gazebo_plugin_path
+
     gazebo = ExecuteProcess(
-        cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
-        # cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )
     gazebo_ros_robot = Node(
@@ -60,46 +66,59 @@ def generate_launch_description():
         # arguments=[urdf_file]
     )
 
-    # Not used -- happens in gazebo xacro file
-    controller_manager = Node(
-        package='controller_manager',
-        executable='ros2_control_node',
-        name='controller_manager',
-        output='screen',
-        parameters=[controller_config]
-    )
-
-    joint_state_broadcaster = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
-        output='screen'
-    )
-
-    joint_trajectory_controller = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=['joint_trajectory_controller', '--controller-manager', '/controller_manager'],
-        output='screen'
-    )
-
-    # Delay start of robot_controller after `joint_state_broadcaster`
-    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster,
-            on_exit=[joint_trajectory_controller],
+    if use_ros_control:
+        # Not used -- happens in gazebo xacro file
+        controller_manager = Node(
+            package='controller_manager',
+            executable='ros2_control_node',
+            name='controller_manager',
+            output='screen',
+            parameters=[controller_config]
         )
-    )
 
-    return LaunchDescription([
-        use_sim_time,
-        gazebo,
-        gazebo_ros_robot,
-        robot_state_publisher,
-        joint_state_broadcaster,
-        # joint_trajectory_controller,
-        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
-    ])
+        joint_state_broadcaster = Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
+            output='screen'
+        )
+
+        joint_trajectory_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=['joint_trajectory_controller', '--controller-manager', '/controller_manager'],
+            output='screen'
+        )
+
+        # Delay start of robot_controller after `joint_state_broadcaster`
+        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster,
+                on_exit=[joint_trajectory_controller],
+            )
+        )
+
+        args = [
+            use_sim_time,
+            gazebo,
+            gazebo_ros_robot,
+            robot_state_publisher,
+            joint_state_broadcaster,
+            delay_robot_controller_spawner_after_joint_state_broadcaster_spawner
+        ]
+
+    else:
+        args = [
+            use_sim_time,
+            gazebo,
+            gazebo_ros_robot,
+            robot_state_publisher,
+            # joint_state_publisher
+        ]
+
+    return LaunchDescription(args)
+
+
 
 if __name__ == '__main__':
     generate_launch_description()

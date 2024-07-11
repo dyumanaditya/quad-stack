@@ -1,0 +1,12 @@
+float32 battery
+float32 bus_v
+float32 bus_i
+float32 bus_p
+float32 bus_pt
+float32 legs_v
+float32 charger_v
+float32 bridge_t
+float32 ext1_t
+float32 ext2_t 
+string[] status
+int32 up_time

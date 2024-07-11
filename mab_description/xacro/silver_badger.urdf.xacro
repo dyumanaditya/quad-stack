@@ -4,6 +4,8 @@
     <compiler balanceinertia="false" discardvisual="false"/>
   </mujoco>
 
+  <!-- Include IMU-->
+  <xacro:include filename="$(find mab_description)/xacro/imu.xacro" />
   
   <!-- Include gazebo elements and colors-->
   <xacro:include filename="$(find mab_description)/xacro/silver_badger.gazebo.xacro" />
@@ -77,17 +79,13 @@
       </geometry>
     </collision>
   </link>
-  <joint name="sp_j0" type="continuous">
-    <parent link="body"/>
-    <child link="rear"/>
-    <origin rpy="3.14159 0 4.71" xyz="-0.141 -0.0395 0"/>
-    <axis xyz="1 0 0"/>
-    <limit effort="${sp_j0_max_effort}" lower="${sp_j0_limit_lower}" upper="${sp_j0_limit_upper}" velocity="${sp_j0_max_velocity}"/>
-  </joint>
+
   <joint name="root" type="fixed">
     <parent link="base_link"/>
     <child link="body"/>
   </joint>
+
+  <xacro:imu parent_link="body"/>
 
   <!-- LEG LINKS 0-4 -->
   <link name="fr_l0">
@@ -604,6 +602,13 @@
     <axis xyz="0.0 0 0"/>
   </joint>
 
-  <!-- <xacro:silver_badger_ros2_control/> -->
+  <!-- Spine Joint-->
+  <joint name="sp_j0" type="continuous">
+    <parent link="body"/>
+    <child link="rear"/>
+    <origin rpy="3.14159 0 4.71" xyz="-0.141 -0.0395 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="${sp_j0_max_effort}" lower="${sp_j0_limit_lower}" upper="${sp_j0_limit_upper}" velocity="${sp_j0_max_velocity}"/>
+  </joint>
 
 </robot>
