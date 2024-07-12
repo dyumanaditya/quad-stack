@@ -117,7 +117,7 @@ class MABStand(Node):
 
     def __init__(self):
         super().__init__('mab_stand')
-        self.publisher_ = self.create_publisher(JointCommand, '/hb40/joint_command', 10)
+        self.publisher_ = self.create_publisher(JointCommand, '/hb40/joint_commandHighPrio', 10)
         self.timer_ = self.create_timer(0.01, self.timer_callback)  # 100 Hz
         self.first_time = True
 

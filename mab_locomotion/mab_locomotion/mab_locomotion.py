@@ -23,7 +23,7 @@ class MABLocomotion(Node):
     def __init__(self):
         super().__init__("mab_locomotion")
 
-        self.is_real_robot = True
+        self.is_real_robot = False
         self.is_tuda_robot = True
 
         qos_profile = QoSProfile(
@@ -190,7 +190,6 @@ class MABLocomotion(Node):
         robot_action = action[self.mask_from_xmlsim_to_real]
 
         target_joint_positions = self.nominal_joint_positions + self.scaling_factor * robot_action
-        # target_joint_positions = self.nominal_joint_positions
         if self.is_real_robot and self.is_tuda_robot:
             target_joint_positions[-1] *= -1.0
 

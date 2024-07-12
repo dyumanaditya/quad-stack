@@ -2,7 +2,15 @@
 ROS2 Support for MAB Robotics Silver Badger and Honey Badger robots.
 
 # Gazebo
-Follow these steps to run:
+## Launch
+Run the following line to teleoperate. 
+
+```
+ros2 launch mab_keyboard_teleop silver_badger_teleop.launch.py
+```
+
+## Run Separately
+You can run all the processes in separate terminals to debug if necessary
 
 
 To launch the robot in gazebo

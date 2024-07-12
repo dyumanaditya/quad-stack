@@ -42,8 +42,8 @@ def generate_launch_description():
     os.environ['GAZEBO_PLUGIN_PATH'] = gazebo_plugin_path
 
     gazebo = ExecuteProcess(
-        # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
-        cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )
     gazebo_ros_robot = Node(

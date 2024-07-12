@@ -22,7 +22,7 @@ class TeleopNode(Node):
         self.get_logger().info('Teleop Node has been started.')
         self.settings = termios.tcgetattr(sys.stdin)
         self.zero_twist = Twist()
-        self.zero_twist.linear.x = 1.0
+        self.zero_twist.linear.x = 0.0
         self.zero_twist.angular.z = 0.0
 
         # Create a timer to publish zero twist
@@ -68,8 +68,8 @@ class TeleopNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = TeleopNode()
-    # node.run()
-    rclpy.spin(node)
+    node.run()
+    # rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
 

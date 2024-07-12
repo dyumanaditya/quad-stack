@@ -30,7 +30,7 @@ namespace gazebo
         {
             RCLCPP_INFO(rclcpp::get_logger("mab_gazebo_control_plugin"), "Loading mab_gazebo_ros2_control plugin");
             model_ = model;
-            node_->declare_parameter("joint_topic", "/hb40/joint_command");
+            node_->declare_parameter("joint_topic", "/hb40/joint_commandHighPrio");
             node_->get_parameter("joint_topic", joint_topic_);
 
             // Get joints from the model
