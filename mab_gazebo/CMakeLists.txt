@@ -21,6 +21,7 @@ endif()
 # Find ament packages and libraries for ament and system dependencies
 ################################################################################
 find_package(ament_cmake REQUIRED)
+find_package(realsense_gazebo_plugin REQUIRED)
 
 ################################################################################
 # Build

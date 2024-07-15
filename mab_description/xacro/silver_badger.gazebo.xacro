@@ -153,4 +153,21 @@
       </sensor>
   </gazebo>
 
+  <!-- Realsense Camera-->
+  <!-- <gazebo>
+    <plugin name="realsense_camera" filename="librealsense_gazebo_plugin.so"/>
+      <camera_name>depth_camera</camera_name>
+      <depth_topic>/camera/depth/image_raw</depth_topic>
+      <color_topic>/camera/color/image_raw</color_topic>
+      <infrared1_topic>/camera/infra1/image_raw</infrared1_topic>
+      <infrared2_topic>/camera/infra2/image_raw</infrared2_topic>
+      <depth_camera_info_topic>/camera/depth/camera_info</depth_camera_info_topic>
+      <color_camera_info_topic>/camera/color/camera_info</color_camera_info_topic>
+      <infrared1_camera_info_topic>/camera/infra1/camera_info</infrared1_camera_info_topic>
+      <infrared2_camera_info_topic>/camera/infra2/camera_info</infrared2_camera_info_topic>
+      <pointcloud_topic>/camera/depth/points</pointcloud_topic>
+      <pointcloud_cutoff>0.5</pointcloud_cutoff>
+      <range_max>4.0</range_max>
+  </gazebo> -->
+
 </robot>

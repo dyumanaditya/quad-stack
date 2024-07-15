@@ -21,6 +21,7 @@
 
 	<exec_depend>mab_description</exec_depend>
 	<exec_depend>mab_control</exec_depend>
+	<depend>realsense_gazebo_plugin</depend>
 
 	<export>
 		<build_type>ament_cmake</build_type>

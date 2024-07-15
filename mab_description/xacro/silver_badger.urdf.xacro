@@ -22,6 +22,10 @@
   <!-- Initialize controls-->
   <xacro:silver_badger_ros2_control/>
 
+  <!-- Initialize camera-->
+  <xacro:include filename="$(find mab_description)/xacro/camera.xacro"/>
+  <xacro:realsense2_camera parent="base_link" name="d435_camera"/>
+
   <!-- BODY -->
   <link name="base_link"/>
   <link name="body">
@@ -86,6 +90,23 @@
   </joint>
 
   <xacro:imu parent_link="body"/>
+  <!-- <sensor_d435 parent="base_link"/> -->
+  <!-- <link name="realsense_link">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material>
+        <color rgba="0 1 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="realsense_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="realsense_link"/>
+    <origin xyz="0 0 1.0" rpy="0 0 0"/>
+  </joint> -->
 
   <!-- LEG LINKS 0-4 -->
   <link name="fr_l0">

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot name="realsense2_camera" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="realsense2_camera" params="parent name">
+        
+        <!-- Initialize camera-->
+        <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
+        <xacro:sensor_d435 parent="base_link" name="${name}">
+        <origin xyz="0 0 0.5" rpy="0 0 0"/>
+        </xacro:sensor_d435>
+    
+        <!-- Include the RealSense Camera Gazebo Macro -->
+        <xacro:include filename="$(find realsense2_description)/urdf/_d435.gazebo.xacro"/>
+    
+        <!-- Use the RealSense Camera Gazebo Macro -->
+        <xacro:gazebo_d435 
+        camera_name="${name}"
+        reference_link="${name}_link" 
+        topics_ns="/${name}" 
+        depth_optical_frame="${name}_depth_optical_frame" 
+        color_optical_frame="${name}_color_optical_frame" 
+        infrared1_optical_frame="${name}_infrared1_optical_frame" 
+        infrared2_optical_frame="${name}_infrared2_optical_frame" 
+        publish_pointcloud="true">
+        </xacro:gazebo_d435>
+
+        <!-- Adjust color for gazebo-->
+        <gazebo reference="${name}_link">
+            <material>Gazebo/Grey</material>
+        </gazebo>
+
+    </xacro:macro>
+    
+</robot>

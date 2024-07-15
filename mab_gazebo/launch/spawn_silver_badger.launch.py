@@ -13,9 +13,11 @@ def generate_launch_description():
     description_package_name = 'mab_description'
     gazebo_package_name = 'mab_gazebo'
     plugin_package_name = 'mab_gazebo_plugin'
+    realsense_package_name = 'realsense_gazebo_plugin'
     description_pkg_share = get_package_share_directory(description_package_name)
     gazebo_pkg_share = get_package_share_directory(gazebo_package_name)
     gazebo_pkg_prefix = get_package_prefix(plugin_package_name)
+    realsense_pkg_prefix = get_package_prefix(realsense_package_name)
     
     # Set the path to the Xacro file
     xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
@@ -39,11 +41,15 @@ def generate_launch_description():
     )
     gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
     gazebo_plugin_path = os.path.join(gazebo_pkg_prefix, 'lib', 'mab_gazebo_plugin')
-    os.environ['GAZEBO_PLUGIN_PATH'] = gazebo_plugin_path
+    realsense_plugin_path = os.path.join(realsense_pkg_prefix, 'lib')
+
+
+    plugin_paths = gazebo_plugin_path + ':' + realsense_plugin_path
+    os.environ['GAZEBO_PLUGIN_PATH'] = plugin_paths
 
     gazebo = ExecuteProcess(
-        cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
-        # cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )
     gazebo_ros_robot = Node(

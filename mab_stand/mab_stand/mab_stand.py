@@ -136,7 +136,7 @@ class MABStand(Node):
                 msg = JointCommand()
                 msg.t_pos = positions
                 msg.kd = [0.5] * 13
-                msg.kp = [20.0] * 13
+                msg.kp = [30.0] * 13
                 self.publisher_.publish(msg)
                 time.sleep(duration / num_points)
         else:
