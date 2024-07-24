@@ -1,11 +1,13 @@
 import os
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, RegisterEventHandler, IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.parameter_descriptions import ParameterValue
+
 
 def generate_launch_description():
     # Get the package directory
@@ -27,8 +29,8 @@ def generate_launch_description():
         urdf = infp.read()
 
     # Launch configuration variables specific to simulation
-    x_pose = LaunchConfiguration('x_pose', default='0.0')
-    y_pose = LaunchConfiguration('y_pose', default='0.0')
+    x_pose = LaunchConfiguration('x_pose', default='-2.0')
+    y_pose = LaunchConfiguration('y_pose', default='3.5')
 
     # Controller configuration
     controller_config = os.path.join(gazebo_pkg_share, 'config', 'silver_badger_controller.yaml')
@@ -39,7 +41,9 @@ def generate_launch_description():
         default_value='false',
         description='Use simulation (Gazebo) clock if true'
     )
+
     gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
+    os.environ["GAZEBO_MODEL_PATH"] = description_pkg_share 
     gazebo_plugin_path = os.path.join(gazebo_pkg_prefix, 'lib', 'mab_gazebo_plugin')
     realsense_plugin_path = os.path.join(realsense_pkg_prefix, 'lib')
 
@@ -47,9 +51,16 @@ def generate_launch_description():
     plugin_paths = gazebo_plugin_path + ':' + realsense_plugin_path
     os.environ['GAZEBO_PLUGIN_PATH'] = plugin_paths
 
+    # Launch Gazebo with a world file
+    world_pkg = 'turtlebot3_gazebo'
+    world_file = os.path.join(get_package_share_directory(world_pkg), 'worlds', 'turtlebot3_house.world')
+    # world_pkg = 'aws_robomaker_small_house_world'
+    # world_file = os.path.join(get_package_share_directory(world_pkg), 'worlds', 'small_house.world')
+    gazebo_models_path = os.path.join(get_package_share_directory(world_pkg), 'models')
+    os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path + ':' + os.environ["GAZEBO_MODEL_PATH"]
     gazebo = ExecuteProcess(
-        # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
-        cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', world_file, '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )
     gazebo_ros_robot = Node(

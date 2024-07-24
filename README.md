@@ -1,6 +1,18 @@
 # MAB ROS
 ROS2 Support for MAB Robotics Silver Badger and Honey Badger robots.
 
+# Setup
+Dependencies:
+
+1. Slam Toolbox
+2. Realsense
+3. nlohmann-json3-dev
+4. robot_localization
+5. ORB-SLAM3
+    - python3-ament-package
+6. OpenCV
+7. Pangolin (build from git repo)
+
 # Gazebo
 ## Launch
 Run the following line to teleoperate. 

@@ -47,11 +47,11 @@ def generate_launch_description():
 
     # Launch keyboard teleop
     # Define the keyboard teleop node using ExecuteProcess
-    # teleop_node = ExecuteProcess(
-    #     cmd=['xterm', '-e', 'ros2 run mab_keyboard_teleop teleop_node'],
-    #     output='screen',
-    #     shell=True
-    # )
+    teleop_node = ExecuteProcess(
+        cmd=['xterm', '-e', 'ros2 run mab_keyboard_teleop teleop_node'],
+        output='screen',
+        shell=True
+    )
 
 
     return LaunchDescription([
@@ -59,7 +59,7 @@ def generate_launch_description():
         robot_state_publisher,
         policy_node,
         delay_mab_stand_node,
-        # teleop_node
+        teleop_node
     ])
 
 
