@@ -29,7 +29,7 @@
 
         <!-- Initialize camera-->
         <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
-        <xacro:sensor_d435 parent="${parent}" name="${name}" use_nominal_extrinsics="false">
+        <xacro:sensor_d435 parent="${parent}" name="${name}" use_nominal_extrinsics="true">
             <origin xyz="${0.290755-d435_mesh_x_offset-d435_zero_depth_to_glass - d435_glass_to_front} ${0.000053-d435_cam_depth_pz} ${0.068583}" rpy="${-M_PI/2} 0 0"/>
         </xacro:sensor_d435> 
 
@@ -51,6 +51,13 @@
             <origin rpy="${d435_cam_roll} 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" />
         </joint>
 
+        <link name="laser_frame"/>
+        <joint name="laser_joint" type="fixed">
+            <parent link="camera_image_link"/>
+            <child link="laser_frame"/>
+            <origin rpy="${-d435_cam_roll} 0 0" xyz="0 0 0"/>
+        </joint>
+
         <!-- Some parameters-->
         <xacro:property name="camera_name" value="${name}" />
         <xacro:property name="topics_ns" value="/${name}" />
@@ -64,6 +71,7 @@
         <!-- Gazebo stuff for realsense-->
         <!-- Load parameters to model's main link-->
         <xacro:property name="deg_to_rad" value="0.01745329251994329577" />
+        <!-- <gazebo reference="camera_image_link"> -->
         <gazebo reference="camera_image_link">
             <self_collide>0</self_collide>
             <enable_wind>0</enable_wind>
@@ -148,8 +156,8 @@
                 <camera name="${camera_name}">
                     <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
                     <image>
-                        <width>1280</width>
-                        <height>720</height>
+                        <width>640</width>
+                        <height>480</height>
                     </image>
                     <clip>
                         <near>0.1</near>

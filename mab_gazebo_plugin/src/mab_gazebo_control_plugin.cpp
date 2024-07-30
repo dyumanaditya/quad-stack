@@ -43,6 +43,10 @@ namespace gazebo
             auto qos = rclcpp::QoS(rclcpp::KeepLast(10));
             qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
 
+            // rclcpp::NodeOptions options;
+            // options.parameter_overrides({{"use_sim_time", true}});
+            // this->node_ = std::make_shared<rclcpp::Node>("mab_gazebo_control_plugin", options);
+
             // Subscribe to the joint command topic
             joint_command_sub_ = node_->create_subscription<hb40_commons::msg::JointCommand>(
                 joint_topic_, qos, std::bind(&MABGazeboControlPlugin::OnJointCommand, this, std::placeholders::_1));
@@ -60,7 +64,9 @@ namespace gazebo
         void publishJointStates()
         {
             sensor_msgs::msg::JointState joint_state_msg;
-            joint_state_msg.header.stamp = node_->get_clock()->now();
+            gazebo::common::Time sim_time = model_->GetWorld()->SimTime();
+            joint_state_msg.header.stamp.sec = sim_time.sec;
+            joint_state_msg.header.stamp.nanosec = sim_time.nsec;
             
             joint_state_msg.name = joint_names_input_;
 

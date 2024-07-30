@@ -281,6 +281,7 @@
     </joint>
   </ros2_control>
   <!-- BODY -->
+  <link name="odom"/>
   <link name="base_link"/>
   <link name="body">
     <!-- <inertial>
@@ -296,7 +297,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/body.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/body.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -322,7 +323,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/rear.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/rear.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -334,10 +335,24 @@
       </geometry>
     </collision>
   </link>
-  <joint name="root" type="fixed">
+  <joint name="root1" type="fixed">
+    <parent link="odom"/>
+    <child link="base_link"/>
+  </joint>
+  <joint name="root2" type="fixed">
     <parent link="base_link"/>
     <child link="body"/>
   </joint>
+  <!-- <link name="map"/>
+  <joint name="map_root" type="floating">
+    <parent link="base_link"/>
+    <child link="map"/>
+  </joint> -->
+  <!-- <link name="odom"/>
+  <joint name="odom_root" type="fixed">
+    <parent link="base_link"/>
+    <child link="odom"/>
+  </joint> -->
   <link name="imu_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -365,7 +380,7 @@
     <visual>
       <origin rpy="0 0 1.5707963267948966" xyz="0.11501 0.000167 0.024886"/>
       <geometry>
-        <mesh filename="package://meshes/camera_mount/hb-camera-mount.stl"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/camera_mount/hb-camera-mount.stl"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -383,7 +398,7 @@
     <visual>
       <origin rpy="1.5707963267948966 3.141592653589793 1.5707963267948966" xyz="0.26171 0.000167 0.068486"/>
       <geometry>
-        <mesh filename="package://meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -399,18 +414,18 @@
     <color rgba="0.1 0.1 0.1 1"/>
   </material>
   <!-- camera body, with origin at bottom screw mount -->
-  <joint name="d435_camera__joint" type="fixed">
+  <joint name="d435_camera_joint" type="fixed">
     <origin rpy="-1.5707963267948966 0 0" xyz="0.275855 -0.012447000000000001 0.068583"/>
-    <parent link="camera_interface"/>
-    <child link="d435_camera__bottom_screw_frame"/>
+    <parent link="body"/>
+    <child link="d435_camera_bottom_screw_frame"/>
   </joint>
-  <link name="d435_camera__bottom_screw_frame"/>
-  <joint name="d435_camera__link_joint" type="fixed">
+  <link name="d435_camera_bottom_screw_frame"/>
+  <joint name="d435_camera_link_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0.010600000000000002 0.0175 0.0125"/>
-    <parent link="d435_camera__bottom_screw_frame"/>
-    <child link="d435_camera__link"/>
+    <parent link="d435_camera_bottom_screw_frame"/>
+    <child link="d435_camera_link"/>
   </joint>
-  <link name="d435_camera__link">
+  <link name="d435_camera_link">
     <visual>
       <!-- the mesh origin is at front plate in between the two infrared camera axes -->
       <origin rpy="1.5707963267948966 0 1.5707963267948966" xyz="0.0043 -0.0175 0"/>
@@ -432,83 +447,81 @@
     </inertial>
   </link>
   <!-- camera depth joints and links -->
-  <joint name="d435_camera__depth_joint" type="fixed">
+  <joint name="d435_camera_depth_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="d435_camera__link"/>
-    <child link="d435_camera__depth_frame"/>
+    <parent link="d435_camera_link"/>
+    <child link="d435_camera_depth_frame"/>
   </joint>
-  <link name="d435_camera__depth_frame"/>
-  <joint name="d435_camera__depth_optical_joint" type="fixed">
+  <link name="d435_camera_depth_frame"/>
+  <joint name="d435_camera_depth_optical_joint" type="fixed">
     <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
-    <parent link="d435_camera__depth_frame"/>
-    <child link="d435_camera__depth_optical_frame"/>
+    <parent link="d435_camera_depth_frame"/>
+    <child link="d435_camera_depth_optical_frame"/>
   </joint>
-  <link name="d435_camera__depth_optical_frame"/>
+  <link name="d435_camera_depth_optical_frame"/>
   <!-- camera left IR joints and links -->
-  <joint name="d435_camera__infra1_joint" type="fixed">
+  <joint name="d435_camera_infra1_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0.0 0"/>
-    <parent link="d435_camera__link"/>
-    <child link="d435_camera__infra1_frame"/>
+    <parent link="d435_camera_link"/>
+    <child link="d435_camera_infra1_frame"/>
   </joint>
-  <link name="d435_camera__infra1_frame"/>
-  <joint name="d435_camera__infra1_optical_joint" type="fixed">
+  <link name="d435_camera_infra1_frame"/>
+  <joint name="d435_camera_infra1_optical_joint" type="fixed">
     <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
-    <parent link="d435_camera__infra1_frame"/>
-    <child link="d435_camera__infra1_optical_frame"/>
+    <parent link="d435_camera_infra1_frame"/>
+    <child link="d435_camera_infra1_optical_frame"/>
   </joint>
-  <link name="d435_camera__infra1_optical_frame"/>
+  <link name="d435_camera_infra1_optical_frame"/>
   <!-- camera right IR joints and links -->
-  <joint name="d435_camera__infra2_joint" type="fixed">
+  <joint name="d435_camera_infra2_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 -0.05 0"/>
-    <parent link="d435_camera__link"/>
-    <child link="d435_camera__infra2_frame"/>
+    <parent link="d435_camera_link"/>
+    <child link="d435_camera_infra2_frame"/>
   </joint>
-  <link name="d435_camera__infra2_frame"/>
-  <joint name="d435_camera__infra2_optical_joint" type="fixed">
+  <link name="d435_camera_infra2_frame"/>
+  <joint name="d435_camera_infra2_optical_joint" type="fixed">
     <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
-    <parent link="d435_camera__infra2_frame"/>
-    <child link="d435_camera__infra2_optical_frame"/>
+    <parent link="d435_camera_infra2_frame"/>
+    <child link="d435_camera_infra2_optical_frame"/>
   </joint>
-  <link name="d435_camera__infra2_optical_frame"/>
+  <link name="d435_camera_infra2_optical_frame"/>
   <!-- camera color joints and links -->
-  <joint name="d435_camera__color_joint" type="fixed">
+  <joint name="d435_camera_color_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0.015 0"/>
-    <parent link="d435_camera__link"/>
-    <child link="d435_camera__color_frame"/>
+    <parent link="d435_camera_link"/>
+    <child link="d435_camera_color_frame"/>
   </joint>
-  <link name="d435_camera__color_frame"/>
-  <joint name="d435_camera__color_optical_joint" type="fixed">
+  <link name="d435_camera_color_frame"/>
+  <joint name="d435_camera_color_optical_joint" type="fixed">
     <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
-    <parent link="d435_camera__color_frame"/>
-    <child link="d435_camera__color_optical_frame"/>
+    <parent link="d435_camera_color_frame"/>
+    <child link="d435_camera_color_optical_frame"/>
   </joint>
-  <link name="d435_camera__color_optical_frame"/>
-  <joint name="d435_camera__usb_plug_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.00605 -0.0528 0"/>
-    <parent link="d435_camera__link"/>
-    <child link="d435_camera__usb_plug_link"/>
-  </joint>
-  <link name="d435_camera__usb_plug_link">
+  <link name="d435_camera_color_optical_frame"/>
+  <!-- Link for camera image and gazebe plugin-->
+  <link name="camera_image_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
     <visual>
-      <!-- 0.044850 0.008000 0.018500 -->
-      <origin rpy="0 0 1.5707963267948966" xyz="0. -0.022425 0."/>
-      <geometry>
-        <!--box size="0.044850 0.008 0.0185" /-->
-        <mesh filename="file:///home/aditya/ros2_ws/install/realsense2_description/share/realsense2_description/meshes/plug.stl"/>
-      </geometry>
-      <material name="plastic"/>
+      <origin rpy="-1.5707963267948966 0 0" xyz="0.290755 5.3e-05 0.068583"/>
     </visual>
-    <collision>
-      <origin rpy="0 0 1.5707963267948966" xyz="0. -0.022425 0."/>
-      <geometry>
-        <!--box size="0.044850 0.008 0.0185" /-->
-        <mesh filename="file:///home/aditya/ros2_ws/install/realsense2_description/share/realsense2_description/meshes/plug_collision.stl"/>
-      </geometry>
-    </collision>
   </link>
-  <!-- Include the RealSense Camera Gazebo Macro -->
-  <!-- <xacro:include filename="$(find realsense2_description)/urdf/_d435.gazebo.xacro"/> -->
-  <gazebo reference="camera_interface">
+  <joint name="camera_image_joint" type="fixed">
+    <parent link="body"/>
+    <child link="camera_image_link"/>
+    <origin rpy="-1.5707963267948966 0 0" xyz="0.290755 5.3e-05 0.068583"/>
+  </joint>
+  <link name="laser_frame"/>
+  <joint name="laser_joint" type="fixed">
+    <parent link="camera_image_link"/>
+    <child link="laser_frame"/>
+    <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
+  </joint>
+  <!-- <gazebo reference="camera_image_link"> -->
+  <gazebo reference="laser_frame">
     <self_collide>0</self_collide>
     <enable_wind>0</enable_wind>
     <kinematic>0</kinematic>
@@ -522,8 +535,8 @@
     <kd>1</kd>
     <!--<max_vel>0.01</max_vel>
             <min_depth>0</min_depth>-->
-    <sensor name="d435_camera_color" type="camera">
-      <camera name="d435_camera_">
+    <sensor name="d435_cameracolor" type="camera">
+      <camera name="d435_camera">
         <horizontal_fov>1.2112585008840648</horizontal_fov>
         <image>
           <width>640</width>
@@ -544,8 +557,8 @@
       <update_rate>30</update_rate>
       <visualize>1</visualize>
     </sensor>
-    <sensor name="d435_camera_ired1" type="camera">
-      <camera name="d435_camera_">
+    <sensor name="d435_cameraired1" type="camera">
+      <camera name="d435_camera">
         <horizontal_fov>1.4870205226991688</horizontal_fov>
         <image>
           <width>1280</width>
@@ -566,8 +579,8 @@
       <update_rate>90</update_rate>
       <visualize>0</visualize>
     </sensor>
-    <sensor name="d435_camera_ired2" type="camera">
-      <camera name="d435_camera_">
+    <sensor name="d435_cameraired2" type="camera">
+      <camera name="d435_camera">
         <horizontal_fov>1.4870205226991688</horizontal_fov>
         <image>
           <width>1280</width>
@@ -588,12 +601,12 @@
       <update_rate>90</update_rate>
       <visualize>0</visualize>
     </sensor>
-    <sensor name="d435_camera_depth" type="depth">
-      <camera name="d435_camera_">
+    <sensor name="d435_cameradepth" type="depth">
+      <camera name="d435_camera">
         <horizontal_fov>1.4870205226991688</horizontal_fov>
         <image>
-          <width>1280</width>
-          <height>720</height>
+          <width>640</width>
+          <height>480</height>
         </image>
         <clip>
           <near>0.1</near>
@@ -611,35 +624,33 @@
     </sensor>
   </gazebo>
   <gazebo>
-    <plugin filename="librealsense_gazebo_plugin.so" name="/d435_camera_">
-      <origin>${0.290755-d435_mesh_x_offset-d435_zero_depth_to_glass - d435_glass_to_front} ${0.000053-d435_cam_depth_pz} ${0.068583} ${-M_PI/2} 0 0<origin/>
-      <prefix>d435_camera_</prefix>
+    <plugin filename="librealsense_gazebo_plugin.so" name="/d435_camera">
+      <prefix>d435_camera</prefix>
       <depthUpdateRate>30.0</depthUpdateRate>
       <colorUpdateRate>30.0</colorUpdateRate>
       <infraredUpdateRate>30.0</infraredUpdateRate>
-      <depthTopicName>/d435_camera_/depth/image_raw</depthTopicName>
-      <depthCameraInfoTopicName>/d435_camera_/depth/camera_info</depthCameraInfoTopicName>
-      <colorTopicName>/d435_camera_/color/image_raw</colorTopicName>
-      <colorCameraInfoTopicName>/d435_camera_/color/camera_info</colorCameraInfoTopicName>
-      <infrared1TopicName>/d435_camera_/infra1/image_raw</infrared1TopicName>
-      <infrared1CameraInfoTopicName>/d435_camera_/infra1/camera_info</infrared1CameraInfoTopicName>
-      <infrared2TopicName>/d435_camera_/infra2/image_raw</infrared2TopicName>
-      <infrared2CameraInfoTopicName>/d435_camera_/infra2/camera_info</infrared2CameraInfoTopicName>
-      <colorOpticalframeName>d435_camera__color_optical_frame</colorOpticalframeName>
-      <depthOpticalframeName>d435_camera__depth_optical_frame</depthOpticalframeName>
-      <infrared1OpticalframeName>d435_camera__infra1_frame</infrared1OpticalframeName>
-      <infrared2OpticalframeName>d435_camera__infra2_frame</infrared2OpticalframeName>
+      <depthTopicName>/d435_camera/depth/image_raw</depthTopicName>
+      <depthCameraInfoTopicName>/d435_camera/depth/camera_info</depthCameraInfoTopicName>
+      <colorTopicName>/d435_camera/color/image_raw</colorTopicName>
+      <colorCameraInfoTopicName>/d435_camera/color/camera_info</colorCameraInfoTopicName>
+      <infrared1TopicName>/d435_camera/infra1/image_raw</infrared1TopicName>
+      <infrared1CameraInfoTopicName>/d435_camera/infra1/camera_info</infrared1CameraInfoTopicName>
+      <infrared2TopicName>/d435_camera/infra2/image_raw</infrared2TopicName>
+      <infrared2CameraInfoTopicName>/d435_camera/infra2/camera_info</infrared2CameraInfoTopicName>
+      <colorOpticalframeName>d435_camera_color_optical_frame</colorOpticalframeName>
+      <depthOpticalframeName>d435_camera_depth_optical_frame</depthOpticalframeName>
+      <infrared1OpticalframeName>d435_camera_infra1_frame</infrared1OpticalframeName>
+      <infrared2OpticalframeName>d435_camera_infra2_frame</infrared2OpticalframeName>
       <rangeMinDepth>0.2</rangeMinDepth>
       <rangeMaxDepth>10.0</rangeMaxDepth>
       <pointCloud>True</pointCloud>
-      <pointCloudTopicName>/d435_camera_/depth/color/points</pointCloudTopicName>
+      <pointCloudTopicName>/d435_camera/depth/color/points</pointCloudTopicName>
       <pointCloudCutoff>0.25</pointCloudCutoff>
       <pointCloudCutoffMax>9.0</pointCloudCutoffMax>
-      </origin>
     </plugin>
   </gazebo>
   <!-- Adjust color for gazebo-->
-  <gazebo reference="d435_camera__link">
+  <gazebo reference="d435_camera_link">
     <material>Gazebo/Grey</material>
   </gazebo>
   <!-- LEG LINKS 0-4 -->
@@ -657,7 +668,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -676,7 +687,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -701,9 +712,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="red"/>
+      <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="1.3 0 0" xyz="0 0.01 0.0055"/>
@@ -754,7 +765,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -773,7 +784,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -798,7 +809,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -851,7 +862,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -870,7 +881,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -895,7 +906,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -948,7 +959,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -967,7 +978,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -992,7 +1003,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>

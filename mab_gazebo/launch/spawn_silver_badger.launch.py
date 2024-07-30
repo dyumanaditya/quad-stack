@@ -3,7 +3,7 @@ from ament_index_python.packages import get_package_share_directory, get_package
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, RegisterEventHandler, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetParameter
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.parameter_descriptions import ParameterValue
@@ -35,13 +35,6 @@ def generate_launch_description():
     # Controller configuration
     controller_config = os.path.join(gazebo_pkg_share, 'config', 'silver_badger_controller.yaml')
 
-    # Declare the launch options
-    use_sim_time = DeclareLaunchArgument(
-        name='use_sim_time',
-        default_value='false',
-        description='Use simulation (Gazebo) clock if true'
-    )
-
     gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
     os.environ["GAZEBO_MODEL_PATH"] = description_pkg_share 
     gazebo_plugin_path = os.path.join(gazebo_pkg_prefix, 'lib', 'mab_gazebo_plugin')
@@ -67,7 +60,10 @@ def generate_launch_description():
         package='gazebo_ros',
         executable='spawn_entity.py',
         arguments=['-entity', 'silver_badger', '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', '0.0'],
-        output='screen'
+        output='screen',
+        parameters=[
+            {'use_sim_time':True},
+        ]
     )
 
     robot_state_publisher = Node(
@@ -76,8 +72,8 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[{
-            'use_sim_time': LaunchConfiguration('use_sim_time'), 
-            'robot_description': ParameterValue(Command(['xacro ', xacro_file]), value_type=str)
+            'use_sim_time':True,
+            'robot_description': ParameterValue(Command(['xacro ', xacro_file]), value_type=str),
             # 'robot_description': urdf
         }],
         # arguments=[urdf_file]
@@ -116,7 +112,7 @@ def generate_launch_description():
         )
 
         args = [
-            use_sim_time,
+            # use_sim_time,
             gazebo,
             gazebo_ros_robot,
             robot_state_publisher,
@@ -126,10 +122,10 @@ def generate_launch_description():
 
     else:
         args = [
-            use_sim_time,
             gazebo,
             gazebo_ros_robot,
             robot_state_publisher,
+            # map_frame_pub,
             # joint_state_publisher
         ]
 

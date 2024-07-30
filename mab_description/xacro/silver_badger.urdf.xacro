@@ -14,13 +14,13 @@
   <xacro:include filename="$(find mab_description)/xacro/materials.xacro" />
 
   <!-- Import control tags-->
-  <xacro:include filename="$(find mab_description)/xacro/control.xacro" />
+  <!-- <xacro:include filename="$(find mab_description)/xacro/control.xacro" /> -->
 
   <!-- Include limits-->
   <xacro:include filename="$(find mab_description)/xacro/limits.xacro" />
   
   <!-- Initialize controls-->
-  <xacro:silver_badger_ros2_control/>
+  <!-- <xacro:silver_badger_ros2_control/> -->
 
   <!-- Initialize camera-->
   <xacro:include filename="$(find mab_description)/xacro/camera.xacro"/>
@@ -99,7 +99,7 @@
   
   <!-- <link name="odom"/>
   <joint name="odom_root" type="fixed">
-    <parent link="body"/>
+    <parent link="base_link"/>
     <child link="odom"/>
   </joint> -->
 
