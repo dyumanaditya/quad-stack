@@ -54,7 +54,7 @@ namespace gazebo
             // Joint state publisher
             joint_state_publisher_ = node_->create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
             timer_ = node_->create_wall_timer(
-                1ms, std::bind(&MABGazeboControlPlugin::publishJointStates, this));
+                10ms, std::bind(&MABGazeboControlPlugin::publishJointStates, this));
 
             // Run ROS 2 async spinner in a separate thread
             ros_thread_ = std::thread([this]()
@@ -97,14 +97,14 @@ namespace gazebo
             }
 
             // Assuming a control loop period of 50Hz (as in mab_locomotion policy node)
-            double dt = 0.02; 
+            // double dt = 0.02; 
 
             for (size_t i = 0; i < msg->t_pos.size(); ++i)
             {
-                double position_error = msg->t_pos[i] - joints_[i]->Position(0);
-                double derivative_error = (position_error - prev_errors_[i]) / dt;
+                // double position_error = msg->t_pos[i] - joints_[i]->Position(0);
+                // double derivative_error = (position_error - prev_errors_[i]) / dt;
 
-                double torque = msg->kp[i] * position_error + msg->kd[i] * derivative_error;
+                // double torque = msg->kp[i] * position_error + msg->kd[i] * derivative_error;
 
                 // Find the correct joint to apply the torque
                 std::string joint_name = joint_names_input_[i];
@@ -126,10 +126,8 @@ namespace gazebo
 
                 // joints_[i]->SetForce(0, torque);
 
-                
-
                 // Update previous error
-                prev_errors_[i] = position_error;
+                // prev_errors_[i] = position_error;
             }
         }
 

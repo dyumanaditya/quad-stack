@@ -42,34 +42,54 @@ def generate_launch_description():
         ]
     )
 
-    depth_to_laser = Node(
-        package='depthimage_to_laserscan',
-        executable='depthimage_to_laserscan_node',
-        name='depthimage_to_laserscan',
+    rtabmap_slam = Node(
+        package='rtabmap_slam',
+        executable='rtabmap',
+        name='rtabmap',
         output='screen',
-        parameters=[laser_settings_file],
+        parameters=[{
+            'frame_id': 'base_link',
+            'approx_sync': True,
+            'odom_frame_id': 'odom',
+        }],
         remappings=[
-            ('depth', '/d435_camera/depth/image_raw'),
-            ('depth_camera_info', '/d435_camera/depth/camera_info'),
-            ('scan', '/scan')
+            ('/rgb/image', '/d435_camera/color/image_raw'),
+            ('/depth/image', '/d435_camera/depth/image_raw'),
+            ('/rgb/camera_info', '/d435_camera/color/camera_info'),
+            ('/imu', '/imu/out'),
         ]
     )
 
-    slam = Node(
-            package='slam_toolbox',
-            executable='sync_slam_toolbox_node',
-            name='slam_toolbox',
-            output='screen',
-            parameters=[slam_settings_file],
-            # remappings=[
-            #     ('/scan', scan_topic)
-            # ]
-        )
+
+    # depth_to_laser = Node(
+    #     package='depthimage_to_laserscan',
+    #     executable='depthimage_to_laserscan_node',
+    #     name='depthimage_to_laserscan',
+    #     output='screen',
+    #     parameters=[laser_settings_file],
+    #     remappings=[
+    #         ('depth', '/d435_camera/depth/image_raw'),
+    #         ('depth_camera_info', '/d435_camera/depth/camera_info'),
+    #         ('scan', '/scan')
+    #     ]
+    # )
+
+    # slam = Node(
+    #     package='slam_toolbox',
+    #     executable='sync_slam_toolbox_node',
+    #     name='slam_toolbox',
+    #     output='screen',
+    #     parameters=[slam_settings_file],
+    #     # remappings=[
+    #     #     ('/scan', scan_topic)
+    #     # ]
+    # )
 
 
     return LaunchDescription([
-        rviz,
+        # rviz,
         rtabmap,
-        depth_to_laser,
-        slam
+        rtabmap_slam,
+        # depth_to_laser,
+        # slam
     ])

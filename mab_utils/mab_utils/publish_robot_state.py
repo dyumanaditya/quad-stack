@@ -31,7 +31,7 @@ class PublishRobotState(Node):
         )
 
         self.publisher = self.create_publisher(BridgeData, '/hb40/bridge_data', 10)
-        timer_period = 0.001  # seconds (1000 Hz)
+        timer_period = 0.01  # seconds (100 Hz)
         self.timer = self.create_timer(timer_period, self.publish_combined_message)
 
         self.current_orientation = None

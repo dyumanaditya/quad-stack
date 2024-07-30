@@ -65,7 +65,7 @@
         <xacro:property name="color_optical_frame" value="${name}_color_optical_frame" />
         <xacro:property name="infrared1_optical_frame" value="${name}_infra1_frame" />
         <xacro:property name="infrared2_optical_frame" value="${name}_infra2_frame" />
-        <xacro:property name="publish_pointcloud" value="true" />
+        <xacro:property name="publish_pointcloud" value="false" />
 
 
         <!-- Gazebo stuff for realsense-->
@@ -112,8 +112,8 @@
                 <camera name="${camera_name}">
                     <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
                     <image>
-                        <width>1280</width>
-                        <height>720</height>
+                        <width>640</width>
+                        <height>480</height>
                         <format>L_INT8</format>
                     </image>
                     <clip>
@@ -127,15 +127,15 @@
                     </noise>
                 </camera>
                 <always_on>1</always_on>
-                <update_rate>90</update_rate>
+                <update_rate>0</update_rate>
                 <visualize>0</visualize>
             </sensor>
             <sensor name="${camera_name}ired2" type="camera">
                 <camera name="${camera_name}">
                     <horizontal_fov>${85.2*deg_to_rad}</horizontal_fov>
                     <image>
-                        <width>1280</width>
-                        <height>720</height>
+                        <width>640</width>
+                        <height>480</height>
                         <format>L_INT8</format>
                     </image>
                     <clip>
@@ -149,7 +149,7 @@
                     </noise>
                 </camera>
                 <always_on>1</always_on>
-                <update_rate>90</update_rate>
+                <update_rate>0</update_rate>
                 <visualize>0</visualize>
             </sensor>
             <sensor name="${camera_name}depth" type="depth">
@@ -180,7 +180,7 @@
                 <prefix>${camera_name}</prefix>
                 <depthUpdateRate>30.0</depthUpdateRate>
                 <colorUpdateRate>30.0</colorUpdateRate>
-                <infraredUpdateRate>30.0</infraredUpdateRate>
+                <infraredUpdateRate>0.0</infraredUpdateRate>
                 <depthTopicName>${topics_ns}/depth/image_raw</depthTopicName>
                 <depthCameraInfoTopicName>${topics_ns}/depth/camera_info</depthCameraInfoTopicName>
                 <colorTopicName>${topics_ns}/color/image_raw</colorTopicName>

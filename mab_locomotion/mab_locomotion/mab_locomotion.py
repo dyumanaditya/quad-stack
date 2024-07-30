@@ -90,7 +90,7 @@ class MABLocomotion(Node):
 
         # neural_network_path = "plane.model"
         package_share_directory = get_package_share_directory('mab_locomotion')
-        neural_network_path = os.path.join(package_share_directory, 'resource', "plane.model")
+        neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new.model")
 
         splitted_path = neural_network_path.split("/")
         checkpoint_dir = "/".join(splitted_path[:-1]) if len(splitted_path) > 1 else "."
