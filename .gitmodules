@@ -1,0 +1,4 @@
+[submodule "realsense_gazebo_plugin"]
+	path = realsense_gazebo_plugin
+	url = https://github.com/pal-robotics/realsense_gazebo_plugin
+	branch = foxy-devel
