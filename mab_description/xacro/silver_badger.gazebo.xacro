@@ -143,22 +143,42 @@
     </gazebo>
 
     <!-- Sensors-->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
     <gazebo reference="imu_link">
+    <!-- <gazebo reference="d435i_camera_accel_frame"> -->
       <gravity>true</gravity>
       <sensor name='imu_sensor' type='imu'>
           <always_on>1</always_on>
-          <update_rate>20</update_rate>
+          <update_rate>100</update_rate>
           <visualize>1</visualize>
           <topic>imu</topic>
           <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
               <topicName>imu</topicName>
               <bodyName>imu_sensor_link</bodyName>
-              <updateRateHZ>20.0</updateRateHZ>
+              <updateRateHZ>100.0</updateRateHZ>
               <xyzOffset>0 0 0</xyzOffset>
               <rpyOffset>0 0 0</rpyOffset>
           </plugin>
           <pose>0 0 0 0 0 0</pose>
       </sensor>
-  </gazebo>
+    </gazebo>
+    
+    <!-- <gazebo reference="d435i_camera_accel_frame">
+      <gravity>true</gravity>
+      <sensor name='cam_imu_sensor' type='imu'>
+          <always_on>1</always_on>
+          <update_rate>100</update_rate>
+          <visualize>1</visualize>
+          <topic>cam_imu</topic>
+          <plugin name='cam_imu' filename='libgazebo_ros_imu_sensor.so'>
+              <topicName>cam_imu</topicName>
+              <bodyName>cam_imu_sensor_link</bodyName>
+              <updateRateHZ>100.0</updateRateHZ>
+              <xyzOffset>0 0 0</xyzOffset>
+              <rpyOffset>0 0 0</rpyOffset>
+          </plugin>
+          <pose>0 0 0 0 0 0</pose>
+      </sensor>
+    </gazebo> -->
 
 </robot>

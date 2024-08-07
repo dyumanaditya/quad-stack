@@ -9,15 +9,18 @@ slam_toolbox:
     scan_topic: /scan
     scan_queue_size: 5000
     
+    do_loop_closing: true
     resolution: 0.05
-    max_laser_range: 30.0
+    max_laser_range: 10.0
     minimum_time_interval: 1.0
     transform_publish_period: 0.05
-    map_update_interval: 5.0
+    # map_update_interval: 1.0
+    map_update_interval: 0.1
     publish_frame_period: 0.05
     laser_min_range: 0.5
     laser_max_range: 10.0
     minimum_time_interval: 0.25
     maximum_laser_scan_time: 1.0
-    map_update_interval: 0.5
     use_scan_matching: true
+    minimum_travel_distance: 0.1
+    loop_match_minimum_chain_size: 5

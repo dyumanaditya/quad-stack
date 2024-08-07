@@ -5,13 +5,14 @@ import sys
 import select
 import termios
 import tty
+import time
 
 # Key mappings
 move_bindings = {
-    'w': (1, 0),
-    's': (-1, 0),
-    'a': (0, 1),
-    'd': (0, -1),
+    'w': (0.2, 0),
+    's': (-0.2, 0),
+    'a': (0, 0.2),
+    'd': (0, -0.2),
     'f': (0, 0),
     'q': (0, 0)
 }
@@ -26,8 +27,11 @@ class TeleopNode(Node):
         self.zero_twist.linear.x = 0.0
         self.zero_twist.angular.z = 0.0
 
+        self.current_x = 0.0
+        self.current_y = 0.0
+
         # Create a timer to publish zero twist
-        self.timer = self.create_timer(0.1, self.publish_zero_twist)
+        self.timer = self.create_timer(0.2, self.publish_zero_twist)
         self.key_pressed = False
 
     def get_key(self):
@@ -52,8 +56,13 @@ class TeleopNode(Node):
                 if key in move_bindings.keys():
                     x, y = move_bindings[key]
                     twist = Twist()
-                    twist.linear.x = float(x)
-                    twist.angular.z = float(y)
+                    self.current_x += x
+                    self.current_y += y
+                    if key == 'f':
+                        self.current_x = 0.0
+                        self.current_y = 0.0
+                    twist.linear.x = float(self.current_x)
+                    twist.angular.z = float(self.current_y)
                     self.publisher_.publish(twist)
                     self.key_pressed = True
                     if key == 'q':
@@ -65,6 +74,7 @@ class TeleopNode(Node):
         finally:
             self.publisher_.publish(self.zero_twist)
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
+            time.sleep(0.5)
 
 def main(args=None):
     rclpy.init(args=args)

@@ -38,25 +38,25 @@ def generate_launch_description():
     pkg_name = "mab_localization"
     pkg_share = get_package_share_directory(pkg_name)
     voc_file = os.path.join(pkg_share, 'resource', 'ORBvoc.txt')
-    settings_file = os.path.join(pkg_share, 'resource', f'realsense_d435_{mode}.yaml')
-    # settings_file = '/home/aditya/ros2_ws/src/orbslam3/config/rgb-d/RealSense_D435i.yaml'
-    # settings_file = '/home/aditya/ros2_ws/src/orbslam3/config/stereo/RealSense_D435i.yaml'
+    settings_file = os.path.join(pkg_share, 'resource', f'realsense_d435i_{mode}.yaml')
+    # settings_file = '/home/aditya/ros2_ws/src/orbslam3/config/rgb-d/RealSense_d435i.yaml'
+    # settings_file = '/home/aditya/ros2_ws/src/orbslam3/config/stereo/RealSense_d435i.yaml'
     
     # Launch the ORB_SLAM3 node
     if mode == 'rgbd':
         remappings = [
-            ('/camera/rgb', '/d435_camera/color/image_raw'),
-            ('/camera/depth', '/d435_camera/depth/image_raw'),
+            ('/camera/rgb', '/d435i_camera/color/image_raw'),
+            ('/camera/depth', '/d435i_camera/depth/image_raw'),
         ]
     elif mode == 'stereo':
         remappings = [
-            ('/camera/left', '/d435_camera/color/image_raw'),
-            ('/camera/right', '/d435_camera/color/image_raw'),
+            ('/camera/left', '/d435i_camera/color/image_raw'),
+            ('/camera/right', '/d435i_camera/color/image_raw'),
         ]
     elif mode == 'stereo-inertial':
         remappings = [
-            ('/camera/left', '/d435_camera/infra1/image_raw'),
-            ('/camera/right', '/d435_camera/infra1/image_raw'),
+            ('/camera/left', '/d435i_camera/infra1/image_raw'),
+            ('/camera/right', '/d435i_camera/infra1/image_raw'),
             ('/imu', '/imu/out')
         ]
 

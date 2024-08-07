@@ -103,13 +103,13 @@
     <child link="odom"/>
   </joint> -->
 
-  <!-- Setup IMU-->
-  <xacro:imu parent_link="body"/>
-
+  
   <!-- Setup camera mount-->
   <xacro:realsense2_camera_mount parent="body"/>
-  <xacro:realsense2_camera parent="body" name="d435_camera"/>
-
+  <xacro:realsense2_camera parent="body" name="d435i_camera"/>
+  
+  <!-- Setup IMU-->
+  <xacro:imu parent_link="body"/>
 
   <!-- LEG LINKS 0-4 -->
   <link name="fr_l0">

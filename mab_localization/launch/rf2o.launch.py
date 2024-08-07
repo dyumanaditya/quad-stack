@@ -20,8 +20,8 @@ def generate_launch_description():
         output='screen',
         parameters=[laser_settings_file],
         remappings=[
-            ('depth', '/d435_camera/depth/image_raw'),
-            ('depth_camera_info', '/d435_camera/depth/camera_info'),
+            ('depth', '/d435i_camera/depth/image_raw'),
+            ('depth_camera_info', '/d435i_camera/depth/camera_info'),
             ('scan', '/scan')
         ]
     )

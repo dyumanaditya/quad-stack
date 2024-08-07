@@ -23,12 +23,15 @@ def generate_launch_description():
     
     # Set the path to the Xacro file
     xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
+    # xacro_file = os.path.join(get_package_share_directory('turtlebot3_description_custom'), 'urdf', 'turtlebot3_waffle.urdf.xacro')
     urdf_file = os.path.join(description_pkg_share, 'urdf', 'silver_badger.urdf')
 
     with open(urdf_file, 'r') as infp:
         urdf = infp.read()
 
     # Launch configuration variables specific to simulation
+    # x_pose = LaunchConfiguration('x_pose', default='0')
+    # y_pose = LaunchConfiguration('y_pose', default='2')
     x_pose = LaunchConfiguration('x_pose', default='-2.0')
     y_pose = LaunchConfiguration('y_pose', default='3.5')
 
@@ -37,6 +40,7 @@ def generate_launch_description():
 
     gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
     os.environ["GAZEBO_MODEL_PATH"] = description_pkg_share 
+    os.environ["GAZEBO_MODEL_PATH"] = get_package_share_directory('turtlebot3_description_custom') + ':' + os.environ["GAZEBO_MODEL_PATH"] 
     gazebo_plugin_path = os.path.join(gazebo_pkg_prefix, 'lib', 'mab_gazebo_plugin')
     realsense_plugin_path = os.path.join(realsense_pkg_prefix, 'lib')
 
@@ -46,13 +50,15 @@ def generate_launch_description():
 
     # Launch Gazebo with a world file
     world_pkg = 'turtlebot3_gazebo'
-    world_file = os.path.join(get_package_share_directory(world_pkg), 'worlds', 'turtlebot3_house.world')
+    # world_file = os.path.join(get_package_share_directory(world_pkg), 'worlds', 'turtlebot3_house.world')
+    world_file = os.path.join(gazebo_pkg_share, 'worlds', 'silver_badger_house.world')
     # world_pkg = 'aws_robomaker_small_house_world'
     # world_file = os.path.join(get_package_share_directory(world_pkg), 'worlds', 'small_house.world')
     gazebo_models_path = os.path.join(get_package_share_directory(world_pkg), 'models')
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path + ':' + os.environ["GAZEBO_MODEL_PATH"]
     gazebo = ExecuteProcess(
         cmd=['gazebo', world_file, '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
         # cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )

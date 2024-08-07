@@ -8,10 +8,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
-    mab_gazebo_pkg_dir = get_package_share_directory('mab_gazebo')
-    mab_gazebo_launch = os.path.join(mab_gazebo_pkg_dir, 'launch', 'spawn_silver_badger.launch.py')
-    mab_gazebo_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_gazebo_launch)
+    mab_bringup_pkg_dir = get_package_share_directory('mab_bringup')
+    mab_bringup_launch = os.path.join(mab_bringup_pkg_dir, 'launch', 'mab_spawn.launch.py')
+    mab_bringup_include_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(mab_bringup_launch)
     )
 
     mab_stand_node = Node(
@@ -45,6 +45,11 @@ def generate_launch_description():
         output='screen'
     )
 
+    delay_policy_node = TimerAction(
+        period=8.0,
+        actions=[policy_node]
+    )
+
     # Launch keyboard teleop
     # Define the keyboard teleop node using ExecuteProcess
     teleop_node = ExecuteProcess(
@@ -55,10 +60,10 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-        mab_gazebo_include_launch,
+        mab_bringup_include_launch,
         robot_state_publisher,
-        policy_node,
         delay_mab_stand_node,
+        delay_policy_node,
         teleop_node
     ])
 

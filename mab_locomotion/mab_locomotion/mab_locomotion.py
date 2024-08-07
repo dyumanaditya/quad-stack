@@ -168,43 +168,58 @@ class MABLocomotion(Node):
     def timer_callback(self):
         if not self.nn_active:
             return
-
-        qpos = (self.joint_positions - self.nominal_joint_positions) / 3.14
-        qpos = qpos[self.mask_from_real_to_obssim]
-        qvel = self.joint_velocities / self.max_joint_velocities
-        qvel = qvel[self.mask_from_real_to_obssim]
-        previous_action = self.previous_action[self.mask_from_xmlsim_to_obssim] / 3.14
-        qpos_qvel_previous_action = np.vstack((qpos, qvel, previous_action)).T.flatten()
-
-        ang_vel = self.angular_velocity / 10.0
-        orientation_quat_inv = R.from_quat(self.orientation).inv()
-        projected_gravity_vector = orientation_quat_inv.apply(np.array([0.0, 0.0, -1.0]))
-
-        observation = np.concatenate([
-            qpos_qvel_previous_action, ang_vel,
-            [self.x_goal_velocity, self.y_goal_velocity, self.yaw_goal_velocity],
-            projected_gravity_vector
-        ])
         
-        action = jax.device_get(self.policy.apply(self.policy_state.params, observation))
-        robot_action = action[self.mask_from_xmlsim_to_real]
-
-        target_joint_positions = self.nominal_joint_positions + self.scaling_factor * robot_action
-        if self.is_real_robot and self.is_tuda_robot:
-            target_joint_positions[-1] *= -1.0
+        if self.x_goal_velocity != 0.0 or self.y_goal_velocity != 0.0 or self.yaw_goal_velocity != 0.0:
+            use_policy = True
+        else:
+            use_policy = False
 
         joint_command_msg = JointCommand()
-        joint_command_msg.header.stamp = self.get_clock().now().to_msg()
-        # joint_command_msg.source_node = "nn_controller"
-        joint_command_msg.kp = self.kp
-        joint_command_msg.kd = self.kd
-        joint_command_msg.t_pos = target_joint_positions.tolist()
-        joint_command_msg.t_vel = [0.0,] * 13
-        joint_command_msg.t_trq = [0.0,] * 13
+        if not use_policy:
+            joint_command_msg.header.stamp = self.get_clock().now().to_msg()
+            joint_command_msg.kp = [50.0,] * 13
+            joint_command_msg.kd = [0.5,] * 13
+            joint_command_msg.t_pos = self.nominal_joint_positions.tolist()
+            joint_command_msg.t_vel = [0.0,] * 13
+            joint_command_msg.t_trq = [0.0,] * 13
+        
+        else:
+            qpos = (self.joint_positions - self.nominal_joint_positions) / 3.14
+            qpos = qpos[self.mask_from_real_to_obssim]
+            qvel = self.joint_velocities / self.max_joint_velocities
+            qvel = qvel[self.mask_from_real_to_obssim]
+            previous_action = self.previous_action[self.mask_from_xmlsim_to_obssim] / 3.14
+            qpos_qvel_previous_action = np.vstack((qpos, qvel, previous_action)).T.flatten()
+
+            ang_vel = self.angular_velocity / 10.0
+            orientation_quat_inv = R.from_quat(self.orientation).inv()
+            projected_gravity_vector = orientation_quat_inv.apply(np.array([0.0, 0.0, -1.0]))
+
+            observation = np.concatenate([
+                qpos_qvel_previous_action, ang_vel,
+                [self.x_goal_velocity, self.y_goal_velocity, self.yaw_goal_velocity],
+                projected_gravity_vector
+            ])
+            
+            action = jax.device_get(self.policy.apply(self.policy_state.params, observation))
+            robot_action = action[self.mask_from_xmlsim_to_real]
+
+            target_joint_positions = self.nominal_joint_positions + self.scaling_factor * robot_action
+            if self.is_real_robot and self.is_tuda_robot:
+                target_joint_positions[-1] *= -1.0
+
+            joint_command_msg.header.stamp = self.get_clock().now().to_msg()
+            # joint_command_msg.source_node = "nn_controller"
+            joint_command_msg.kp = self.kp
+            joint_command_msg.kd = self.kd
+            joint_command_msg.t_pos = target_joint_positions.tolist()
+            joint_command_msg.t_vel = [0.0,] * 13
+            joint_command_msg.t_trq = [0.0,] * 13
+
+            self.previous_action = action
 
         self.joint_commands_publisher.publish(joint_command_msg)
 
-        self.previous_action = action
 
 
 def main(args=None):

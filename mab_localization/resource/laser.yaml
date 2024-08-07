@@ -1,7 +1,10 @@
 depthimage_to_laserscan:
   ros__parameters:
     use_sim_time: true
-    scan_height: 10
-    range_min: 0.5
-    range_max: 5.0
-    output_frame: "laser_frame"
+    scan_height: 200
+    # scan_height: 100
+    range_min: 0.2
+    range_max: 10.0
+    # output_frame: "laser_frame"
+    output_frame: "base_link"
+    # output_frame: "camera_rgb_frame"

@@ -1,8 +1,8 @@
-import os
-from glob import glob
 from setuptools import find_packages, setup
+from glob import glob
+import os
 
-package_name = 'mab_localization'
+package_name = 'mab_navigation'
 
 setup(
     name=package_name,
@@ -22,10 +22,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'image_rotate_node = mab_localization.image_rotate:main',
-            'map_saver = mab_localization.map_saver:main',
-            'imu_covariance_node = mab_localization.imu_covariance:main',
-            'velocity_relay = mab_localization.velocity_relay:main',
         ],
     },
 )
