@@ -1,6 +1,13 @@
 # MAB ROS
 ROS2 Support for MAB Robotics Silver Badger and Honey Badger robots.
 
+# Install
+To clone
+
+```bash
+git clone https://github.com/boris-il-forte/mab_ros --recursive
+```
+
 # Setup
 To install all the necessary dependencies run the following
 
