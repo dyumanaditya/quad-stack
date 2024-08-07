@@ -2,52 +2,30 @@
 ROS2 Support for MAB Robotics Silver Badger and Honey Badger robots.
 
 # Setup
-Dependencies:
+To install all the necessary dependencies run the following
 
-1. Slam Toolbox
-2. Realsense
-3. nlohmann-json3-dev
-4. robot_localization
-5. ORB-SLAM3
-    - python3-ament-package
-6. OpenCV
-7. Pangolin (build from git repo)
+```bash
+chmod +x setup.sh
+./setup.sh
+```
 
 # Gazebo
-## Launch
-Run the following line to teleoperate. 
 
-```
-ros2 launch mab_keyboard_teleop silver_badger_teleop.launch.py
-```
+To spawn the robot
 
-## Run Separately
-You can run all the processes in separate terminals to debug if necessary
-
-
-To launch the robot in gazebo
-
-```
-ros2 launch mab_gazebo spawn_silver_badger.launch.py
+```bash
+ros2 launch mab_bringup mab_spawn.launch.py
 ```
 
-To make the robot stand
+To spawn the robot with teleop and a neural locomotion control policy
 
-```
-ros2 run mab_stand mab_stand
-```
-
-To publish the robot states that are needed by the locomotion policy
-```
-ros2 run mab_utils publish_robot_state
+```bash
+ros2 launch mab_bringup mab_teleop.launch.py
 ```
 
-To run the locomotion policy
-```
-ros2 run mab_locomotion mab_locomotion 
-```
 
-To run the keyboard teleop that will make the robot walk
-```
-ros2 run mab_keyboard_teleop teleop_node
+To spawn the robot with teleop and a neural locomotion control policy and localization (visual odometry and SLAM)
+
+```bash
+ros2 launch mab_bringup mab_localization.launch.py
 ```
