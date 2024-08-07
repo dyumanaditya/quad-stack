@@ -36,3 +36,10 @@ To spawn the robot with teleop and a neural locomotion control policy and locali
 ```bash
 ros2 launch mab_bringup mab_localization.launch.py
 ```
+
+
+To spawn the robot with the localization stack and navigation stack (ros nav2)
+
+```bash
+ros2 launch mab_bringup mab_localization.launch.py
+```
