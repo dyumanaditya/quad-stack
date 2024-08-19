@@ -8,7 +8,8 @@
   <xacro:include filename="$(find mab_description)/xacro/imu.xacro" />
   
   <!-- Include gazebo elements and colors-->
-  <xacro:include filename="$(find mab_description)/xacro/silver_badger.gazebo.xacro" />
+  <xacro:include filename="$(find mab_description)/xacro/gazebo.xacro" />
+  <xacro:gazebo_simulation robot="silver_badger"/>
   
   <!-- Import Rviz colors -->
   <xacro:include filename="$(find mab_description)/xacro/materials.xacro" />
@@ -90,19 +91,6 @@
     <parent link="base_link"/>
     <child link="body"/>
   </joint>
-  
-  <!-- <link name="map"/>
-  <joint name="map_root" type="floating">
-    <parent link="base_link"/>
-    <child link="map"/>
-  </joint> -->
-  
-  <!-- <link name="odom"/>
-  <joint name="odom_root" type="fixed">
-    <parent link="base_link"/>
-    <child link="odom"/>
-  </joint> -->
-
   
   <!-- Setup camera mount-->
   <xacro:realsense2_camera_mount parent="body"/>
@@ -509,6 +497,9 @@
       </geometry>
     </collision>
   </link>
+
+
+
   <!-- LEG JOINTS 0-4 -->
   <!-- Front Right Leg -->
   <joint armature="0.01" name="fr_j0" type="continuous">

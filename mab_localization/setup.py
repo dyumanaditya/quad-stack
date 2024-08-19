@@ -12,6 +12,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (os.path.join('share', package_name, 'resource'), glob('resource/*')),
+        (os.path.join('share', package_name, 'maps'), glob('maps/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -22,10 +23,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'image_rotate_node = mab_localization.image_rotate:main',
             'map_saver = mab_localization.map_saver:main',
             'imu_covariance_node = mab_localization.imu_covariance:main',
-            'velocity_relay = mab_localization.velocity_relay:main',
+            'odom_2d = mab_localization.odom_2d:main',
         ],
     },
 )

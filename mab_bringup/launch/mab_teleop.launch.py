@@ -2,16 +2,27 @@ import os
 from launch_ros.actions import Node
 from launch import LaunchDescription
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import IncludeLaunchDescription, TimerAction, ExecuteProcess
+from launch.actions import IncludeLaunchDescription, TimerAction, ExecuteProcess, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 
 
 
 def generate_launch_description():
     mab_bringup_pkg_dir = get_package_share_directory('mab_bringup')
     mab_bringup_launch = os.path.join(mab_bringup_pkg_dir, 'launch', 'mab_spawn.launch.py')
+
+    robot_arg = DeclareLaunchArgument(
+        'robot',
+        default_value='silver_badger',
+        description='Choose the robot to spawn, silver_badger or honey_badger'
+    )
+
     mab_bringup_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_bringup_launch)
+        PythonLaunchDescriptionSource(mab_bringup_launch),
+        launch_arguments={
+            'robot': LaunchConfiguration('robot')
+        }.items()
     )
 
     mab_stand_node = Node(
@@ -42,7 +53,8 @@ def generate_launch_description():
         package='mab_locomotion',
         executable='mab_locomotion',
         name='mab_locomotion',
-        output='screen'
+        output='screen',
+        parameters=[{'robot': LaunchConfiguration('robot')}]
     )
 
     delay_policy_node = TimerAction(
@@ -60,6 +72,7 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        robot_arg,
         mab_bringup_include_launch,
         robot_state_publisher,
         delay_mab_stand_node,

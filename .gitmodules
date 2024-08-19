@@ -2,3 +2,6 @@
 	path = realsense_gazebo_plugin
 	url = https://github.com/dyumanaditya/realsense_gazebo_plugin
     branch = foxy-devel
+[submodule "depthimage_to_laserscan"]
+	path = depthimage_to_laserscan
+	url = https://github.com/dyumanaditya/depthimage_to_laserscan

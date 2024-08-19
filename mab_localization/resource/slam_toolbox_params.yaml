@@ -1,6 +1,6 @@
 slam_toolbox:
   ros__parameters:
-    use_sim_time: true
+    # use_sim_time: true
 
     # ROS Parameters
     odom_frame: odom
@@ -22,5 +22,8 @@ slam_toolbox:
     minimum_time_interval: 0.25
     maximum_laser_scan_time: 1.0
     use_scan_matching: true
-    minimum_travel_distance: 0.1
-    loop_match_minimum_chain_size: 5
+    minimum_travel_distance: 0.2
+    loop_match_minimum_chain_size: 8
+    # loop_match maximum_variance_coarse: 0.3
+    # loop_match minimum_response_coarse: 0.6
+    # loop_match minimum_response_fine: 0.78

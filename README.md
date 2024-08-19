@@ -16,6 +16,31 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+## Bug in Nav2
+Due to [this bug](https://github.com/ros-navigation/navigation2/issues/3644#issuecomment-1614553365)
+
+In `/opt/ros/humble/share/nav2_bringup/launch/localization_launch.py`  Change
+```yaml
+            ComposableNode(
+                package='nav2_map_server',
+                plugin='nav2_map_server::MapServer',
+                name='map_server',
+                parameters=[configured_params],
+                remappings=remappings),
+```
+
+to 
+
+```yaml
+            ComposableNode(
+                package='nav2_map_server',
+                plugin='nav2_map_server::MapServer',
+                name='map_server',
+                parameters=[configured_params,
+                            {'yaml_filename': map_yaml_file}], # Added this to parameters
+                remappings=remappings),
+```
+
 # Gazebo
 
 To spawn the robot

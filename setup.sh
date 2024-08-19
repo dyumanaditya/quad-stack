@@ -19,6 +19,7 @@ sudo apt install -y python3 python3-pip
 pip3 install -U jax
 pip3 install flax
 pip3 install opencv-python
+pip3 install transforms3d
 
 # Install xterm
 sudo apt install -y xterm
@@ -34,5 +35,12 @@ sudo apt-get install -y ros-humble-robot-localization
 
 # Install ROS Humble RTAB-Map package
 sudo apt install -y ros-humble-rtabmap*
+
+# Install ROS Humble TF2 ROS package
+sudo apt-get install ros-humble-tf2-ros ros-humble-tf2-tools
+sudo apt install ros-humble-tf-transformations
+
+sudo apt-get install ros-humble-rcl-interfaces
+
 
 echo "Installation of all packages for mab_ros is complete!"

@@ -43,15 +43,14 @@
                 <mass value="0" />
                 <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
             </inertial>
-            <visual>
-                <origin rpy="${d435_cam_roll} 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" />
-            </visual>
         </link>
         <joint name="camera_image_joint" type="fixed">
             <parent link="${parent}"/>
             <child link="camera_image_link"/>
+            <!-- <origin rpy="0 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" /> -->
             <origin rpy="${d435_cam_roll} 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" />
         </joint>
+        
 
         <link name="laser_frame"/>
         <joint name="laser_joint" type="fixed">
@@ -109,7 +108,7 @@
                     </noise>
                 </camera>
                 <always_on>1</always_on>
-                <update_rate>90</update_rate>
+                <update_rate>60</update_rate>
                 <visualize>1</visualize>
             </sensor>
             <sensor name="${camera_name}ired1" type="camera">
@@ -185,9 +184,9 @@
             <plugin name="${topics_ns}" filename="librealsense_gazebo_plugin.so">
                 <prefix>${camera_name}</prefix>
                 <depthUpdateRate>90.0</depthUpdateRate>
-                <colorUpdateRate>90.0</colorUpdateRate>
+                <colorUpdateRate>60.0</colorUpdateRate>
                 <infraredUpdateRate>0.0</infraredUpdateRate>
-                <depthTopicName>${topics_ns}/depth/image_raw</depthTopicName>
+                <depthTopicName>${topics_ns}/depth/image_rect_raw</depthTopicName>
                 <depthCameraInfoTopicName>${topics_ns}/depth/camera_info</depthCameraInfoTopicName>
                 <colorTopicName>${topics_ns}/color/image_raw</colorTopicName>
                 <colorCameraInfoTopicName>${topics_ns}/color/camera_info</colorCameraInfoTopicName>

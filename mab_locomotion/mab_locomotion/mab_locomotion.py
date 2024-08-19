@@ -31,6 +31,11 @@ class MABLocomotion(Node):
             depth=10
         )
 
+        # Which robot we are using
+        self.declare_parameter("robot", "silver_badger")
+        self.robot = self.get_parameter("robot").get_parameter_value().string_value
+        self.get_logger().info(f'Locomotion node started for {self.robot}')
+
         self.bridge_data_subscription = self.create_subscription(
             BridgeData,
             "/hb40/bridge_data",
@@ -90,7 +95,11 @@ class MABLocomotion(Node):
 
         # neural_network_path = "plane.model"
         package_share_directory = get_package_share_directory('mab_locomotion')
-        neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new.model")
+
+        if self.robot == "silver_badger":
+            neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_silver_badger.model")
+        elif self.robot == "honey_badger":
+            neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_honey_badger.model")
 
         splitted_path = neural_network_path.split("/")
         checkpoint_dir = "/".join(splitted_path[:-1]) if len(splitted_path) > 1 else "."

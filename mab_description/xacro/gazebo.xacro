@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="gazebo_simulation" params="robot">
+
+    <!-- Colors-->
+    <gazebo reference="body">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="rear">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="fr_l0">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fr_l1">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Orange</material>
+    </gazebo>
+    
+    <gazebo reference="fr_l2">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fr_foot">
+      <mu1>0.6</mu1>
+      <mu2>0.6</mu2>
+      <self_collide>0</self_collide>
+      <kp value="1000000.0"/>
+      <kd value="1.0"/>
+      <material>Gazebo/Black</material>
+    </gazebo>
+    
+    <gazebo reference="fl_l0">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fl_l1">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Orange</material>
+    </gazebo>
+    
+    <gazebo reference="fl_l2">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    
+    <gazebo reference="fl_foot">
+      <mu1>0.6</mu1>
+      <mu2>0.6</mu2>
+      <self_collide>0</self_collide>
+      <kp value="1000000.0"/>
+      <kd value="1.0"/>
+      <material>Gazebo/Black</material>
+    </gazebo>
+    
+    <gazebo reference="rl_l0">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rl_l1">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <gazebo reference="rl_l2">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rl_foot">
+      <mu1>0.6</mu1>
+      <mu2>0.6</mu2>
+      <self_collide>0</self_collide>
+      <kp value="1000000.0"/>
+      <kd value="1.0"/>
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="rr_l0">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rr_l1">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <gazebo reference="rr_l2">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="rr_foot">
+      <mu1>0.6</mu1>
+      <mu2>0.6</mu2>
+      <self_collide>0</self_collide>
+      <kp value="1000000.0"/>
+      <kd value="1.0"/>
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="camera_mount">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+    
+    <gazebo reference="camera_interface">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+    <!-- Controllers-->
+    <!-- <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <parameters>$(find mab_gazebo)/config/silver_badger_controller.yaml</parameters>
+      </plugin>
+    </gazebo> -->
+
+    <gazebo>
+      <plugin name="mab_gazebo_plugin" filename="libmab_control.so">
+        <robot>${robot}</robot>
+      </plugin>
+    </gazebo>
+
+    <!-- Sensors-->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <gazebo reference="imu_link">
+    <!-- <gazebo reference="d435i_camera_accel_frame"> -->
+      <gravity>true</gravity>
+      <sensor name='imu_sensor' type='imu'>
+          <always_on>1</always_on>
+          <update_rate>100</update_rate>
+          <visualize>1</visualize>
+          <topic>imu</topic>
+          <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
+              <topicName>imu</topicName>
+              <bodyName>imu_sensor_link</bodyName>
+              <updateRateHZ>100.0</updateRateHZ>
+              <xyzOffset>0 0 0</xyzOffset>
+              <rpyOffset>0 0 0</rpyOffset>
+          </plugin>
+          <pose>0 0 0 0 0 0</pose>
+      </sensor>
+    </gazebo>
+    
+    <!-- <gazebo reference="d435i_camera_accel_frame">
+      <gravity>true</gravity>
+      <sensor name='cam_imu_sensor' type='imu'>
+          <always_on>1</always_on>
+          <update_rate>100</update_rate>
+          <visualize>1</visualize>
+          <topic>cam_imu</topic>
+          <plugin name='cam_imu' filename='libgazebo_ros_imu_sensor.so'>
+              <topicName>cam_imu</topicName>
+              <bodyName>cam_imu_sensor_link</bodyName>
+              <updateRateHZ>100.0</updateRateHZ>
+              <xyzOffset>0 0 0</xyzOffset>
+              <rpyOffset>0 0 0</rpyOffset>
+          </plugin>
+          <pose>0 0 0 0 0 0</pose>
+      </sensor>
+    </gazebo> -->
+
+  </xacro:macro>
+</robot>
