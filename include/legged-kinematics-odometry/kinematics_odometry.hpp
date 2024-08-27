@@ -1,0 +1,56 @@
+#include <vector>
+#include <map>
+
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <gazebo_msgs/msg/contacts_state.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
+
+
+class KinematicsOdometry : public rclcpp::Node
+{
+  public:
+    KinematicsOdometry();
+
+  private:
+    // Subscriber to feet contact states
+    rclcpp::Subscription<gazebo_msgs::msg::ContactsState>::SharedPtr feet_contact_sub_;
+    void feetContactCallback(const gazebo_msgs::msg::ContactsState::SharedPtr msg);
+
+    // Subscriber for joint states
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;
+    void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
+
+    // Subscriber for IMU
+    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
+    void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
+
+    // Velocity publisher
+    rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr velocity_pub_;
+    void publishVelocity();
+    void _computeVelocity(std::string foot_in_contact_name);
+    rclcpp::TimerBase::SharedPtr timer_;
+
+    // Store a map of legs and the velocity they make the body move
+    std::map<std::string, Eigen::Vector3d> leg_velocities_buffer_;
+
+
+    // Array to store joint states
+    std::vector<double> joint_states_;
+    std::vector<std::string> joint_states_names_;
+    std::vector<double> joint_velocities_;
+    std::map<std::string, int> pinocchio_joint_map_;
+
+    // Array to store imu data
+    std::vector<double> imu_ang_vel_;
+
+    // Pinocchio model
+    pinocchio::Model model_;
+    pinocchio::Data data_;
+    std::vector<std::string> pinocchio_joint_names_;
+
+    std::vector<std::string> _getKinematicChain(const std::string &link_name);
+
+
+};
