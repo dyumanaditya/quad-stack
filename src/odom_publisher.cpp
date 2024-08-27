@@ -4,6 +4,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <sensor_msgs/msg/imu.hpp>
 
 
 class OdomPublisherNode : public rclcpp::Node
@@ -15,6 +16,9 @@ public:
         // Initialize subscriber to "base_lin_vel" topic
         twist_subscriber_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
             "/base_lin_vel", 10, std::bind(&OdomPublisherNode::twist_callback, this, std::placeholders::_1));
+
+        imu_subscriber_ = this->create_subscription<sensor_msgs::msg::Imu>(
+            "/imu/out", 10, std::bind(&OdomPublisherNode::imu_callback, this, std::placeholders::_1));
 
         // Initialize publisher for odometry on "/odom_kinematics" topic
         odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom_kinematics", 10);
@@ -38,6 +42,7 @@ public:
         yaw_ = 0.0;
 
         prev_rot_mat_ = tf2::Matrix3x3::getIdentity();
+        prev_rot_mat_.setRPY(roll_, pitch_, yaw_);
         orientation_matrix_.setIdentity();
         orientation_matrix_.setRPY(roll_, pitch_, yaw_);
 
@@ -62,6 +67,40 @@ private:
         double omega_y = msg->twist.angular.y;
         double omega_z = msg->twist.angular.z;
 
+        // // Create a small rotation quaternion based on the angular velocities (in the body frame)
+        // tf2::Quaternion delta_q;
+        // double magnitude = std::sqrt(omega_x * omega_x + omega_y * omega_y + omega_z * omega_z);
+        // if (magnitude > 1e-12) {
+        //     double half_theta = 0.5 * magnitude * dt;
+        //     double sin_half_theta = std::sin(half_theta);
+        //     delta_q.setValue(sin_half_theta * omega_x / magnitude,
+        //                      sin_half_theta * omega_y / magnitude,
+        //                      sin_half_theta * omega_z / magnitude,
+        //                      std::cos(half_theta));
+        // } else {
+        //     // No rotation, or very small angular velocity
+        //     delta_q.setValue(0, 0, 0, 1);
+        // }
+
+        // // Convert the small rotation quaternion to a rotation matrix
+        // tf2::Matrix3x3 delta_matrix(delta_q);
+
+        // // Update the current orientation matrix by applying the small rotation (body frame to world frame)
+        // orientation_matrix_ *= delta_matrix;
+
+        // Convert the current orientation matrix back to roll, pitch, yaw
+        double roll, pitch, yaw;
+        orientation_matrix_.getRPY(roll, pitch, yaw);
+
+        // Convert body frame velocities to world frame using the current orientation matrix
+        tf2::Vector3 velocity_body(vx_body, vy_body, vz_body);
+        tf2::Vector3 velocity_world = orientation_matrix_ * velocity_body;
+
+        // Update position based on world frame velocities
+        x_ += velocity_world.getX() * dt;
+        y_ += velocity_world.getY() * dt;
+        z_ += velocity_world.getZ() * dt;
+
         // Create a small rotation quaternion based on the angular velocities (in the body frame)
         tf2::Quaternion delta_q;
         double magnitude = std::sqrt(omega_x * omega_x + omega_y * omega_y + omega_z * omega_z);
@@ -82,19 +121,6 @@ private:
 
         // Update the current orientation matrix by applying the small rotation (body frame to world frame)
         orientation_matrix_ *= delta_matrix;
-
-        // Convert the current orientation matrix back to roll, pitch, yaw
-        double roll, pitch, yaw;
-        orientation_matrix_.getRPY(roll, pitch, yaw);
-
-        // Convert body frame velocities to world frame using the current orientation matrix
-        tf2::Vector3 velocity_body(vx_body, vy_body, vz_body);
-        tf2::Vector3 velocity_world = orientation_matrix_ * velocity_body;
-
-        // Update position based on world frame velocities
-        x_ += velocity_world.getX() * dt;
-        y_ += velocity_world.getY() * dt;
-        z_ += velocity_world.getZ() * dt;
 
         // Fill in the odometry message
         odom_msg_.header.stamp = msg->header.stamp;
@@ -322,7 +348,16 @@ private:
         // last_time_ = current_time;
     }
 
+    void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg)
+    {
+        // Update roll, pitch, and yaw based on the IMU data
+        // roll_ = msg->orientation.x;
+        // pitch_ = msg->orientation.y;
+        // yaw_ = msg->orientation.z;
+    }
+
     rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr twist_subscriber_;
+    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_subscriber_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     nav_msgs::msg::Odometry odom_msg_;
