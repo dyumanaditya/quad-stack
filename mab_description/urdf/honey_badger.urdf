@@ -162,6 +162,85 @@
           <pose>0 0 0 0 0 0</pose>
       </sensor>
     </gazebo> -->
+  <!-- Foot Contact Sensors-->
+  <gazebo reference="fr_foot">
+    <sensor name="fr_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <material>Gazebo/Red</material>
+      <contact>
+        <collision>fr_l2_fixed_joint_lump__fr_foot_collision_2</collision>
+      </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_fr_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
+    </sensor>
+  </gazebo>
+  <gazebo reference="fl_foot">
+    <sensor name="fl_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <material>Gazebo/Red</material>
+      <contact>
+        <collision>fl_l2_fixed_joint_lump__fl_foot_collision_2</collision>
+      </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_fl_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
+    </sensor>
+  </gazebo>
+  <gazebo reference="rr_foot">
+    <sensor name="rr_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <material>Gazebo/Red</material>
+      <contact>
+        <collision> </collision>
+      </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_rr_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
+    </sensor>
+  </gazebo>
+  <gazebo reference="rl_foot">
+    <sensor name="rl_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <material>Gazebo/Red</material>
+      <contact>
+        <collision>rl_l2_fixed_joint_lump__rl_foot_collision_2</collision>
+      </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_rl_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
+    </sensor>
+  </gazebo>
+  <!-- Ground truth odom-->
+  <gazebo>
+    <plugin filename="libgazebo_ros_p3d.so" name="gazebo_ros_p3d">
+      <ros>
+        <remapping>odom:=odom_gt</remapping>
+      </ros>
+      <body_name>base_link</body_name>
+      <frame_name>world</frame_name>
+      <update_rate>50</update_rate>
+      <xyz_offset>0 0 0</xyz_offset>
+      <rpy_offset>0 0 0</rpy_offset>
+      <gaussian_noise>0.0</gaussian_noise>
+    </plugin>
+  </gazebo>
   <material name="silver">
     <color rgba="0.600 0.600 0.600 1.000"/>
   </material>
@@ -377,28 +456,12 @@
     <!-- <origin rpy="0 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" /> -->
     <origin rpy="-1.5707963267948966 0 0" xyz="0.290755 5.3e-05 0.068583"/>
   </joint>
-  <link name="laser_frame">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0"/>
-      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
-    </inertial>
-    <!-- <visual>
-                <origin rpy="${d435_cam_roll} 0 0" xyz="${d435_cam_x} ${d435_cam_y} 0" />
-            </visual> -->
-  </link>
-  <joint name="laser_frame_joint" type="fixed">
-    <parent link="body"/>
+  <link name="laser_frame"/>
+  <joint name="laser_joint" type="fixed">
+    <parent link="camera_image_link"/>
     <child link="laser_frame"/>
-    <!-- <origin rpy="0 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" /> -->
-    <origin rpy="0 0 0" xyz="0.290755 5.3e-05 0"/>
+    <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
   </joint>
-  <!-- <link name="laser_frame"/>
-        <joint name="laser_joint" type="fixed">
-            <parent link="camera_image_link"/>
-            <child link="laser_frame"/>
-            <origin rpy="${-d435_cam_roll} 0 0" xyz="0 0 0"/>
-        </joint> -->
   <!-- <gazebo reference="camera_image_link"> -->
   <gazebo reference="camera_image_link">
     <self_collide>0</self_collide>
@@ -949,21 +1012,21 @@
   </link>
   <!-- LEGS JOINTS 0-4  -->
   <!-- Front Right Leg -->
-  <joint armature="0.01" name="fr_j0" type="continuous">
+  <joint armature="0.01" name="fr_j0" type="revolute">
     <parent link="body"/>
     <child link="fr_l0"/>
     <origin rpy="0 0 0" xyz="0.1375 -0.064 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="fr_j1" type="continuous">
+  <joint name="fr_j1" type="revolute">
     <parent link="fr_l0"/>
     <child link="fr_l1"/>
     <origin rpy="0 0 -1.57" xyz="0.0555 -0.0125 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="fr_j2" type="continuous">
+  <joint name="fr_j2" type="revolute">
     <parent link="fr_l1"/>
     <child link="fr_l2"/>
     <origin rpy="2.909 0 0" xyz="0.0584 -0.200 0"/>
@@ -977,21 +1040,21 @@
     <axis xyz="0.0 0 0"/>
   </joint>
   <!-- Front Left Leg -->
-  <joint armature="0.01" name="fl_j0" type="continuous">
+  <joint armature="0.01" name="fl_j0" type="revolute">
     <parent link="body"/>
     <child link="fl_l0"/>
     <origin rpy="0 0 0" xyz="0.137 0.064 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="fl_j1" type="continuous">
+  <joint name="fl_j1" type="revolute">
     <parent link="fl_l0"/>
     <child link="fl_l1"/>
     <origin rpy="0 0 1.57" xyz="0.0555 0.0125 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="fl_j2" type="continuous">
+  <joint name="fl_j2" type="revolute">
     <parent link="fl_l1"/>
     <child link="fl_l2"/>
     <origin rpy="-2.909 0 0" xyz="0.0584 0.200 0"/>
@@ -1005,21 +1068,21 @@
     <axis xyz="0.0 0 0"/>
   </joint>
   <!-- Rear Left Leg -->
-  <joint armature="0.01" name="rl_j0" type="continuous">
+  <joint armature="0.01" name="rl_j0" type="revolute">
     <parent link="body"/>
     <child link="rl_l0"/>
     <origin rpy="0 0 -3.14159" xyz="-0.1375 0.064 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="rl_j1" type="continuous">
+  <joint name="rl_j1" type="revolute">
     <parent link="rl_l0"/>
     <child link="rl_l1"/>
     <origin rpy="0 0 -1.57" xyz="0.0555 -0.0125 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="rl_j2" type="continuous">
+  <joint name="rl_j2" type="revolute">
     <parent link="rl_l1"/>
     <child link="rl_l2"/>
     <origin rpy="-2.909 0 0" xyz="0.0584 0.20 0"/>
@@ -1033,21 +1096,21 @@
     <axis xyz="0.0 0 0"/>
   </joint>
   <!-- Rear Right Leg -->
-  <joint armature="0.01" name="rr_j0" type="continuous">
+  <joint armature="0.01" name="rr_j0" type="revolute">
     <parent link="body"/>
     <child link="rr_l0"/>
     <origin rpy="0 0 -3.14159" xyz="-0.1375 -0.064 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="rr_j1" type="continuous">
+  <joint name="rr_j1" type="revolute">
     <parent link="rr_l0"/>
     <child link="rr_l1"/>
     <origin rpy="0 0 1.57" xyz="0.0555 0.0125 0"/>
     <axis xyz="1.0 0 0"/>
     <limit effort="16" lower="-1.57" upper="1.57" velocity="25"/>
   </joint>
-  <joint name="rr_j2" type="continuous">
+  <joint name="rr_j2" type="revolute">
     <parent link="rr_l1"/>
     <child link="rr_l2"/>
     <origin rpy="2.909 0 0" xyz="0.0584 -0.20 0"/>

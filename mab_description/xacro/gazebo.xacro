@@ -161,6 +161,7 @@
               <updateRateHZ>100.0</updateRateHZ>
               <xyzOffset>0 0 0</xyzOffset>
               <rpyOffset>0 0 0</rpyOffset>
+              <gaussianNoise>0.017</gaussianNoise>
           </plugin>
           <pose>0 0 0 0 0 0</pose>
       </sensor>
@@ -183,6 +184,94 @@
           <pose>0 0 0 0 0 0</pose>
       </sensor>
     </gazebo> -->
+
+    <!-- Foot Contact Sensors-->
+    <gazebo reference="fr_foot">
+      <sensor name="fr_foot_bumper" type="contact">
+          <selfCollide>true</selfCollide>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>50.0</updateRate>
+          <material>Gazebo/Red</material>
+          <contact>
+              <collision>fr_l2_fixed_joint_lump__fr_foot_collision_2</collision>
+          </contact>
+          <plugin name="gazebo_ros_bumper_controller_fr_foot" filename="libgazebo_ros_bumper.so">
+              <ros>
+                  <remapping>bumper_states:=feet_contact</remapping>
+              </ros>
+              
+          </plugin>
+      </sensor>
+  </gazebo>
+    
+  <gazebo reference="fl_foot">
+      <sensor name="fl_foot_bumper" type="contact">
+          <selfCollide>true</selfCollide>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>50.0</updateRate>
+          <material>Gazebo/Red</material>
+          <contact>
+              <collision>fl_l2_fixed_joint_lump__fl_foot_collision_2</collision>
+          </contact>
+          <plugin name="gazebo_ros_bumper_controller_fl_foot" filename="libgazebo_ros_bumper.so">
+              <ros>
+                  <remapping>bumper_states:=feet_contact</remapping>
+              </ros>
+              
+          </plugin>
+      </sensor>
+  </gazebo>
+
+  <gazebo reference="rr_foot">
+    <sensor name="rr_foot_bumper" type="contact">
+        <selfCollide>true</selfCollide>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <material>Gazebo/Red</material>
+        <contact>
+            <collision>rr_l2_fixed_joint_lump__rr_foot_collision_2</collision>
+        </contact>
+        <plugin name="gazebo_ros_bumper_controller_rr_foot" filename="libgazebo_ros_bumper.so">
+            <ros>
+                <remapping>bumper_states:=feet_contact</remapping>
+            </ros>
+            
+        </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="rl_foot">
+    <sensor name="rl_foot_bumper" type="contact">
+        <selfCollide>true</selfCollide>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <material>Gazebo/Red</material>
+        <contact>
+            <collision>rl_l2_fixed_joint_lump__rl_foot_collision_2</collision>
+        </contact>
+        <plugin name="gazebo_ros_bumper_controller_rl_foot" filename="libgazebo_ros_bumper.so">
+            <ros>
+                <remapping>bumper_states:=feet_contact</remapping>
+            </ros>
+            
+        </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Ground truth odom-->
+  <gazebo>
+    <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
+      <ros>
+        <remapping>odom:=odom_gt</remapping>
+      </ros>
+      <body_name>base_link</body_name>
+      <frame_name>world</frame_name>
+      <update_rate>100</update_rate>
+      <xyz_offset>0 0 0</xyz_offset>
+      <rpy_offset>0 0 0</rpy_offset>
+      <gaussian_noise>0.0</gaussian_noise>
+    </plugin>
+  </gazebo>
 
   </xacro:macro>
 </robot>

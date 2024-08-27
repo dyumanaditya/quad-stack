@@ -63,6 +63,7 @@ class TeleopNode(Node):
                         self.current_y = 0.0
                     twist.linear.x = float(self.current_x)
                     twist.angular.z = float(self.current_y)
+                    self.get_logger().info(f'Linear: {twist.linear.x}, Angular: {twist.angular.z}')
                     self.publisher_.publish(twist)
                     self.key_pressed = True
                     if key == 'q':

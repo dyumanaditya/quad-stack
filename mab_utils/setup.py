@@ -29,6 +29,8 @@ setup(
             'image_rotate = mab_utils.image_rotate:main',
             'project_laser_frame = mab_utils.project_laser_frame:main',
             'fake_imu = mab_utils.fake_imu:main',
+            'odom_gt = mab_utils.odom_gt:main',
+            'odom_plotter = mab_utils.odom_plotter:main',
         ],
     },
 )

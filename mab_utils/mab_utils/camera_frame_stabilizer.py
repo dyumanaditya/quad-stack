@@ -88,7 +88,7 @@ class FrameStabilizer(Node):
         if self.camera_info:
             fx = self.camera_info.k[0]  # Focal length in x
             fy = self.camera_info.k[4]  # Focal length in y
-            translation_y = pitch_rad * fy  # Pitch translation in pixels
+            translation_y = np.tan(pitch_rad) * fy  # Pitch translation in pixels
         else:
             translation_y = 0
 

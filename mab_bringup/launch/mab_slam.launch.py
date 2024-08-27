@@ -33,6 +33,12 @@ def generate_launch_description():
         default_value='silver_badger',
         description='Choose the robot to spawn, silver_badger or honey_badger'
     )
+    
+    odom_gt_arg = DeclareLaunchArgument(
+        'odom_gt',
+        default_value='false',
+        description='Whether to use ground truth odometry'
+    )
 
     rviz = Node(
         package='rviz2',
@@ -68,7 +74,8 @@ def generate_launch_description():
 
     delayed_localization_vo_launch = TimerAction(
         period=12.0,
-        actions=[mab_localization_vo_include_launch]
+        actions=[mab_localization_vo_include_launch],
+        condition=UnlessCondition(LaunchConfiguration('odom_gt'))
     )
     
     delayed_localization_slam_launch = TimerAction(
@@ -85,13 +92,23 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'd435i_camera_link'],
         condition=IfCondition(LaunchConfiguration('rosbag'))
     )
+
+    odom_gt = Node(
+        package='mab_utils',
+        executable='odom_gt',
+        name='odom_gt',
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('odom_gt'))
+    )
     
     return LaunchDescription([
         rosbag_arg,
         robot_arg,
+        odom_gt_arg,
         base_link_transform,
         mab_bringup_teleop_include_launch,
         delayed_localization_vo_launch,
+        odom_gt,
         delayed_localization_slam_launch,
         image_rotation,
         # camera_frame_stabilizer,

@@ -3,7 +3,8 @@ slam_toolbox:
     # use_sim_time: true
 
     # ROS Parameters
-    odom_frame: odom
+    odom_frame: odom_kinematics
+    # odom_frame: odom
     map_frame: map
     base_frame: base_link
     scan_topic: /scan
