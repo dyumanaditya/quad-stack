@@ -37,10 +37,12 @@ sudo apt-get install -y ros-humble-robot-localization
 sudo apt install -y ros-humble-rtabmap*
 
 # Install ROS Humble TF2 ROS package
-sudo apt-get install ros-humble-tf2-ros ros-humble-tf2-tools
-sudo apt install ros-humble-tf-transformations
+sudo apt-get install -y ros-humble-tf2-ros ros-humble-tf2-tools
+sudo apt install -y ros-humble-tf-transformations
 
-sudo apt-get install ros-humble-rcl-interfaces
+sudo apt-get install -y ros-humble-rcl-interfaces
+
+pip install -U "jax[cuda12]"
 
 
 echo "Installation of all packages for mab_ros is complete!"

@@ -43,7 +43,7 @@ def generate_launch_description():
 
     gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', [os.path.join(description_pkg_share)])
     os.environ["GAZEBO_MODEL_PATH"] = description_pkg_share 
-    os.environ["GAZEBO_MODEL_PATH"] = get_package_share_directory('turtlebot3_description_custom') + ':' + os.environ["GAZEBO_MODEL_PATH"] 
+    # os.environ["GAZEBO_MODEL_PATH"] = get_package_share_directory('turtlebot3_description_custom') + ':' + os.environ["GAZEBO_MODEL_PATH"] 
     gazebo_plugin_path = os.path.join(gazebo_pkg_prefix, 'lib', 'mab_control')
     realsense_plugin_path = os.path.join(realsense_pkg_prefix, 'lib')
 

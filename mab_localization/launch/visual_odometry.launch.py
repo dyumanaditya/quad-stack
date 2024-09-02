@@ -42,7 +42,7 @@ def generate_launch_description():
             'OdomF2M/MaxSize': '1200', # Max features
             'Vis/MaxFeatures': '700', # Max features extracted from image
             'wait_imu_to_init': True,
-            'guess_frame_id': 'odom_kinematics',
+            # 'guess_frame_id': 'odom_kinematics',
         }],
         remappings=[
             # ('/rgb/image', '/d435i_camera/color/image_raw/rotated'),
@@ -62,10 +62,10 @@ def generate_launch_description():
         ]
     )
 
-    kinematics_odometry = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(kinematics_odom_pkg_share, 'launch', 'kinematics_odometry.launch.py')),
-        launch_arguments={'urdf': os.path.join(description_pkg_share, 'urdf', 'silver_badger.urdf')}.items()
-    )
+    # kinematics_odometry = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(os.path.join(kinematics_odom_pkg_share, 'launch', 'kinematics_odometry.launch.py')),
+    #     launch_arguments={'urdf': os.path.join(description_pkg_share, 'urdf', 'silver_badger.urdf')}.items()
+    # )
 
     odom_gt = Node(
         package='mab_utils',
@@ -108,7 +108,7 @@ def generate_launch_description():
         rtabmap,
         # odom_gt,
         # odom_2d,
-        kinematics_odometry,
+        # kinematics_odometry,
         # imu_covariance,
         # ekf_filter,
         # rtabmap_vis,
