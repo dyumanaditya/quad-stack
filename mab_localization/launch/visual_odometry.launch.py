@@ -11,10 +11,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     pkg_name = "mab_localization"
-    kinematics_odom_pkg_name = "legged_kinematics_odometry"
+    # kinematics_odom_pkg_name = "legged_kinematics_odometry"
     description_pkg_name = "mab_description"
     pkg_share = get_package_share_directory(pkg_name)
-    kinematics_odom_pkg_share = get_package_share_directory(kinematics_odom_pkg_name)
+    # kinematics_odom_pkg_share = get_package_share_directory(kinematics_odom_pkg_name)
     description_pkg_share = get_package_share_directory(description_pkg_name)
     ekf_settings_file = os.path.join(pkg_share, 'resource', 'ekf.yaml')
     

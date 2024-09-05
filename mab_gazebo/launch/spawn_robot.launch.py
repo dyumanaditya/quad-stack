@@ -60,7 +60,7 @@ def generate_launch_description():
     gazebo = ExecuteProcess(
         cmd=['gazebo', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
-        # cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )
     gazebo_ros_robot = Node(

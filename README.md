@@ -16,6 +16,12 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+You will also need the `legged_kinematic_odometry` package in `src`. Contact Dyuman Aditya if you need access
+
+```bash
+git clone https://github.com/dyumanaditya/legged_kinematics_odometry
+```
+
 ## Bug in Nav2
 Due to [this bug](https://github.com/ros-navigation/navigation2/issues/3644#issuecomment-1614553365)
 
