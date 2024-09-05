@@ -34,7 +34,7 @@ def generate_launch_description():
             # 'odom_frame_id': 'odom_turtlebot3',
             # 'queue_size': 1000,
             # 'wait_for_transform': 1.0,
-            # 'approx_sync_max_interval': 0.5,
+            'approx_sync_max_interval': 0.05,
             # 'sensor_data_compression_format': 'jpeg',
             # 'topic_queue_size': 1000,
             'Odom/Strategy': '0', # Frame to map or Frame to frame
