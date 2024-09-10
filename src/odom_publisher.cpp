@@ -31,15 +31,15 @@ public:
         odom_msg_.child_frame_id = "base_link";  // Robot base frame
 
         // Initialize position and orientation
-        x_ = -2.0;
-        y_ = 3.5;
-        z_ = 0.3;
-        // roll_ = 0.026;
-        pitch_ = 0.861;
-        // yaw_ =  1.403;
-        roll_ = 0.0;
+        x_ = -2.0459031821872986;
+        y_ = 3.496181887042353;
+        z_ = 0.3003354309985301;
+        roll_ =  0.036;
+        pitch_ = -1.604;
+        yaw_ =   1.596;
+        // roll_ = 0.0;
         // pitch_ = 0.0;
-        yaw_ = 0.0;
+        // yaw_ = 0.0;
 
         prev_rot_mat_ = tf2::Matrix3x3::getIdentity();
         prev_rot_mat_.setRPY(roll_, pitch_, yaw_);
@@ -67,42 +67,21 @@ private:
         double omega_y = msg->twist.angular.y;
         double omega_z = msg->twist.angular.z;
 
-        // // Create a small rotation quaternion based on the angular velocities (in the body frame)
-        // tf2::Quaternion delta_q;
-        // double magnitude = std::sqrt(omega_x * omega_x + omega_y * omega_y + omega_z * omega_z);
-        // if (magnitude > 1e-12) {
-        //     double half_theta = 0.5 * magnitude * dt;
-        //     double sin_half_theta = std::sin(half_theta);
-        //     delta_q.setValue(sin_half_theta * omega_x / magnitude,
-        //                      sin_half_theta * omega_y / magnitude,
-        //                      sin_half_theta * omega_z / magnitude,
-        //                      std::cos(half_theta));
+        // Create a small rotation quaternion based on the angular velocities (in the body frame)
+        tf2::Quaternion delta_q;
+        // omega_x = 0;
+        // omega_y = 0;
+        // tf2::Vector3 ha = tf2::Vector3(omega_x, omega_y, omega_z) * (dt * 0.5);
+        // double l = ha.length();
+        // // double magnitude = std::sqrt(omega_x * omega_x + omega_y * omega_y + omega_z * omega_z);
+        // if (l > 0) {
+        //     ha = ha * (std::sin(l) / l);
+        //     delta_q.setValue(ha.getX(), ha.getY(), ha.getZ(), std::cos(l));
         // } else {
         //     // No rotation, or very small angular velocity
         //     delta_q.setValue(0, 0, 0, 1);
         // }
 
-        // // Convert the small rotation quaternion to a rotation matrix
-        // tf2::Matrix3x3 delta_matrix(delta_q);
-
-        // // Update the current orientation matrix by applying the small rotation (body frame to world frame)
-        // orientation_matrix_ *= delta_matrix;
-
-        // Convert the current orientation matrix back to roll, pitch, yaw
-        double roll, pitch, yaw;
-        orientation_matrix_.getRPY(roll, pitch, yaw);
-
-        // Convert body frame velocities to world frame using the current orientation matrix
-        tf2::Vector3 velocity_body(vx_body, vy_body, vz_body);
-        tf2::Vector3 velocity_world = orientation_matrix_ * velocity_body;
-
-        // Update position based on world frame velocities
-        x_ += velocity_world.getX() * dt;
-        y_ += velocity_world.getY() * dt;
-        z_ += velocity_world.getZ() * dt;
-
-        // Create a small rotation quaternion based on the angular velocities (in the body frame)
-        tf2::Quaternion delta_q;
         double magnitude = std::sqrt(omega_x * omega_x + omega_y * omega_y + omega_z * omega_z);
         if (magnitude > 1e-12) {
             double half_theta = 0.5 * magnitude * dt;
@@ -121,6 +100,44 @@ private:
 
         // Update the current orientation matrix by applying the small rotation (body frame to world frame)
         orientation_matrix_ *= delta_matrix;
+        // orientation_matrix_ = delta_matrix * orientation_matrix_;
+
+        // Convert the current orientation matrix back to roll, pitch, yaw
+        double roll, pitch, yaw;
+        orientation_matrix_.getRPY(roll, pitch, yaw);
+        // orientation_matrix_.setRPY(omega_x, omega_y, omega_z);
+
+        // Convert body frame velocities to world frame using the current orientation matrix
+        tf2::Vector3 velocity_body(vx_body, vy_body, vz_body);
+        tf2::Vector3 velocity_world = orientation_matrix_ * velocity_body;
+
+        // Update position based on world frame velocities
+        x_ += velocity_world.getX() * dt;
+        y_ += velocity_world.getY() * dt;
+        z_ += velocity_world.getZ() * dt;
+
+        // Create a small rotation quaternion based on the angular velocities (in the body frame)
+        // tf2::Quaternion delta_q;
+        // omega_y = 0;
+        // omega_z = 0;
+        // double magnitude = std::sqrt(omega_x * omega_x + omega_y * omega_y + omega_z * omega_z);
+        // if (magnitude > 1e-12) {
+        //     double half_theta = 0.5 * magnitude * dt;
+        //     double sin_half_theta = std::sin(half_theta);
+        //     delta_q.setValue(sin_half_theta * omega_x / magnitude,
+        //                      sin_half_theta * omega_y / magnitude,
+        //                      sin_half_theta * omega_z / magnitude,
+        //                      std::cos(half_theta));
+        // } else {
+        //     // No rotation, or very small angular velocity
+        //     delta_q.setValue(0, 0, 0, 1);
+        // }
+
+        // // Convert the small rotation quaternion to a rotation matrix
+        // tf2::Matrix3x3 delta_matrix(delta_q);
+
+        // // Update the current orientation matrix by applying the small rotation (body frame to world frame)
+        // orientation_matrix_ *= delta_matrix;
 
         // Fill in the odometry message
         odom_msg_.header.stamp = msg->header.stamp;
