@@ -38,8 +38,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -65,8 +65,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -92,8 +92,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
@@ -119,8 +119,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
@@ -199,7 +199,6 @@
               <ros>
                   <remapping>bumper_states:=feet_contact</remapping>
               </ros>
-              
           </plugin>
       </sensor>
   </gazebo>

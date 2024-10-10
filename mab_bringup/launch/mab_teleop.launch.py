@@ -70,7 +70,6 @@ def generate_launch_description():
         shell=True
     )
 
-
     return LaunchDescription([
         robot_arg,
         mab_bringup_include_launch,
@@ -79,8 +78,6 @@ def generate_launch_description():
         delay_policy_node,
         teleop_node
     ])
-
-
 
 if __name__ == '__main__':
     generate_launch_description()

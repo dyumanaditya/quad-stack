@@ -136,7 +136,7 @@ class OdometryPlotter(Node):
         plt.grid(True)
 
         plt.tight_layout()
-        plt.savefig('/home/aditya/results/new/kinematics-odom.png')
+        plt.savefig('/home/junninghuang/Desktop/Code/legged_odometry_py/kinematics-odom.png')
         plt.show()
 
     def plot_odom_path(self):
@@ -170,7 +170,7 @@ class OdometryPlotter(Node):
         plt.grid(True)
 
         plt.tight_layout()
-        plt.savefig('/home/aditya/results/new/vo-odom.png')
+        plt.savefig('/home/junninghuang/Desktop/Code/legged_odometry_py/vo-odom.png')
         plt.show()
 
     def plot_3d_path_kinematics(self):
@@ -186,7 +186,7 @@ class OdometryPlotter(Node):
         ax.set_zlabel('Z Position')
         ax.set_title('3D Odometry Path vs Ground Truth')
         ax.legend()
-        plt.savefig('/home/aditya/results/new/3d-kinematics-odom.png')
+        plt.savefig('/home/junninghuang/Desktop/Code/legged_odometry_py/3d-kinematics-odom.png')
         plt.show()
     
     def plot_3d_path_odom(self):
@@ -202,7 +202,7 @@ class OdometryPlotter(Node):
         ax.set_zlabel('Z Position')
         ax.set_title('3D Odometry Path vs Ground Truth')
         ax.legend()
-        plt.savefig('/home/aditya/results/new/3d-vo-odom.png')
+        plt.savefig('/home/junninghuang/Desktop/Code/legged_odometry_py/3d-vo-odom.png')
         plt.show()
 
 def main(args=None):

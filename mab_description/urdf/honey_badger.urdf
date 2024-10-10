@@ -5,7 +5,7 @@
 <!-- =================================================================================== -->
 <robot name="honey_badger">
   <mujoco>
-    <compiler balanceinertia="false" discardvisual="false" meshdir="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/"/>
+    <compiler balanceinertia="false" discardvisual="false" meshdir="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/"/>
   </mujoco>
   <!-- Colors-->
   <gazebo reference="body">
@@ -276,7 +276,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/hb40.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/hb40.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -299,7 +299,7 @@
     <visual>
       <origin rpy="0 0 1.5707963267948966" xyz="0.11501 0.000167 0.024886"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/camera_mount/hb-camera-mount.stl"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/camera_mount/hb-camera-mount.stl"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -317,7 +317,7 @@
     <visual>
       <origin rpy="1.5707963267948966 3.141592653589793 1.5707963267948966" xyz="0.26171 0.000167 0.068486"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -350,7 +350,7 @@
       <!-- the mesh origin is at front plate in between the two infrared camera axes -->
       <origin rpy="1.5707963267948966 0 1.5707963267948966" xyz="0.0043 -0.0175 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/realsense2_description/share/realsense2_description/meshes/d435.dae"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/realsense2_description/share/realsense2_description/meshes/d435.dae"/>
       </geometry>
     </visual>
     <collision>
@@ -632,7 +632,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -651,7 +651,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -677,7 +677,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -730,7 +730,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -749,7 +749,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -775,7 +775,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -828,7 +828,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -847,7 +847,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -873,7 +873,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -926,7 +926,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -945,7 +945,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -971,7 +971,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/aditya/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="file:///home/junninghuang/ros2_ws/install/mab_description/share/mab_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
