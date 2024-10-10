@@ -1,6 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import TwistStamped
+from sensor_msgs.msg import JointState
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pickle
@@ -31,6 +33,19 @@ class OdometryPlotter(Node):
             self.odom_gt_callback,
             10)
         
+        self.base_lin_vel_subscriber = self.create_subscription(
+            TwistStamped,
+            '/base_lin_vel',
+            self.base_lin_vel_callback,
+            10)
+        
+        # Subscriber for /joint_states
+        self.joint_state_subscriber = self.create_subscription(
+            JointState,
+            '/joint_states',
+            self.joint_state_callback,
+            10)
+        
         # Data for plotting and saving
         self.kinematics_data = []
         self.odom_data = []
@@ -44,6 +59,13 @@ class OdometryPlotter(Node):
         self.gt_x = []
         self.gt_y = []
         self.gt_z = []
+        # Variables to store velocity data
+        self.vel_x = []
+        self.vel_y = []
+        self.vel_z = []
+        # Data for joint states
+        self.joint_velocities = []
+        self.joint_names = []
 
     def odom_kinematics_callback(self, msg):
         timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
@@ -74,6 +96,17 @@ class OdometryPlotter(Node):
         self.gt_x.append(x)
         self.gt_y.append(y)
         self.gt_z.append(z)
+        
+    def base_lin_vel_callback(self, msg):
+        # Extract linear velocities
+        self.vel_x.append(msg.twist.linear.x)
+        self.vel_y.append(msg.twist.linear.y)
+        self.vel_z.append(msg.twist.linear.z)
+        
+    def joint_state_callback(self, msg):
+        if not self.joint_names:
+            self.joint_names = list(msg.name)
+        self.joint_velocities.append(list(msg.velocity))
 
     def synchronize_data(self, odom, gt):
         # Convert lists to numpy arrays for interpolation
@@ -99,7 +132,12 @@ class OdometryPlotter(Node):
         data = {
             'kinematics_data': self.kinematics_data,
             'odom_data': self.odom_data,
-            'gt_data': self.gt_data
+            'gt_data': self.gt_data,
+            'velocity_data': {
+                'vel_x': self.vel_x,
+                'vel_y': self.vel_y,
+                'vel_z': self.vel_z
+            }
         }
         with open(filename, 'wb') as f:
             pickle.dump(data, f)
@@ -124,10 +162,13 @@ class OdometryPlotter(Node):
         plt.grid(True)
 
         # Subplot 2: Error between Odometry and Ground Truth
+        # print(kinematics_positions[0])
+        # print()
+        # print(gt_positions[0])
         plt.subplot(1, 2, 2)
-        error = np.sqrt((kinematics_positions[:, 0] - gt_positions[:, 0])**2 +
-                        (kinematics_positions[:, 1] - gt_positions[:, 1])**2 +
-                        (kinematics_positions[:, 2] - gt_positions[:, 2])**2)
+        error = np.sqrt((kinematics_positions[4:, 0] - gt_positions[4:, 0])**2 +
+                        (kinematics_positions[4:, 1] - gt_positions[4:, 1])**2 +
+                        (kinematics_positions[4:, 2] - gt_positions[4:, 2])**2)
         plt.plot(error, label="Position Error")
         plt.xlabel('Sample')
         plt.ylabel('Error (m)')
@@ -136,7 +177,7 @@ class OdometryPlotter(Node):
         plt.grid(True)
 
         plt.tight_layout()
-        plt.savefig('/home/aditya/results/new/kinematics-odom.png')
+        plt.savefig('/home/ws/results/kinematics-odom.png')
         plt.show()
 
     def plot_odom_path(self):
@@ -170,7 +211,7 @@ class OdometryPlotter(Node):
         plt.grid(True)
 
         plt.tight_layout()
-        plt.savefig('/home/aditya/results/new/vo-odom.png')
+        plt.savefig('/home/ws/results/vo-odom.png')
         plt.show()
 
     def plot_3d_path_kinematics(self):
@@ -185,8 +226,11 @@ class OdometryPlotter(Node):
         ax.set_ylabel('Y Position')
         ax.set_zlabel('Z Position')
         ax.set_title('3D Odometry Path vs Ground Truth')
+        ax.set_xlim(-4.0, -1.0)
+        ax.set_ylim(1.0, 4.0)
+        ax.set_zlim(0.0, 1.6)
         ax.legend()
-        plt.savefig('/home/aditya/results/new/3d-kinematics-odom.png')
+        plt.savefig('/home/ws/results/3d-kinematics-odom.png')
         plt.show()
     
     def plot_3d_path_odom(self):
@@ -202,8 +246,70 @@ class OdometryPlotter(Node):
         ax.set_zlabel('Z Position')
         ax.set_title('3D Odometry Path vs Ground Truth')
         ax.legend()
-        plt.savefig('/home/aditya/results/new/3d-vo-odom.png')
+        plt.savefig('/home/ws/results/3d-vo-odom.png')
         plt.show()
+        
+    def plot_velocities(self):
+        # Plot linear velocities in X, Y, and Z directions
+        plt.figure(figsize=(10, 5))
+        plt.ylim(-0.1, 0.1)
+        
+        # Plot X velocity
+        plt.subplot(3, 1, 1)
+        plt.plot(self.vel_x, label='X Velocity')
+        plt.xlabel('Sample')
+        plt.ylabel('Velocity (m/s)')
+        plt.title('Linear Velocity in X')
+        plt.legend()
+        plt.grid(True)
+        
+        # Plot Y velocity
+        plt.subplot(3, 1, 2)
+        plt.plot(self.vel_y, label='Y Velocity')
+        plt.xlabel('Sample')
+        plt.ylabel('Velocity (m/s)')
+        plt.title('Linear Velocity in Y')
+        plt.legend()
+        plt.grid(True)
+        
+        # Plot Z velocity
+        plt.subplot(3, 1, 3)
+        plt.plot(self.vel_z, label='Z Velocity')
+        plt.xlabel('Sample')
+        plt.ylabel('Velocity (m/s)')
+        plt.title('Linear Velocity in Z')
+        plt.legend()
+        plt.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig('/home/ws/results/linear_velocities.png')
+        plt.show()
+        
+    def plot_joint_velocities(self):
+        # Check if joint velocity data is available
+        if not self.joint_velocities:
+            self.get_logger().warn("No joint velocity data received.")
+            return
+
+        # Number of joints
+        num_joints = len(self.joint_names)
+
+        # Plot joint velocities separately for each joint
+        for i in range(num_joints):
+            plt.figure(figsize=(8, 4))
+            plt.ylim(-0.8, 0.8)
+            plt.plot([vel[i] for vel in self.joint_velocities], label=f'{self.joint_names[i]} Velocity')
+            plt.xlabel('Sample')
+            plt.ylabel('Velocity (rad/s)')
+            plt.title(f'Joint Velocity: {self.joint_names[i]}')
+            plt.legend()
+            plt.grid(True)
+
+            # Save the individual plot
+            plt.savefig(f'/home/ws/results/joint_velocity_{self.joint_names[i]}.png')
+            plt.show()
+
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -225,6 +331,12 @@ def main(args=None):
     # Plot 3D path
     odometry_plotter.plot_3d_path_kinematics()
     odometry_plotter.plot_3d_path_odom()
+    
+    # Plot velocity data
+    odometry_plotter.plot_velocities()
+    
+    # Plot joint state data
+    odometry_plotter.plot_joint_velocities()
 
     odometry_plotter.destroy_node()
     rclpy.shutdown()

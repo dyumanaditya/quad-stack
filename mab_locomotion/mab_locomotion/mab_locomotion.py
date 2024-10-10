@@ -147,7 +147,8 @@ class MABLocomotion(Node):
 
         print(f"Robot ready. Using device: {jax.default_backend()}")
 
-        timer_period = 0.02  # 50 Hz
+        timer_period = 0.01  # 100 Hz
+        # timer_period = 0.02  # 50 Hz
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
 

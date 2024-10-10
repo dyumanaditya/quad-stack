@@ -20,6 +20,7 @@ pip3 install -U jax
 pip3 install flax
 pip3 install opencv-python
 pip3 install transforms3d
+pip3 install matplotlib
 
 # Install xterm
 sudo apt install -y xterm

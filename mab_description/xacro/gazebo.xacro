@@ -161,7 +161,8 @@
               <updateRateHZ>100.0</updateRateHZ>
               <xyzOffset>0 0 0</xyzOffset>
               <rpyOffset>0 0 0</rpyOffset>
-              <gaussianNoise>0.017</gaussianNoise>
+              <gaussianNoise>0.0</gaussianNoise>
+              <!-- <gaussianNoise>0.017</gaussianNoise> -->
           </plugin>
           <pose>0 0 0 0 0 0</pose>
       </sensor>
