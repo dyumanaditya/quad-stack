@@ -27,6 +27,9 @@ target_link_libraries(kinematics_odometry pinocchio::pinocchio)
 add_executable(odom_publisher src/odom_publisher.cpp)
 ament_target_dependencies(odom_publisher rclcpp std_msgs sensor_msgs nav_msgs geometry_msgs tf2 tf2_geometry_msgs)
 
+add_executable(imu_gt_fd src/imu_gt_fd.cpp)
+ament_target_dependencies(imu_gt_fd rclcpp std_msgs sensor_msgs nav_msgs geometry_msgs tf2 tf2_geometry_msgs)
+
 include_directories(
   include
   ${rclcpp_INCLUDE_DIRS}
@@ -49,6 +52,9 @@ install(TARGETS kinematics_odometry
   DESTINATION lib/${PROJECT_NAME})
 
   install(TARGETS odom_publisher
+  DESTINATION lib/${PROJECT_NAME})
+  
+  install(TARGETS imu_gt_fd
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY

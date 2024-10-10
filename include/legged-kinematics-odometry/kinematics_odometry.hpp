@@ -32,8 +32,16 @@ class KinematicsOdometry : public rclcpp::Node
     void _computeVelocity(std::string foot_in_contact_name);
     rclcpp::TimerBase::SharedPtr timer_;
 
+    // Helper for skew symmetric matrix
+    Eigen::Matrix3d skewSymmetricMatrix(const Eigen::Vector3d& v);
+
     // Store a map of legs and the velocity they make the body move
     std::map<std::string, Eigen::Vector3d> leg_velocities_buffer_;
+
+    // Maps for least squares
+    // Store map for feet positions and foot velocities wrt to base frame
+    std::map<std::string, Eigen::Vector3d> feet_positions_;
+    std::map<std::string, Eigen::Vector3d> feet_velocities_;
 
 
     // Array to store joint states
@@ -44,6 +52,7 @@ class KinematicsOdometry : public rclcpp::Node
 
     // Array to store imu data
     std::vector<double> imu_ang_vel_;
+    std::vector<double> imu_orientation_;
 
     // Pinocchio model
     pinocchio::Model model_;

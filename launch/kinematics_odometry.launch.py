@@ -28,9 +28,17 @@ def generate_launch_description():
         name='odom_publisher',
         output='screen',
     )
+    
+    imu_gt_fd = Node(
+        package='legged_kinematics_odometry',
+        executable='imu_gt_fd',
+        name='imu_gt_fd',
+        output='screen',
+    )
 
     return LaunchDescription([
         urdf,
         kinematics_odometry,
+        imu_gt_fd,
         odom_publisher,
     ])
