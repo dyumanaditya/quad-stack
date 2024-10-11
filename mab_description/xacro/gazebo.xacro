@@ -38,8 +38,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -65,8 +65,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -92,8 +92,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
@@ -119,8 +119,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
