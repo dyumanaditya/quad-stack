@@ -3,6 +3,26 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="gazebo_simulation" params="robot">
 
+  <physics type="ode">
+    <max_step_size>0.001</max_step_size>
+    <real_time_factor>1</real_time_factor>
+    <real_time_update_rate>1000</real_time_update_rate>
+    <ode>
+      <solver>
+        <type>quick</type>
+        <iters>300</iters>
+        <sor>1.3</sor>
+      </solver>
+      <constraints>
+        <cfm>0.00001</cfm>
+        <erp>0.2</erp>
+        <contact_max_correcting_vel>10.0</contact_max_correcting_vel>
+        <contact_surface_layer>0.001</contact_surface_layer>
+      </constraints>
+    </ode>
+  </physics>
+
+
     <!-- Colors-->
     <gazebo reference="body">
       <mu1>0.2</mu1>
@@ -38,8 +58,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -65,8 +85,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -92,8 +112,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
@@ -119,8 +139,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1000000.0"/>
-      <kd value="1.0"/>
+      <kp value="1e15"/>
+      <kd value="1e13"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
