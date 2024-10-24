@@ -4,6 +4,8 @@
 #include "gazebo/common/PID.hh"
 #include <gazebo/physics/physics.hh>
 #include <gazebo_ros/node.hpp>
+#include <gazebo/sensors/sensors.hh>
+#include <gazebo/sensors/ContactSensor.hh>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -11,8 +13,13 @@
 #include <rclcpp/qos.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <chrono>
-
 #include <hb40_commons/msg/joint_command.hpp>
+#include <hb40_commons/msg/robot_state.hpp>
+#include <hb40_commons/msg/leg_state.hpp>
+
+// include files for contact sensor
+#include <thread>
+#include <unordered_map>
 
 using namespace std::chrono_literals;
 
@@ -47,6 +54,26 @@ namespace gazebo
             auto qos = rclcpp::QoS(rclcpp::KeepLast(10));
             qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
 
+            // Contact sensor QoS
+            auto qos_contacts = rclcpp::QoS(rclcpp::KeepLast(5));
+            qos_contacts.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+
+            // Contact sensor publisher
+            contact_state_publisher_ = node_->create_publisher<hb40_commons::msg::RobotState>("/feet_contact_state", 10);
+
+            // Get sensor manager
+            sensors_ = sensors::SensorManager::Instance();
+
+            // Read contact sensor data with sensor manager
+            contact_sensors_["fr_foot"] = std::dynamic_pointer_cast<sensors::ContactSensor>(sensors_->GetSensor("fr_foot_bumper"));
+            contact_sensors_["fl_foot"] = std::dynamic_pointer_cast<sensors::ContactSensor>(sensors_->GetSensor("fl_foot_bumper"));
+            contact_sensors_["rr_foot"] = std::dynamic_pointer_cast<sensors::ContactSensor>(sensors_->GetSensor("rr_foot_bumper"));
+            contact_sensors_["rl_foot"] = std::dynamic_pointer_cast<sensors::ContactSensor>(sensors_->GetSensor("rl_foot_bumper"));
+
+            // Create a timer to publish contact states
+            auto publish_frequency = std::chrono::milliseconds(2);
+            contact_timer_ = node_->create_wall_timer(publish_frequency, std::bind(&MABGazeboControlPlugin::publishContactStates, this));
+
             // rclcpp::NodeOptions options;
             // options.parameter_overrides({{"use_sim_time", true}});
             // this->node_ = std::make_shared<rclcpp::Node>("mab_gazebo_control_plugin", options);
@@ -71,13 +98,13 @@ namespace gazebo
             gazebo::common::Time sim_time = model_->GetWorld()->SimTime();
             joint_state_msg.header.stamp.sec = sim_time.sec;
             joint_state_msg.header.stamp.nanosec = sim_time.nsec;
-            
+
             joint_state_msg.name = joint_names_input_;
 
             for (size_t i = 0; i < joint_names_input_.size(); ++i)
             {
                 // Find the correct joint
-                std::string joint_name = joint_names_input_[i];   
+                std::string joint_name = joint_names_input_[i];
                 for (size_t j = 0; j < joints_.size(); ++j)
                 {
                     if (robot == "honey_badger" && joint_name == "sp_j0")
@@ -108,7 +135,7 @@ namespace gazebo
             // }
 
             // Assuming a control loop period of 50Hz (as in mab_locomotion policy node)
-            // double dt = 0.02; 
+            // double dt = 0.02;
 
             for (size_t i = 0; i < msg->t_pos.size(); ++i)
             {
@@ -144,6 +171,46 @@ namespace gazebo
             }
         }
 
+        void publishContactStates()
+        {
+            // Get the contact state
+            hb40_commons::msg::RobotState robot_state;
+            robot_state.header.stamp = node_->now();
+            robot_state.header.frame_id = "base_link";
+            robot_state.leg.resize(4);
+            robot_state.leg.clear();
+
+            // Get the contact state for each foot
+            for (auto &contact_sensor : contact_sensors_)
+            {
+                std::string leg_name = contact_sensor.first;
+                sensors::ContactSensorPtr contact_sensor_ptr = contact_sensor.second;
+
+                bool is_contact = detectContact(contact_sensor_ptr);
+                hb40_commons::msg::LegState leg_state;
+                leg_state.leg_name = leg_name;
+                leg_state.contact = is_contact;
+                robot_state.leg.push_back(leg_state);
+            }
+
+            // Publish the contact state
+            contact_state_publisher_->publish(robot_state);
+        }
+
+        bool detectContact(sensors::ContactSensorPtr contact_sensor)
+        {
+            for (unsigned int i = 0; i < contact_sensor->GetCollisionCount(); i++)
+            {
+                std::string collision_name = contact_sensor->GetCollisionName(i);
+                std::map<std::string, physics::Contact> contacts = contact_sensor->Contacts(collision_name);
+                if (contacts.size() > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     private:
         physics::ModelPtr model_;
         std::vector<physics::JointPtr> joints_;
@@ -153,6 +220,13 @@ namespace gazebo
         std::string joint_topic_;
         std::thread ros_thread_;
 
+        // Contact sensor
+        rclcpp::Publisher<hb40_commons::msg::RobotState>::SharedPtr contact_state_publisher_;
+        std::unordered_map<std::string, sensors::ContactSensorPtr> contact_sensors_;
+        sensors::SensorManager *sensors_;
+        rclcpp::TimerBase::SharedPtr contact_timer_;
+
+        // Joint state publisher
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;
         rclcpp::TimerBase::SharedPtr timer_;
 
@@ -171,8 +245,7 @@ namespace gazebo
             "rr_j0",
             "rr_j1",
             "rr_j2",
-            "sp_j0"
-        };
+            "sp_j0"};
     };
 
     GZ_REGISTER_MODEL_PLUGIN(MABGazeboControlPlugin)
