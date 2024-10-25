@@ -71,7 +71,7 @@ namespace gazebo
             contact_sensors_["rl_foot"] = std::dynamic_pointer_cast<sensors::ContactSensor>(sensors_->GetSensor("rl_foot_bumper"));
 
             // Create a timer to publish contact states
-            auto publish_frequency = std::chrono::milliseconds(2);
+            auto publish_frequency = std::chrono::milliseconds(10);
             contact_timer_ = node_->create_wall_timer(publish_frequency, std::bind(&MABGazeboControlPlugin::publishContactStates, this));
 
             // rclcpp::NodeOptions options;
