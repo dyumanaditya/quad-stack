@@ -18,6 +18,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <hb40_commons/msg/robot_state.hpp>
 
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <tf2/LinearMath/Quaternion.h>
@@ -25,23 +26,24 @@
 
 using namespace std::chrono_literals;
 
-
-
 KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
 {
     // QOS to keep most recent messages
     rclcpp::QoS qos_most_recent(rclcpp::KeepLast(1));
     rclcpp::QoS qos_contacts(rclcpp::KeepLast(5));
 
-    feet_contact_sub_ = this->create_subscription<gazebo_msgs::msg::ContactsState>(
-        "/feet_contact", qos_contacts, std::bind(&KinematicsOdometry::feetContactCallback, this, std::placeholders::_1));
+    // feet_contact_sub_ = this->create_subscription<gazebo_msgs::msg::ContactsState>(
+    //     "/feet_contact", qos_contacts, std::bind(&KinematicsOdometry::feetContactCallback, this, std::placeholders::_1));
+
+    feet_contact_state_sub_ = this->create_subscription<hb40_commons::msg::RobotState>(
+        "/feet_contact_state", qos_contacts, std::bind(&KinematicsOdometry::feetContactStateCallback, this, std::placeholders::_1));
 
     joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_states", qos_most_recent, std::bind(&KinematicsOdometry::jointStateCallback, this, std::placeholders::_1));
 
     imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
         "/imu_gt_fd", qos_most_recent, std::bind(&KinematicsOdometry::imuCallback, this, std::placeholders::_1));
-        // "/imu/out", qos_most_recent, std::bind(&KinematicsOdometry::imuCallback, this, std::placeholders::_1));
+    // "/imu/out", qos_most_recent, std::bind(&KinematicsOdometry::imuCallback, this, std::placeholders::_1));
 
     velocity_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("/base_lin_vel", 10);
     timer_ = this->create_wall_timer(5ms, std::bind(&KinematicsOdometry::publishVelocity, this));
@@ -67,7 +69,6 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
     std::cout << "Dimension of velocity vector space: " << model_.nv << std::endl;
     std::cout << "Degrees of freedom: " << model_.nq << std::endl;
 
-
     for (int i = 0; i < model_.njoints; i++)
     {
         std::cout << "Joint " << i << " has name " << model_.names[i] << std::endl;
@@ -75,9 +76,9 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
 
     // Initialize joint states (we don't care about the first "universe" joint)
     pinocchio_joint_names_ = model_.names;
-    joint_states_.resize(model_.njoints-1, 0.0);
+    joint_states_.resize(model_.njoints - 1, 0.0);
     joint_states_names_.resize(0);
-    joint_velocities_.resize(model_.njoints-1, 0.0);
+    joint_velocities_.resize(model_.njoints - 1, 0.0);
 
     // Initialize pinocchio joint map
     for (int i = 0; i < model_.njoints; i++)
@@ -90,7 +91,6 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
     imu_ang_vel_.resize(3, 0.0);
 }
 
-
 void KinematicsOdometry::feetContactCallback(const gazebo_msgs::msg::ContactsState::SharedPtr msg)
 {
     // When a contact for a foot is detected, we compute forward kinematics and compute the velocity of the leg
@@ -101,7 +101,7 @@ void KinematicsOdometry::feetContactCallback(const gazebo_msgs::msg::ContactsSta
     }
 
     // Contact name
-    std::string contact_name = msg->states[msg->states.size()-1].collision1_name;
+    std::string contact_name = msg->states[msg->states.size() - 1].collision1_name;
     std::string foot_in_contact_name;
 
     if (contact_name.find("fl_foot") != std::string::npos)
@@ -121,8 +121,29 @@ void KinematicsOdometry::feetContactCallback(const gazebo_msgs::msg::ContactsSta
         foot_in_contact_name = "rr_foot";
     }
 
-    _computeVelocity(foot_in_contact_name);    
+    _computeLegVelocity(foot_in_contact_name);
+}
 
+void KinematicsOdometry::feetContactStateCallback(const hb40_commons::msg::RobotState::SharedPtr msg)
+{
+    // When a contact for a foot is detected, we compute forward kinematics and compute the velocity of the leg
+    // The average of all foot velocities is take for the feet on the ground
+    if (joint_states_names_.empty() || msg->leg.empty())
+    {
+        return;
+    }
+
+    // Contact name
+    std::string foot_in_contact_name;
+
+    for (auto leg_state : msg->leg)
+    {
+        if (leg_state.contact)
+        {
+            foot_in_contact_name = leg_state.leg_name;
+            _computeLegVelocity(foot_in_contact_name);
+        }
+    }
 }
 
 void KinematicsOdometry::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg)
@@ -146,13 +167,13 @@ std::vector<std::string> KinematicsOdometry::_getKinematicChain(const std::strin
     pinocchio::JointIndex current_joint_idx = joint2_idx;
 
     while (current_joint_idx != joint1_idx && current_joint_idx != 0)
-    { 
+    {
         // Add the joint name to the list
         kinematic_chain.push_back(model_.names[current_joint_idx]);
-        
+
         // Move to the parent joint
         current_joint_idx = model_.parents[current_joint_idx];
-    } 
+    }
 
     // Reverse the list to go from link1 to link2
     std::reverse(kinematic_chain.begin(), kinematic_chain.end());
@@ -172,13 +193,13 @@ void KinematicsOdometry::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
     imu_ang_vel_[2] = msg->angular_velocity.z;
 }
 
-void KinematicsOdometry::_computeVelocity(std::string foot_in_contact_name)
+void KinematicsOdometry::_computeLegVelocity(std::string foot_in_contact_name)
 {
     // Update forward kinematics for current joint configuration
     Eigen::VectorXd q = Eigen::VectorXd::Zero(joint_states_.size());
 
     // Map the joint states to the pinocchio joint order
-    for (int i=0; i<joint_states_names_.size(); i++)
+    for (int i = 0; i < joint_states_names_.size(); i++)
     {
         auto it = std::find(pinocchio_joint_names_.begin(), pinocchio_joint_names_.end(), joint_states_names_[i]);
         int idx = std::distance(pinocchio_joint_names_.begin(), it) - 1;
@@ -192,9 +213,7 @@ void KinematicsOdometry::_computeVelocity(std::string foot_in_contact_name)
     pinocchio::FrameIndex frame_id = model_.getFrameId(foot_in_contact_name);
     Eigen::MatrixXd J(6, model_.nv);
     pinocchio::computeJointJacobians(model_, data_, q);
-    // pinocchio::getFrameJacobian(model_, data_, frame_id, pinocchio::LOCAL, J);
     pinocchio::getFrameJacobian(model_, data_, frame_id, pinocchio::LOCAL_WORLD_ALIGNED, J);
-    // pinocchio::getFrameJacobian(model_, data_, frame_id, pinocchio::WORLD, J);
 
     // Get the kinematic chain for the leg
     std::vector<std::string> kinematic_chain;
@@ -220,19 +239,19 @@ void KinematicsOdometry::_computeVelocity(std::string foot_in_contact_name)
     std::vector<int> joint_indices;
     for (auto joint_name : kinematic_chain)
     {
-        joint_indices.push_back(pinocchio_joint_map_[joint_name]-1);
+        joint_indices.push_back(pinocchio_joint_map_[joint_name] - 1);
     }
 
     // Extract the leg Jacobian
     Eigen::MatrixXd J_leg = Eigen::MatrixXd::Zero(6, kinematic_chain.size());
-    for (int i=0; i<joint_indices.size(); i++)
+    for (int i = 0; i < joint_indices.size(); i++)
     {
         J_leg.col(i) = J.col(joint_indices[i]);
     }
 
     // Choose the joint velocities corresponding to the leg joints
     Eigen::VectorXd leg_joint_velocities = Eigen::VectorXd::Zero(kinematic_chain.size());
-    for (int i=0; i<kinematic_chain.size(); i++)
+    for (int i = 0; i < kinematic_chain.size(); i++)
     {
         auto it = std::find(joint_states_names_.begin(), joint_states_names_.end(), kinematic_chain[i]);
         int idx = std::distance(joint_states_names_.begin(), it);
@@ -260,19 +279,55 @@ void KinematicsOdometry::_computeVelocity(std::string foot_in_contact_name)
 
     // Eigen::Vector3d imu_ang_vel = leg_velocity.tail(3);
     Eigen::Vector3d imu_ang_vel(imu_ang_vel_[0], imu_ang_vel_[1], imu_ang_vel_[2]);
-    // Eigen::Vector3d imu_ang_vel = R_base_foot.transpose() * leg_velocity.tail(3);
-    // Eigen::Vector3d body_velocity = -leg_velocity.head(3);
-    Eigen::Vector3d body_velocity = -leg_velocity.head(3) - imu_ang_vel.cross(p_base_foot);
-    // Eigen::Vector3d body_velocity = -(R_base_foot.transpose() * leg_velocity.head(3));
-    // Eigen::Vector3d body_velocity = -(R_base_foot.transpose() * leg_velocity.head(3)) - imu_ang_vel.cross(p_base_foot);
-    // std::cout << body_velocity << std::endl;
+    Eigen::Vector3d body_velocity_leg = -leg_velocity.head(3) - imu_ang_vel.cross(p_base_foot);
 
     // Store the velocity in the buffer
-    leg_velocities_buffer_[foot_in_contact_name] = body_velocity;
+    leg_velocities_buffer_[foot_in_contact_name] = body_velocity_leg;
 
     // Fill buffers for least squares data
     feet_positions_[foot_in_contact_name] = p_base_foot;
     feet_velocities_[foot_in_contact_name] = leg_velocity.head(3);
+}
+
+void KinematicsOdometry::_computeBodyVelocity()
+{
+    bool least_squares = false;
+    if (least_squares)
+    {
+        // Create A matrix and b vector for least squares
+        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(3 * leg_velocities_buffer_.size(), 6);
+        Eigen::VectorXd b = Eigen::VectorXd::Zero(3 * leg_velocities_buffer_.size());
+
+        int i = 0;
+        for (auto it = feet_positions_.begin(); it != feet_positions_.end(); it++)
+        {
+            // Fill the A matrix
+            A.block<3, 3>(3 * i, 0) = Eigen::Matrix3d::Identity();
+            A.block<3, 3>(3 * i, 3) = -skewSymmetricMatrix(feet_positions_[it->first]);
+
+            // Fill the b vector
+            b.segment(3 * i, 3) = -feet_velocities_[it->first];
+            i++;
+        }
+
+        // Solve the least squares problem Ax = b
+        Eigen::VectorXd x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+        body_linear_velocity = x.head(3);
+        body_angular_velocity = x.tail(3);
+    }
+    else
+    {
+        body_linear_velocity = Eigen::Vector3d::Zero();
+        // Average the velocities of the legs as the body velocity
+        for (auto it = leg_velocities_buffer_.begin(); it != leg_velocities_buffer_.end(); it++)
+        {
+            body_linear_velocity += it->second;
+        }
+        body_linear_velocity /= leg_velocities_buffer_.size();
+        body_angular_velocity[0] = imu_ang_vel_[0];
+        body_angular_velocity[1] = imu_ang_vel_[1];
+        body_angular_velocity[2] = imu_ang_vel_[2];
+    }
 }
 
 void KinematicsOdometry::publishVelocity()
@@ -283,98 +338,20 @@ void KinematicsOdometry::publishVelocity()
         return;
     }
 
-    bool least_squares = false;
+    _computeBodyVelocity();
+
     geometry_msgs::msg::TwistStamped velocity_msg;
 
-    if (least_squares)
-    {
-        // Create A matrix and b vector for least squares
-        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(3*leg_velocities_buffer_.size(), 6);
-        Eigen::VectorXd b = Eigen::VectorXd::Zero(3*leg_velocities_buffer_.size());
+    // Publish the velocity
+    velocity_msg.header.stamp = this->get_clock()->now();
+    velocity_msg.header.frame_id = "base_link";
+    velocity_msg.twist.linear.x = body_linear_velocity(0);
+    velocity_msg.twist.linear.y = body_linear_velocity(1);
+    velocity_msg.twist.linear.z = body_linear_velocity(2);
 
-        int i = 0;
-        for (auto it = feet_positions_.begin(); it != feet_positions_.end(); it++)
-        {
-            // Fill the A matrix
-            A.block<3, 3>(3*i, 0) = Eigen::Matrix3d::Identity();
-            A.block<3, 3>(3*i, 3) = -skewSymmetricMatrix(feet_positions_[it->first]);
-
-            // Fill the b vector
-            b.segment(3*i, 3) = -feet_velocities_[it->first];
-            i++;
-        }
-
-        // Solve the least squares problem Ax = b
-        Eigen::VectorXd x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
-
-        // Fill the velocity message
-        velocity_msg.header.stamp = this->get_clock()->now();
-        velocity_msg.header.frame_id = "base_link";
-        velocity_msg.twist.linear.x = x(0);
-        velocity_msg.twist.linear.y = x(1);
-        velocity_msg.twist.linear.z = x(2);
-
-        velocity_msg.twist.angular.x = x(3);
-        velocity_msg.twist.angular.y = x(4);
-        velocity_msg.twist.angular.z = x(5);
-    }
-    else
-    {
-        // Go through the buffer and compute the average velocity for publishing
-        Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
-        int legs_in_contact = 0;
-        for (auto it = leg_velocities_buffer_.begin(); it != leg_velocities_buffer_.end(); it++)
-        {
-            // if (it->first == "fl_foot")
-            // {
-                velocity += it->second;
-                legs_in_contact++;
-            // }
-        }
-        velocity /= legs_in_contact;
-
-        velocity_msg.header.stamp = this->get_clock()->now();
-        velocity_msg.header.frame_id = "base_link";
-        velocity_msg.twist.linear.x = velocity(0);
-        velocity_msg.twist.linear.y = velocity(1);
-        velocity_msg.twist.linear.z = velocity(2);
-        // velocity_msg.twist.linear.z = 0;
-
-        // velocity_msg.twist.angular.x = 0;
-        // velocity_msg.twist.angular.y = 0;
-        // velocity_msg.twist.angular.z = 0;
-
-        velocity_msg.twist.angular.x = imu_ang_vel_[0];
-        velocity_msg.twist.angular.y = imu_ang_vel_[1];
-        velocity_msg.twist.angular.z = imu_ang_vel_[2];
-        //Print norm of velocity
-        std::cout << "Velocity norm: " << velocity.norm() << std::endl;
-    }
-
-
-    
-    // velocity_msg.header.stamp = this->get_clock()->now();
-    // velocity_msg.header.frame_id = "base_link";
-    // velocity_msg.twist.linear.x = velocity(0);
-    // velocity_msg.twist.linear.y = velocity(1);
-    // velocity_msg.twist.linear.z = velocity(2);
-
-    // velocity_msg.twist.angular.x = 0;
-    // velocity_msg.twist.angular.y = 0;
-    // velocity_msg.twist.angular.z = 0;
-
-    // velocity_msg.twist.angular.x = imu_ang_vel_[0];
-    // velocity_msg.twist.angular.y = imu_ang_vel_[1];
-    // velocity_msg.twist.angular.z = imu_ang_vel_[2];
-
-    // double r, p, y;
-    // tf2::Quaternion tf2_quaternion(imu_orientation_[0], imu_orientation_[1], imu_orientation_[2], imu_orientation_[3]);
-    // tf2::Matrix3x3 m(tf2_quaternion);
-    // m.getRPY(r, p, y);
-
-    // velocity_msg.twist.angular.x = r;
-    // velocity_msg.twist.angular.y = p;
-    // velocity_msg.twist.angular.z = y;
+    velocity_msg.twist.angular.x = body_angular_velocity(0);
+    velocity_msg.twist.angular.y = body_angular_velocity(1);
+    velocity_msg.twist.angular.z = body_angular_velocity(2);
 
     velocity_pub_->publish(velocity_msg);
 
@@ -384,19 +361,19 @@ void KinematicsOdometry::publishVelocity()
     feet_velocities_.clear();
 }
 
-Eigen::Matrix3d KinematicsOdometry::skewSymmetricMatrix(const Eigen::Vector3d& v) {
+Eigen::Matrix3d KinematicsOdometry::skewSymmetricMatrix(const Eigen::Vector3d &v)
+{
     Eigen::Matrix3d skew;
-    skew <<     0, -v(2),  v(1),
-             v(2),     0, -v(0),
-            -v(1),  v(0),     0;
+    skew << 0, -v(2), v(1),
+        v(2), 0, -v(0),
+        -v(1), v(0), 0;
     return skew;
 }
 
-
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
-  rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<KinematicsOdometry>());
-  rclcpp::shutdown();
-  return 0;
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<KinematicsOdometry>());
+    rclcpp::shutdown();
+    return 0;
 }
