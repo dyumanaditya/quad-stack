@@ -291,22 +291,26 @@ void KinematicsOdometry::_computeLegVelocity(std::string foot_in_contact_name)
 
 void KinematicsOdometry::_computeBodyVelocity()
 {
-    bool least_squares = false;
+    bool least_squares = true;
     if (least_squares)
     {
-        // Create A matrix and b vector for least squares
-        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(3 * leg_velocities_buffer_.size(), 6);
-        Eigen::VectorXd b = Eigen::VectorXd::Zero(3 * leg_velocities_buffer_.size());
+
+        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(6 * leg_velocities_buffer_.size(), 6);
+        Eigen::VectorXd b = Eigen::VectorXd::Zero(6 * leg_velocities_buffer_.size());
 
         int i = 0;
         for (auto it = feet_positions_.begin(); it != feet_positions_.end(); it++)
         {
             // Fill the A matrix
-            A.block<3, 3>(3 * i, 0) = Eigen::Matrix3d::Identity();
-            A.block<3, 3>(3 * i, 3) = -skewSymmetricMatrix(feet_positions_[it->first]);
+            A.block<3, 3>(6 * i, 0) = Eigen::Matrix3d::Identity();
+            A.block<3, 3>(6 * i, 3) = -skewSymmetricMatrix(feet_positions_[it->first]);
+            A.block<3, 3>(6 * i + 3, 3) = Eigen::Matrix3d::Identity();
 
-            // Fill the b vector
-            b.segment(3 * i, 3) = -feet_velocities_[it->first];
+            // Fill the b vector, add imu angular velocity as regularization
+            b.segment(6 * i, 3) = -feet_velocities_[it->first];
+            b(6 * i + 3) = imu_ang_vel_[0];
+            b(6 * i + 4) = imu_ang_vel_[1];
+            b(6 * i + 5) = imu_ang_vel_[2];
             i++;
         }
 
@@ -314,6 +318,23 @@ void KinematicsOdometry::_computeBodyVelocity()
         Eigen::VectorXd x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
         body_linear_velocity = x.head(3);
         body_angular_velocity = x.tail(3);
+
+        // // Print the rank of A matrix
+        // std::cout << "Buffer size" << leg_velocities_buffer_.size() << std::endl;
+        // std::cout << "Rank of A: " << A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).rank() << std::endl;
+
+        // // Compare with average velocity and imu angular velocity
+        // Eigen::Vector3d avg_velocity = Eigen::Vector3d::Zero();
+        // for (auto it = leg_velocities_buffer_.begin(); it != leg_velocities_buffer_.end(); it++)
+        // {
+        //     avg_velocity += it->second;
+        // }
+        // avg_velocity /= leg_velocities_buffer_.size();
+        // std::cout << "Average linear velocity: " << avg_velocity.transpose() << std::endl;
+        // std::cout << "IMU angular velocity: " << imu_ang_vel_[0] << " " << imu_ang_vel_[1] << " " << imu_ang_vel_[2] << std::endl;
+        // std::cout << "Least squares linear velocity: " << x.head(3) << std::endl;
+        // std::cout << "Least squares angular velocity: " << x.tail(3) << std::endl;
+        // std::cout << " ======================== " << std::endl;
     }
     else
     {
