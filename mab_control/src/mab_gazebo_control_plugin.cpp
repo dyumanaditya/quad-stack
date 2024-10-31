@@ -175,7 +175,9 @@ namespace gazebo
         {
             // Get the contact state
             hb40_commons::msg::RobotState robot_state;
-            robot_state.header.stamp = node_->now();
+            gazebo::common::Time sim_time = model_->GetWorld()->SimTime();
+            robot_state.header.stamp.sec = sim_time.sec;
+            robot_state.header.stamp.nanosec = sim_time.nsec;
             robot_state.header.frame_id = "base_link";
             robot_state.leg.resize(4);
             robot_state.leg.clear();
@@ -186,10 +188,28 @@ namespace gazebo
                 std::string leg_name = contact_sensor.first;
                 sensors::ContactSensorPtr contact_sensor_ptr = contact_sensor.second;
 
+                // Check if the foot is in contact
                 bool is_contact = detectContact(contact_sensor_ptr);
                 hb40_commons::msg::LegState leg_state;
                 leg_state.leg_name = leg_name;
                 leg_state.contact = is_contact;
+
+                // Retrieve the contact force
+                if (is_contact)
+                {
+                    physics::Contact contact = contact_sensor_ptr->Contacts(contact_sensor_ptr->GetCollisionName(0)).begin()->second;
+                    ignition::math::Vector3d force = contact.wrench[0].body1Force;
+                    leg_state.foot_force_est.x = force.X();
+                    leg_state.foot_force_est.y = force.Y();
+                    leg_state.foot_force_est.z = force.Z();
+                }
+                else
+                {
+                    leg_state.foot_force_est.x = 0.0;
+                    leg_state.foot_force_est.y = 0.0;
+                    leg_state.foot_force_est.z = 0.0;
+                }
+
                 robot_state.leg.push_back(leg_state);
             }
 
