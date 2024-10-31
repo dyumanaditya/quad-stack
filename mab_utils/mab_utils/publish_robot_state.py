@@ -5,6 +5,7 @@ from sensor_msgs.msg import JointState
 from sensor_msgs.msg import Imu
 from hb40_commons.msg import BridgeData
 from time import time
+from rclpy.clock import Clock, ClockType
 
 
 
@@ -32,7 +33,8 @@ class PublishRobotState(Node):
 
         self.publisher = self.create_publisher(BridgeData, '/hb40/bridge_data', 10)
         timer_period = 0.01  # seconds (100 Hz)
-        self.timer = self.create_timer(timer_period, self.publish_combined_message)
+        self.system_clock = Clock(clock_type=ClockType.SYSTEM_TIME)
+        self.timer = self.create_timer(timer_period, self.publish_combined_message, clock=self.system_clock)
 
         self.current_orientation = None
         self.current_angular_vel = None
@@ -62,6 +64,7 @@ class PublishRobotState(Node):
     def publish_combined_message(self):
         if self.current_orientation is not None and self.current_angular_vel is not None and self.current_joints_pos is not None and self.current_joints_vel is not None and self.current_joints_effort is not None:
             robot_state = BridgeData()
+            robot_state.header.stamp = self.get_clock().now().to_msg()
             robot_state.orientation.x = self.current_orientation.x
             robot_state.orientation.y = self.current_orientation.y
             robot_state.orientation.z = self.current_orientation.z

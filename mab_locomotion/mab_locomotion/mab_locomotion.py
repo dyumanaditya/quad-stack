@@ -17,6 +17,7 @@ from hb40_commons.msg import JointCommand
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
 from ament_index_python.packages import get_package_share_directory
+from rclpy.clock import Clock, ClockType
 
 
 class MABLocomotion(Node):
@@ -149,7 +150,8 @@ class MABLocomotion(Node):
 
         # timer_period = 0.01  # 100 Hz
         timer_period = 0.02  # 50 Hz
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.system_clock = Clock(clock_type=ClockType.SYSTEM_TIME)
+        self.timer = self.create_timer(timer_period, self.timer_callback, clock=self.system_clock)
 
 
     def bridge_data_callback(self, msg):
