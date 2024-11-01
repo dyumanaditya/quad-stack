@@ -45,7 +45,8 @@ def generate_launch_description():
         package='mab_utils',
         executable='publish_robot_state',
         name='publish_robot_state',
-        output='screen'
+        output='screen',
+        parameters=[{'use_sim_time': True}]
     )
 
     # Launch policy
@@ -54,7 +55,7 @@ def generate_launch_description():
         executable='mab_locomotion',
         name='mab_locomotion',
         output='screen',
-        parameters=[{'robot': LaunchConfiguration('robot')}]
+        parameters=[{'robot': LaunchConfiguration('robot')}, {'use_sim_time': True}]
     )
 
     delay_policy_node = TimerAction(
