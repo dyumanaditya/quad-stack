@@ -58,8 +58,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -85,8 +85,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
     
@@ -112,8 +112,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
@@ -139,8 +139,8 @@
       <mu1>0.6</mu1>
       <mu2>0.6</mu2>
       <self_collide>0</self_collide>
-      <kp value="1e15"/>
-      <kd value="1e13"/>
+      <kp value="1e16"/>
+      <kd value="1e14"/>
       <material>Gazebo/Black</material>
     </gazebo>
 
@@ -172,7 +172,7 @@
       <gravity>true</gravity>
       <sensor name='imu_sensor' type='imu'>
           <always_on>1</always_on>
-          <update_rate>100</update_rate>
+          <update_rate>500</update_rate>
           <visualize>1</visualize>
           <topic>imu</topic>
           <plugin name='imu' filename='libgazebo_ros_imu_sensor.so'>
@@ -220,7 +220,6 @@
               <ros>
                   <remapping>bumper_states:=feet_contact</remapping>
               </ros>
-              
           </plugin>
       </sensor>
   </gazebo>

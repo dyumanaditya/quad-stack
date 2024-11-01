@@ -29,7 +29,8 @@ def generate_launch_description():
     )
     
     # Set the path to the Xacro file
-    silver_badger_xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
+    silver_badger_xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf_new_inertia.xacro')
+    # silver_badger_xacro_file = os.path.join(description_pkg_share, 'xacro', 'silver_badger.urdf.xacro')
     honey_badger_xacro_file = os.path.join(description_pkg_share, 'xacro', 'honey_badger.urdf.xacro')
 
     # Launch configuration variables specific to simulation
@@ -54,11 +55,13 @@ def generate_launch_description():
     # Launch Gazebo with a world file
     world_pkg = 'turtlebot3_gazebo'
     # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house.world')
-    world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house_tires.world')
+    # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house_tires.world')
+    world_file = os.path.join(gazebo_pkg_share, 'worlds', 'empty_world.world')
     gazebo_models_path = os.path.join(get_package_share_directory(world_pkg), 'models')
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path + ':' + os.environ["GAZEBO_MODEL_PATH"]
     gazebo = ExecuteProcess(
-        cmd=['gazebo', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
         # cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         output='screen'
@@ -66,7 +69,7 @@ def generate_launch_description():
     gazebo_ros_robot = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
-        arguments=['-entity', 'mab_quadruped', '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', '0.0'],
+        arguments=['-entity', 'mab_quadruped', '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', '0.1'],
         output='screen',
         parameters=[
             {'use_sim_time': True},

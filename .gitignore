@@ -162,3 +162,7 @@ cython_debug/
 #.idea/
 
 mab_localization/resource/ORBvoc.txt
+hb40_control*
+hb40_remote*
+hb40_bridge*
+simulation*

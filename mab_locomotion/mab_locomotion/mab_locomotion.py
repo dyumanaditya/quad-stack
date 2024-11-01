@@ -98,6 +98,7 @@ class MABLocomotion(Node):
         package_share_directory = get_package_share_directory('mab_locomotion')
 
         if self.robot == "silver_badger":
+            # neural_network_path = os.path.join(package_share_directory, 'resource', "plane.model")
             neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_silver_badger.model")
         elif self.robot == "honey_badger":
             neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_honey_badger.model")
@@ -189,6 +190,8 @@ class MABLocomotion(Node):
         joint_command_msg = JointCommand()
         if not use_policy:
             joint_command_msg.header.stamp = self.get_clock().now().to_msg()
+            # joint_command_msg.kp = self.kp
+            # joint_command_msg.kd = self.kd
             joint_command_msg.kp = [50.0,] * 13
             joint_command_msg.kd = [0.5,] * 13
             joint_command_msg.t_pos = self.nominal_joint_positions.tolist()

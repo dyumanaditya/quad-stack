@@ -3,11 +3,15 @@ from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TwistStamped
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import TwistStamped
+from sensor_msgs.msg import JointState
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pickle
 import numpy as np
 from scipy.interpolate import interp1d
+from scipy.spatial.transform import Rotation as R
+import pinocchio as pin
 
 class OdometryPlotter(Node):
     def __init__(self):
@@ -31,6 +35,20 @@ class OdometryPlotter(Node):
             Odometry,
             '/odom_gt',
             self.odom_gt_callback,
+            10)
+        
+        self.base_lin_vel_subscriber = self.create_subscription(
+            TwistStamped,
+            '/base_lin_vel',
+            self.base_lin_vel_callback,
+            10)
+        
+        # Subscriber for /joint_states
+        self.joint_state_subscriber = self.create_subscription(
+            JointState,
+            # '/joint_states_filtered',
+            '/joint_states',
+            self.joint_state_callback,
             10)
         
         self.base_lin_vel_subscriber = self.create_subscription(
@@ -66,12 +84,29 @@ class OdometryPlotter(Node):
         # Data for joint states
         self.joint_velocities = []
         self.joint_names = []
+        self.poses_odom_kinematics = []
+        self.poses_odom_gt = []
+        
+        # Data for aligned poses
+        self.pose_kin_aligned = []
+        self.pose_gt_aligned = []
+        self.vis_kin_x = []
+        self.vis_kin_y = []
+        self.vis_kin_z = []
+        self.vis_gt_x = []
+        self.vis_gt_y = []
+        self.vis_gt_z = []
 
     def odom_kinematics_callback(self, msg):
         timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
         x = msg.pose.pose.position.x
         y = msg.pose.pose.position.y
         z = msg.pose.pose.position.z
+        rot_x = msg.pose.pose.orientation.x
+        rot_y = msg.pose.pose.orientation.y
+        rot_z = msg.pose.pose.orientation.z
+        rot_w = msg.pose.pose.orientation.w
+        self.poses_odom_kinematics.append([timestamp, x, y, z, rot_x, rot_y, rot_z, rot_w])
         self.kinematics_data.append((timestamp, x, y, z))
         self.kinematics_x.append(x)
         self.kinematics_y.append(y)
@@ -92,10 +127,15 @@ class OdometryPlotter(Node):
         x = msg.pose.pose.position.x
         y = msg.pose.pose.position.y
         z = msg.pose.pose.position.z
+        rot_x = msg.pose.pose.orientation.x
+        rot_y = msg.pose.pose.orientation.y
+        rot_z = msg.pose.pose.orientation.z
+        rot_w = msg.pose.pose.orientation.w
         self.gt_data.append((timestamp, x, y, z))
         self.gt_x.append(x)
         self.gt_y.append(y)
         self.gt_z.append(z)
+        self.poses_odom_gt.append([timestamp, x, y, z, rot_x, rot_y, rot_z, rot_w])
         
     def base_lin_vel_callback(self, msg):
         # Extract linear velocities
@@ -137,11 +177,70 @@ class OdometryPlotter(Node):
                 'vel_x': self.vel_x,
                 'vel_y': self.vel_y,
                 'vel_z': self.vel_z
+            },
+            'gt_data': self.gt_data,
+            'velocity_data': {
+                'vel_x': self.vel_x,
+                'vel_y': self.vel_y,
+                'vel_z': self.vel_z
             }
         }
         with open(filename, 'wb') as f:
             pickle.dump(data, f)
         self.get_logger().info(f'Data saved to {filename}')
+
+    def align_odom_kin_gt(self):
+        # convert the poses base on the first pose of ground truth
+        pose_kin = []
+        for i in range(len(self.poses_odom_kinematics)):
+            pose_tran = self.poses_odom_kinematics[i][1:4]
+            pose_quat = self.poses_odom_kinematics[i][4:]
+            R_quat = R.from_quat(pose_quat, scalar_first=False).as_matrix()
+            R_quat = np.array(R_quat)
+            pose_tran = np.array(pose_tran)
+            pose_SE3 = pin.SE3(R_quat, pose_tran)
+            pose_kin.append(pose_SE3)
+        
+        pose_gt = []
+        for i in range(len(self.poses_odom_gt)):
+            pose_tran = self.poses_odom_gt[i][1:4]
+            pose_quat = self.poses_odom_gt[i][4:]
+            R_quat = R.from_quat(pose_quat, scalar_first=False).as_matrix()
+            R_quat = np.array(R_quat)
+            pose_tran = np.array(pose_tran)
+            pose_SE3 = pin.SE3(R_quat, pose_tran)
+            pose_gt.append(pose_SE3)
+            
+        num_iters = min(len(pose_kin), len(pose_gt))
+        vis_gt_x = []
+        vis_gt_y = []
+        vis_gt_z = []
+        vis_kin_x = []
+        vis_kin_y = []
+        vis_kin_z = []
+        X_kin_start = pose_kin[0]
+        X_gt_start = pose_gt[0]
+        X_kin = []
+        X_gt = []
+        for i in range(num_iters):
+            X_kin_aligned = X_gt_start.act(X_kin_start.actInv(pose_kin[i]))
+            X_gt_aligned = pose_gt[i]
+            X_kin.append(X_kin_aligned)
+            X_gt.append(X_gt_aligned)
+            vis_gt_x.append(X_gt_aligned.translation[0])
+            vis_gt_y.append(X_gt_aligned.translation[1])
+            vis_gt_z.append(X_gt_aligned.translation[2])
+            vis_kin_x.append(X_kin_aligned.translation[0])
+            vis_kin_y.append(X_kin_aligned.translation[1])
+            vis_kin_z.append(X_kin_aligned.translation[2])
+        self.pose_kin_aligned = X_kin
+        self.pose_gt_aligned = X_gt
+        self.vis_kin_x = vis_kin_x
+        self.vis_kin_y = vis_kin_y
+        self.vis_kin_z = vis_kin_z
+        self.vis_gt_x = vis_gt_x
+        self.vis_gt_y = vis_gt_y
+        self.vis_gt_z = vis_gt_z
 
     def plot_path(self):
         kinematics_positions, gt_positions = self.synchronize_data(self.kinematics_data, self.gt_data)
@@ -149,12 +248,13 @@ class OdometryPlotter(Node):
         if kinematics_positions is None or gt_positions is None:
             return
 
-        plt.figure(figsize=(10, 5))
+        self.align_odom_kin_gt()
+        plt.figure(figsize=(10, 5))        
 
         # Subplot 1: Odometry Path vs Ground Truth
         plt.subplot(1, 2, 1)
-        plt.plot(self.kinematics_x, self.kinematics_y, label="Odometry Kinematics")
-        plt.plot(self.gt_x, self.gt_y, label="Ground Truth")
+        plt.plot(self.vis_kin_x, self.vis_kin_y, label="Odometry Kinematics")
+        plt.plot(self.vis_gt_x, self.vis_gt_y, label="Ground Truth")
         plt.xlabel('X Position')
         plt.ylabel('Y Position')
         plt.title('Odometry Path vs Ground Truth')
@@ -165,7 +265,13 @@ class OdometryPlotter(Node):
         # print(kinematics_positions[0])
         # print()
         # print(gt_positions[0])
+        # print(kinematics_positions[0])
+        # print()
+        # print(gt_positions[0])
         plt.subplot(1, 2, 2)
+        error = np.sqrt((kinematics_positions[4:, 0] - gt_positions[4:, 0])**2 +
+                        (kinematics_positions[4:, 1] - gt_positions[4:, 1])**2 +
+                        (kinematics_positions[4:, 2] - gt_positions[4:, 2])**2)
         error = np.sqrt((kinematics_positions[4:, 0] - gt_positions[4:, 0])**2 +
                         (kinematics_positions[4:, 1] - gt_positions[4:, 1])**2 +
                         (kinematics_positions[4:, 2] - gt_positions[4:, 2])**2)
@@ -218,16 +324,19 @@ class OdometryPlotter(Node):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
+        # align the poses
+        self.align_odom_kin_gt()
+
         # Plotting the paths in 3D
-        ax.plot(self.kinematics_x, self.kinematics_y, self.kinematics_z, label="Odometry Kinematics")
-        ax.plot(self.gt_x, self.gt_y, self.gt_z, label="Ground Truth")
+        ax.plot(self.vis_kin_x, self.vis_kin_y, self.vis_kin_z, label="Odometry Kinematics")
+        ax.plot(self.vis_gt_x, self.vis_gt_y, self.vis_gt_z, label="Ground Truth")
 
         ax.set_xlabel('X Position')
         ax.set_ylabel('Y Position')
         ax.set_zlabel('Z Position')
         ax.set_title('3D Odometry Path vs Ground Truth')
-        ax.set_xlim(-4.0, -1.0)
-        ax.set_ylim(1.0, 4.0)
+        # ax.set_xlim(-4.0, -1.0)
+        # ax.set_ylim(1.0, 4.0)
         ax.set_zlim(0.0, 1.6)
         ax.legend()
         plt.savefig('/home/ws/results/3d-kinematics-odom.png')
