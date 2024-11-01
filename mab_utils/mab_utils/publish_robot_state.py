@@ -35,8 +35,6 @@ class PublishRobotState(Node):
         timer_period = 0.01  # seconds (100 Hz)
         self.system_clock = Clock(clock_type=ClockType.SYSTEM_TIME)
         self.timer = self.create_timer(timer_period, self.publish_combined_message, clock=self.system_clock)
-        self.system_clock = Clock(clock_type=ClockType.SYSTEM_TIME)
-        self.timer = self.create_timer(timer_period, self.publish_combined_message, clock=self.system_clock)
 
         self.current_orientation = None
         self.current_angular_vel = None
