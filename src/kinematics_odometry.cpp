@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 #include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/multibody/model.hpp>
@@ -26,6 +27,29 @@
 
 using namespace std::chrono_literals;
 
+
+// Implementing the EMAFilter constructor
+EMAFilter::EMAFilter(double alpha)
+    : alpha_(alpha), initialized_(false) {}
+
+// Implementing the filter function
+Eigen::Vector3d EMAFilter::filter(const Eigen::Vector3d &new_value)
+{
+    if (!initialized_)
+    {
+        filtered_value_ = new_value;
+        initialized_ = true;
+    }
+    else
+    {
+        filtered_value_ = alpha_ * new_value + (1.0 - alpha_) * filtered_value_;
+    }
+    return filtered_value_;
+}
+
+
+
+
 KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
 {
     // QOS to keep most recent messages
@@ -40,6 +64,7 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
 
     joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_states", qos_most_recent, std::bind(&KinematicsOdometry::jointStateCallback, this, std::placeholders::_1));
+        // "/joint_states_filtered", qos_most_recent, std::bind(&KinematicsOdometry::jointStateCallback, this, std::placeholders::_1));
 
     imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
         "/imu_gt_fd", qos_most_recent, std::bind(&KinematicsOdometry::imuCallback, this, std::placeholders::_1));
@@ -89,6 +114,9 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
     // Initialize IMU data
     imu_orientation_.resize(4, 0.0);
     imu_ang_vel_.resize(3, 0.0);
+
+    // Initialize EMAFilter for velocity smoothing
+    velocity_filter_ = std::make_shared<EMAFilter>(1.0);
 }
 
 void KinematicsOdometry::feetContactCallback(const gazebo_msgs::msg::ContactsState::SharedPtr msg)
@@ -345,9 +373,14 @@ void KinematicsOdometry::_computeBodyVelocity()
             body_linear_velocity += it->second;
         }
         body_linear_velocity /= leg_velocities_buffer_.size();
+
+        // Apply EMA filter to the linear velocity before publishing
+        body_linear_velocity = velocity_filter_->filter(body_linear_velocity);
         body_angular_velocity[0] = imu_ang_vel_[0];
         body_angular_velocity[1] = imu_ang_vel_[1];
         body_angular_velocity[2] = imu_ang_vel_[2];
+
+        std::cout << "Velocity Norm: " << body_linear_velocity.norm() << std::endl;
     }
 }
 

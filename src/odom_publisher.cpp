@@ -26,6 +26,9 @@ public:
         imu_subscriber_ = this->create_subscription<sensor_msgs::msg::Imu>(
             "/imu/out", 10, std::bind(&OdomPublisherNode::imu_callback, this, std::placeholders::_1));
 
+        // gt_odom_subscriber_ = this->create_subscription<nav_msgs::msg::Odometry>(
+        //     "/odom_gt", 10, std::bind(&OdomPublisherNode::odom_gt_callback, this, std::placeholders::_1));
+
         // Initialize publisher for odometry on "/odom_kinematics" topic
         odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom_kinematics", 10);
 
@@ -38,13 +41,19 @@ public:
 
         // Initialize position and orientation
         first_time_ = true;
-        x_ = -2.0459031821872986;
-        y_ = 3.496181887042353;
-        z_ = 0.3003354309985301;
-        roll_ =  0.036;
-        pitch_ = -1.604;
-        yaw_ =   1.596;
+        x_ = -2.0497805745819044;
+        y_ = 3.501646823445426;
+        z_ = 0.2930235459349441;
+        roll_ =  -0.0008285592586317505;
+        pitch_ = -0.035986024291907226;
+        yaw_ =   0.0069288823779056225;
         
+        // x_ = -2.0459031821872986;
+        // y_ = 3.496181887042353;
+        // z_ = 0.3003354309985301;
+        // roll_ =  0.036;
+        // pitch_ = -1.604;
+        // yaw_ =   1.596;
         // x_ = -2.0;
         // y_ = 3.5;
         // z_ = 0.05;
@@ -55,10 +64,10 @@ public:
         // pitch_ = 0.0;
         // yaw_ = 0.0;
 
-        double deg_to_rad = M_PI / 180.0;
-        roll_ *= deg_to_rad;
-        pitch_ *= deg_to_rad;
-        yaw_ *= deg_to_rad;
+        // double deg_to_rad = M_PI / 180.0;
+        // roll_ *= deg_to_rad;
+        // pitch_ *= deg_to_rad;
+        // yaw_ *= deg_to_rad;
 
         // Create translation vector
         Eigen::Vector3d initial_translation(x_, y_, z_);
@@ -97,7 +106,10 @@ public:
 private:
     void twist_callback(const geometry_msgs::msg::TwistStamped::SharedPtr msg)
     {
-        
+        // if (first_time_)
+        // {
+        //     return;
+        // }
         // Get the current time
         rclcpp::Time current_time = this->get_clock()->now();
 
@@ -361,8 +373,65 @@ private:
         return pose * pinocchio::exp6(v_average * dt);
     }
 
+    void odom_gt_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
+    {
+        if (!first_time_)
+        {
+            return;
+        }
+        first_time_ = false;
+        // Update the ground truth position and orientation
+        x_ = msg->pose.pose.position.x;
+        y_ = msg->pose.pose.position.y;
+        z_ = msg->pose.pose.position.z;
+
+        // Extract the orientation quaternion
+        tf2::Quaternion q;
+        tf2::fromMsg(msg->pose.pose.orientation, q);
+
+        // Convert the quaternion to roll, pitch, yaw
+        tf2::Matrix3x3 m(q);
+        m.getRPY(roll_, pitch_, yaw_);
+
+        // roll_ = 0.0;
+        // pitch_ = 0.0;
+        // yaw_ = 0.0;
+        // roll_ =  0.036;
+        // pitch_ = -1.604;
+        // yaw_ =   1.596;
+
+        double deg_to_rad = M_PI / 180.0;
+        roll_ *= deg_to_rad;
+        pitch_ *= deg_to_rad;
+        yaw_ *= deg_to_rad;
+
+        // Update pose and orientation matrix
+        // Create translation vector
+        Eigen::Vector3d initial_translation(x_, y_, z_);
+
+        tf2::Quaternion tf_q;
+        tf_q.setRPY(roll_, pitch_, yaw_);  // Assumes roll, pitch, yaw are in radians
+
+        publish_odometry(x_, y_, z_, tf_q, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, this->get_clock()->now());
+
+        // Convert tf2 quaternion to Eigen quaternion
+        Eigen::Quaterniond eigen_q(tf_q.w(), tf_q.x(), tf_q.y(), tf_q.z());  // Note the order
+
+        // Convert Eigen quaternion to rotation matrix
+        Eigen::Matrix3d initial_rotation = eigen_q.toRotationMatrix();
+
+        // Initialize pose_ as an SE3 object
+        pose_ = pinocchio::SE3(initial_rotation, initial_translation);
+
+        
+
+        // Initialize previous time
+        last_time_ = this->get_clock()->now();
+    }
+
     rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr twist_subscriber_;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_subscriber_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr gt_odom_subscriber_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     nav_msgs::msg::Odometry odom_msg_;
