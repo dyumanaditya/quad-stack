@@ -98,8 +98,10 @@ class MABLocomotion(Node):
         package_share_directory = get_package_share_directory('mab_locomotion')
 
         if self.robot == "silver_badger":
+            neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_default_dr_silver_badger.model")
+            # neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_hard_dr_silver_badger.model")
             # neural_network_path = os.path.join(package_share_directory, 'resource', "plane.model")
-            neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_silver_badger.model")
+            # neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_silver_badger.model")
         elif self.robot == "honey_badger":
             neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_honey_badger.model")
 
