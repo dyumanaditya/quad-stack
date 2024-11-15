@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- joint limits -->
+  <xacro:property name="sp_j0_limit_lower" value="-0.785"/>
+  <xacro:property name="sp_j0_limit_upper" value="0.785"/>
+  <xacro:property name="fr_j0_limit_lower" value="-1.57"/>
+  <xacro:property name="fr_j0_limit_upper" value="1.57"/>
+  <xacro:property name="fr_j1_limit_lower" value="-1.57"/>
+  <xacro:property name="fr_j1_limit_upper" value="1.57"/>
+  <xacro:property name="fr_j2_limit_lower" value="-2.53"/>
+  <xacro:property name="fr_j2_limit_upper" value="0.0"/>
+  <xacro:property name="fl_j0_limit_lower" value="-1.57"/>
+  <xacro:property name="fl_j0_limit_upper" value="1.57"/>
+  <xacro:property name="fl_j1_limit_lower" value="-1.57"/>
+  <xacro:property name="fl_j1_limit_upper" value="1.57"/>
+  <xacro:property name="fl_j2_limit_lower" value="0.0"/>
+  <xacro:property name="fl_j2_limit_upper" value="2.53"/>
+  <xacro:property name="rl_j0_limit_lower" value="-1.57"/>
+  <xacro:property name="rl_j0_limit_upper" value="1.57"/>
+  <xacro:property name="rl_j1_limit_lower" value="-1.57"/>
+  <xacro:property name="rl_j1_limit_upper" value="1.57"/>
+  <xacro:property name="rl_j2_limit_lower" value="0.0"/>
+  <xacro:property name="rl_j2_limit_upper" value="2.53"/>
+  <xacro:property name="rr_j0_limit_lower" value="-1.57"/>
+  <xacro:property name="rr_j0_limit_upper" value="1.57"/>
+  <xacro:property name="rr_j1_limit_lower" value="-1.57"/>
+  <xacro:property name="rr_j1_limit_upper" value="1.57"/>
+  <xacro:property name="rr_j2_limit_lower" value="-2.53"/>
+  <xacro:property name="rr_j2_limit_upper" value="0.0"/>
+
+  <!-- max torques per joint -->
+  <xacro:property name="sp_j0_max_effort" value="48.0"/>
+  <xacro:property name="fr_j0_max_effort" value="16"/>
+  <xacro:property name="fr_j1_max_effort" value="16"/>
+  <xacro:property name="fr_j2_max_effort" value="16"/>
+  <xacro:property name="fl_j0_max_effort" value="16"/>
+  <xacro:property name="fl_j1_max_effort" value="16"/>
+  <xacro:property name="fl_j2_max_effort" value="16"/>
+  <xacro:property name="rl_j0_max_effort" value="16"/>
+  <xacro:property name="rl_j1_max_effort" value="16"/>
+  <xacro:property name="rl_j2_max_effort" value="16"/>
+  <xacro:property name="rr_j0_max_effort" value="16"/>
+  <xacro:property name="rr_j1_max_effort" value="16"/>
+  <xacro:property name="rr_j2_max_effort" value="16"/>
+
+  <!-- max velocities per joint -->
+  <xacro:property name="sp_j0_max_velocity" value="3.15"/>
+  <xacro:property name="fr_j0_max_velocity" value="25"/>
+  <xacro:property name="fr_j1_max_velocity" value="25"/>
+  <xacro:property name="fr_j2_max_velocity" value="25"/>
+  <xacro:property name="fl_j0_max_velocity" value="25"/>
+  <xacro:property name="fl_j1_max_velocity" value="25"/>
+  <xacro:property name="fl_j2_max_velocity" value="25"/>
+  <xacro:property name="rl_j0_max_velocity" value="25"/>
+  <xacro:property name="rl_j1_max_velocity" value="25"/>
+  <xacro:property name="rl_j2_max_velocity" value="25"/>
+  <xacro:property name="rr_j0_max_velocity" value="25"/>
+  <xacro:property name="rr_j1_max_velocity" value="25"/>
+  <xacro:property name="rr_j2_max_velocity" value="25"/>
+</robot>

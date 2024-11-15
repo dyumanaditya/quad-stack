@@ -1,0 +1,85 @@
+{
+    "cmd_vel_ang": [
+        1.0,
+        0.4000000059604645,
+        0.5
+    ],
+    "cmd_vel_lin": [
+        0.5,
+        0.30000001192092896,
+        0.5
+    ],
+    "control_dt": 0.0025,
+    "gravity": -9.81,
+    "mpc_alpha": 3.999999171355739e-05,
+    "mpc_dt": 0.030000004917383194,
+    "mpc_gains": [
+        0.5,
+        0.5,
+        0.5,
+        2.0,
+        1.0,
+        150.0,
+        0.0,
+        0.0,
+        0.0,
+        0.20000000298023224,
+        0.20000000298023224,
+        1.0,
+        0.0
+    ],
+    "mpc_horizon": 16,
+    "payload_com": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "payload_inertia": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "payload_mass": 0.0,
+    "robot_inertia": [
+        0.550000011920929,
+        1.7200000286102295,
+        2.1500000953674316
+    ],
+    "robot_mass": 10.5,
+    "robot_name": "hb40",
+    "robot_type": "intention",
+    "simulation_dt": 0.0004,
+    "stance_spread_x": 0.49999991059303284,
+    "stance_spread_x_offset": -0.07,
+    "stance_spread_y": 0.30000001192092896,
+    "step_period": 0.4599999785423279,
+    "swing_cart_kd": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "swing_cart_kp": [
+        750.0,
+        750.0,
+        500.0
+    ],
+    "swing_height": 0.05000000447034836,
+    "system_pipe_path": "/tmp/tinyOveloardPipe",
+    "walk_height": 0.28999999165534973,
+    "wbc_joint_kd": [
+        2.0,
+        2.0,
+        2.0
+    ],
+    "wbc_joint_kp": [
+        3.0,
+        3.0,
+        3.0
+    ],
+    "wbc_leg_kd": 0.0,
+    "wbc_leg_kp": 0.0,
+    "wbc_ori_kd": 10.0,
+    "wbc_ori_kp": 200.0,
+    "wbc_pos_kd": 10.0,
+    "wbc_pos_kp": 100.0
+}

@@ -1,0 +1,5 @@
+string feature
+bool state
+uint8[] data
+---
+bool success

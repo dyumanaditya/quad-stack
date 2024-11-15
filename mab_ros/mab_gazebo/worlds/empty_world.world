@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <scene>
+      <shadows>false</shadows>
+    </scene>
+
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose frame=''>0.319654 -0.235002 9.29441 0 1.5138 0.009599</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <ode>
+          <solver>
+            <type>quick</type>  
+            <iters>500</iters> 
+            <sor>1.3</sor>
+          </solver>  
+          <constraints>
+            <cfm>0.00001</cfm>
+            <erp>0.2</erp>
+            <contact_max_correcting_vel>10.0</contact_max_correcting_vel>
+            <contact_surface_layer>0.001</contact_surface_layer>
+          </constraints>  
+      </ode>
+    </physics>
+
+  </world>
+</sdf>

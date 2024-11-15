@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot>
+  <material name="silver">
+    <color rgba="0.600 0.600 0.600 1.000"/>
+  </material>
+  <material name="black">
+    <color rgba="0.1 0.1 0.1 1.000"/>
+  </material>
+  <material name="red">
+    <color rgba="1.0 0 0 1.000"/>
+  </material>
+  <material name="orange">
+    <color rgba="1.0 0.41 0 1.000"/>
+  </material>
+  <material name="invisible">
+    <color rgba="0 0 0 0"/>
+  </material>
+</robot>
