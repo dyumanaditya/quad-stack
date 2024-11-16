@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<robot name="realsense2_camera_mount" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="realsense2_camera_mount" params="parent">
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <link name="camera_mount">
+      <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="0" />
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+      </inertial>
+      
+      <visual>
+        <origin rpy="0 0 ${M_PI/2}" xyz="0.11501 0.000167 0.024886" />
+        <geometry>
+          <mesh filename="file://$(find mab_description)/meshes/camera_mount/hb-camera-mount.stl"/>
+        </geometry>
+        <material name="silver" />
+      </visual>
+    </link>
+
+    <joint name="camera_mount_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="camera_mount"/>
+    </joint>
+
+    <link name="camera_interface">
+      <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="0" />
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+      </inertial>
+      
+      <visual>
+        <origin rpy="${M_PI/2} ${M_PI} ${M_PI/2}" xyz="0.26171 0.000167 0.068486" />
+        <geometry>
+          <mesh filename="file://$(find mab_description)/meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="silver" />
+      </visual>
+    </link>
+
+    <joint name="camera_interface_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="camera_interface"/>
+    </joint>
+
+  </xacro:macro>
+
+</robot>
