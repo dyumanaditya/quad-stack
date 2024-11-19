@@ -3,7 +3,7 @@
     <xacro:macro name="silver_badger_ros2_control">
 
         <!-- Include limits-->
-        <xacro:include filename="$(find mab_description)/xacro/limits.xacro" />
+        <xacro:include filename="$(find silver_badger_description)/xacro/limits.xacro" />
 
         <ros2_control name="silver_badger_joint_trajectory_control" type="system">
             <hardware>

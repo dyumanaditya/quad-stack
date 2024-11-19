@@ -14,7 +14,7 @@
       <visual>
         <origin rpy="0 0 ${M_PI/2}" xyz="0.11501 0.000167 0.024886" />
         <geometry>
-          <mesh filename="file://$(find mab_description)/meshes/camera_mount/hb-camera-mount.stl"/>
+          <mesh filename="package://honey_badger_description/meshes/camera_mount/hb-camera-mount.stl"/>
         </geometry>
         <material name="silver" />
       </visual>
@@ -35,7 +35,7 @@
       <visual>
         <origin rpy="${M_PI/2} ${M_PI} ${M_PI/2}" xyz="0.26171 0.000167 0.068486" />
         <geometry>
-          <mesh filename="file://$(find mab_description)/meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="package://honey_badger_description/meshes/camera_mount/camera-interface-realsense-and-oak.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="silver" />
       </visual>

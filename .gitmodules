@@ -1,7 +1,7 @@
 [submodule "realsense_gazebo_plugin"]
-	path = realsense_gazebo_plugin
+	path = quad_stack/realsense_gazebo_plugin
 	url = https://github.com/dyumanaditya/realsense_gazebo_plugin
     branch = foxy-devel
 [submodule "depthimage_to_laserscan"]
-	path = depthimage_to_laserscan
+	path = quad_stack/depthimage_to_laserscan
 	url = https://github.com/dyumanaditya/depthimage_to_laserscan

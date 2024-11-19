@@ -1,13 +1,23 @@
 <?xml version="1.0"?>
-<package format="2">
-    <name>go1_description</name>
-    <version>0.0.0</version>
-    <description>The go1_description package</description>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+	<name>go1_description</name>
+	<version>0.0.1</version>
+	<description>
+		The go1_description package
+	</description>
 
-    <maintainer email="laikago@unitree.cc">unitree</maintainer>
-    <license>TODO</license>
+	<maintainer email="dyuman2001@gmail.com">Dyuman Aditya</maintainer>
 
-    <buildtool_depend>catkin</buildtool_depend>
-    <depend>roscpp</depend>
-    <depend>std_msgs</depend>
+	<license>BSD</license>
+
+	<author email="dyuman2001@gmail.com">Dyuman Aditya</author>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+ 	<depend>urdf</depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
 </package>

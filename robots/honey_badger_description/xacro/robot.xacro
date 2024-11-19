@@ -2,29 +2,29 @@
 <robot name="honey_badger" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Include IMU-->
-  <xacro:include filename="$(find mab_description)/xacro/imu.xacro" />
+  <xacro:include filename="$(find honey_badger_description)/xacro/imu.xacro" />
   
   <!-- Include gazebo elements and colors-->
-  <xacro:include filename="$(find mab_description)/xacro/gazebo.xacro" />
+  <xacro:include filename="$(find honey_badger_description)/xacro/gazebo.xacro" />
   <xacro:gazebo_simulation robot="honey_badger"/>
   
   <!-- Import Rviz colors -->
-  <xacro:include filename="$(find mab_description)/xacro/materials.xacro" />
+  <xacro:include filename="$(find honey_badger_description)/xacro/materials.xacro" />
 
   <!-- Import control tags-->
-  <!-- <xacro:include filename="$(find mab_description)/xacro/control.xacro" /> -->
+  <!-- <xacro:include filename="$(find honey_badger_description)/xacro/control.xacro" /> -->
 
   <!-- Include limits-->
-  <xacro:include filename="$(find mab_description)/xacro/limits.xacro" />
+  <xacro:include filename="$(find honey_badger_description)/xacro/limits.xacro" />
   
   <!-- Initialize controls-->
   <!-- <xacro:silver_badger_ros2_control/> -->
 
   <!-- Initialize camera-->
-  <xacro:include filename="$(find mab_description)/xacro/camera.xacro"/>
+  <xacro:include filename="$(find honey_badger_description)/xacro/camera.xacro"/>
 
   <!-- Include camera mount files-->
-  <xacro:include filename="$(find mab_description)/xacro/camera_mount.xacro"/>
+  <xacro:include filename="$(find honey_badger_description)/xacro/camera_mount.xacro"/>
   
   
   <!-- BODY  -->
@@ -44,7 +44,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/hb40.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/hb40.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -83,7 +83,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -102,7 +102,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -128,7 +128,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -181,7 +181,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -200,7 +200,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -226,7 +226,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -279,7 +279,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l0r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -298,7 +298,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l1lf.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -324,7 +324,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l2l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -377,7 +377,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l0l.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -396,7 +396,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l1r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="orange"/>
     </visual>
@@ -422,7 +422,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find mab_description)/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://honey_badger_description/meshes/hb40/l2r.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
