@@ -59,9 +59,10 @@ def generate_launch_description():
     # os.environ["GAZEBO_RESOURCE_PATH"] = '$GAZEBO_RESOURCE_PATH:' + sb_description_pkg_share
     # os.environ["GAZEBO_MODEL_PATH"] = sb_description_pkg_share + ':' + hb_description_pkg_share + ':' + a1_description_pkg_share + ':' + go1_description_pkg_share + ':' + go2_description_pkg_share
     realsense_plugin_path = os.path.join(realsense_pkg_prefix, 'lib')
+    gazebo_plugin_path = os.path.join(get_package_prefix('mab_control'), 'lib', 'mab_control')
 
 
-    plugin_paths = realsense_plugin_path
+    plugin_paths = gazebo_plugin_path + ':' + realsense_plugin_path
     os.environ['GAZEBO_PLUGIN_PATH'] = plugin_paths
 
     # Launch Gazebo with a world file
