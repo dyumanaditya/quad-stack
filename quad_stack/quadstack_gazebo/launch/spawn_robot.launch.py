@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, LogInfo, ExecuteProcess, SetEnvironmentVariable, RegisterEventHandler, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, LogInfo, ExecuteProcess, SetEnvironmentVariable, RegisterEventHandler, IncludeLaunchDescription, SetLaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node, SetParameter
 from launch.event_handlers import OnProcessExit
@@ -54,28 +54,43 @@ def generate_launch_description():
     x_pose = LaunchConfiguration('x_pose', default='-2.0')
     y_pose = LaunchConfiguration('y_pose', default='3.5')
     z_pose = LaunchConfiguration('z_pose', default='0.1')
+    
+    # For some robots the z_pose needs to be adjusted
+    z_pose_sub = PythonExpression([
+        "str(max(float('", LaunchConfiguration('z_pose'), "'), 0.4)) "
+        "if '", LaunchConfiguration('robot'), "' == 'a1' "
+        "else '", LaunchConfiguration('z_pose'), "'"
+    ])
 
     # gazebo_env_variable = SetEnvironmentVariable('GAZEBO_MODEL_PATH', sb_description_pkg_share)
     # os.environ["GAZEBO_RESOURCE_PATH"] = '$GAZEBO_RESOURCE_PATH:' + sb_description_pkg_share
     # os.environ["GAZEBO_MODEL_PATH"] = sb_description_pkg_share + ':' + hb_description_pkg_share + ':' + a1_description_pkg_share + ':' + go1_description_pkg_share + ':' + go2_description_pkg_share
     realsense_plugin_path = os.path.join(realsense_pkg_prefix, 'lib')
-    gazebo_plugin_path = os.path.join(get_package_prefix('mab_control'), 'lib', 'mab_control')
+    mab_gazebo_plugin_path = os.path.join(get_package_prefix('mab_control'), 'lib', 'mab_control')
+    unitree_gazebo_plugin_path = os.path.join(get_package_prefix('unitree_control'), 'lib', 'unitree_control')
 
 
-    plugin_paths = gazebo_plugin_path + ':' + realsense_plugin_path
+    plugin_paths = mab_gazebo_plugin_path + ':' + unitree_gazebo_plugin_path + ':' + realsense_plugin_path
     os.environ['GAZEBO_PLUGIN_PATH'] = plugin_paths
 
     # Launch Gazebo with a world file
     world_pkg = 'turtlebot3_gazebo'
     # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house.world')
-    # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house_tires.world')
-    world_file = os.path.join(gazebo_pkg_share, 'worlds', 'empty_world.world')
+    world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house_tires.world')
+    # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'empty_world.world')
     gazebo_models_path = os.path.join(get_package_share_directory(world_pkg), 'models')
     # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path + ':' + os.environ["GAZEBO_MODEL_PATH"]
     # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
+    
+    # Gazebo world file
+    world = LaunchConfiguration('world')
+    world_file_path = [os.path.join(gazebo_pkg_share, 'worlds', ''), world]
+    # world_folder_path = os.path.join(gazebo_pkg_share, 'worlds/')
+    # print(world_folder_path)
     gazebo = ExecuteProcess(
-        # cmd=['gazebo', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
-        cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', world_file_path, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', '--verbose ', world_file_path, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
+        # cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         # cmd=['gazebo', '-s', 'libgazebo_ros_factory.so'],
         # cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         output='screen'
@@ -84,7 +99,7 @@ def generate_launch_description():
         package='gazebo_ros',
         executable='spawn_entity.py',
         # arguments=['-entity', robot, '-file', urdf_paths['silver_badger'], '-x', x_pose, '-y', y_pose, '-z', z_pose],
-        arguments=['-entity', robot, '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', z_pose],
+        arguments=['-entity', robot, '-topic', '/robot_description', '-x', x_pose, '-y', y_pose, '-z', z_pose_sub],
         output='screen',
         parameters=[
             {'use_sim_time': True},

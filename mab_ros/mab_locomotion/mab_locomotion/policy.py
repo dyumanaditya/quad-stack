@@ -5,12 +5,13 @@ import flax.linen as nn
 from flax.linen.initializers import constant, orthogonal
 
 
-def get_policy(algorithm_config):
+def get_policy(algorithm_config, action_space):
     return (
         Policy(
             algorithm_config["std_dev"],
             algorithm_config["policy_mean_abs_clip"],
-            algorithm_config["policy_std_min_clip"], algorithm_config["policy_std_max_clip"]
+            algorithm_config["policy_std_min_clip"], algorithm_config["policy_std_max_clip"],
+            action_space
         )
     )
 
@@ -20,6 +21,7 @@ class Policy(nn.Module):
     policy_mean_abs_clip: float
     policy_std_min_clip: float
     policy_std_max_clip: float
+    action_space: int
 
     @nn.compact
     def __call__(self, x):
@@ -30,7 +32,7 @@ class Policy(nn.Module):
         policy_mean = nn.elu(policy_mean)
         policy_mean = nn.Dense(128, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0))(policy_mean)
         policy_mean = nn.elu(policy_mean)
-        policy_mean = nn.Dense(13, kernel_init=orthogonal(0.01), bias_init=constant(0.0))(policy_mean)
+        policy_mean = nn.Dense(self.action_space, kernel_init=orthogonal(0.01), bias_init=constant(0.0))(policy_mean)
         policy_mean = jnp.clip(policy_mean, -self.policy_mean_abs_clip, self.policy_mean_abs_clip)
 
         return policy_mean

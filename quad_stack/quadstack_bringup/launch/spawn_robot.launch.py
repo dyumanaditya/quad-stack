@@ -17,6 +17,12 @@ def generate_launch_description():
         description='Choose the robot to spawn, silver_badger, honey_badger, a1, go1 or go2'
     )
     
+    world_arg = DeclareLaunchArgument(
+        'world',
+        default_value='mab_house_tires.world',
+        description='Specify the Gazebo world file to load'
+    )
+    
     x_pose_arg = DeclareLaunchArgument(
         'x_pose',
         default_value='-2.0',
@@ -39,6 +45,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(gazebo_launch),
         launch_arguments={
             'robot': LaunchConfiguration('robot'),
+            'world': LaunchConfiguration('world'),
             'x_pose': LaunchConfiguration('x_pose'),
             'y_pose': LaunchConfiguration('y_pose'),
             'z_pose': LaunchConfiguration('z_pose'),
@@ -48,6 +55,7 @@ def generate_launch_description():
     
     return LaunchDescription([
         robot_arg,
+        world_arg,
         x_pose_arg,
         y_pose_arg,
         z_pose_arg,

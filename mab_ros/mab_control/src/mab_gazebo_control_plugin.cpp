@@ -99,7 +99,15 @@ namespace gazebo
             joint_state_msg.header.stamp.sec = sim_time.sec;
             joint_state_msg.header.stamp.nanosec = sim_time.nsec;
 
-            joint_state_msg.name = joint_names_input_;
+            if (robot == "silver_badger")
+            {
+                joint_state_msg.name = joint_names_input_;
+            }
+            else if (robot == "honey_badger")
+            {
+                std::vector<std::string> joint_names_hb(joint_names_input_.begin(), joint_names_input_.end() - 1);
+                joint_state_msg.name = joint_names_hb;
+            }
 
             for (size_t i = 0; i < joint_names_input_.size(); ++i)
             {
@@ -109,9 +117,6 @@ namespace gazebo
                 {
                     if (robot == "honey_badger" && joint_name == "sp_j0")
                     {
-                        joint_state_msg.position.push_back(0.0);
-                        joint_state_msg.velocity.push_back(0.0);
-                        joint_state_msg.effort.push_back(0.0);
                         break;
                     }
                     else if (joints_[j]->GetName() == joint_name)

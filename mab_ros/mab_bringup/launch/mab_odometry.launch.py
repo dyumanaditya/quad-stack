@@ -13,12 +13,12 @@ from launch_ros.actions import Node
 def generate_launch_description():
     mab_bringup_pkg_dir = get_package_share_directory('mab_bringup')
     mab_localization_pkg_dir = get_package_share_directory('mab_localization')
-    mab_utils_pkg_dir = get_package_share_directory('mab_utils')
+    quadstack_utils_pkg_dir = get_package_share_directory('quadstack_utils')
 
     mab_bringup_teleop_launch = os.path.join(mab_bringup_pkg_dir, 'launch', 'mab_teleop.launch.py')
     mab_localization_vo_launch = os.path.join(mab_localization_pkg_dir, 'launch', 'visual_odometry.launch.py')
-    mab_utils_image_rotation_launch = os.path.join(mab_utils_pkg_dir, 'launch', 'rotate_image.launch.py')
-    mab_utils_image_stabilizer_launch = os.path.join(mab_utils_pkg_dir, 'launch', 'camera_frame_stabilizer.launch.py')
+    quadstack_utils_image_rotation_launch = os.path.join(quadstack_utils_pkg_dir, 'launch', 'rotate_image.launch.py')
+    quadstack_utils_image_stabilizer_launch = os.path.join(quadstack_utils_pkg_dir, 'launch', 'camera_frame_stabilizer.launch.py')
     
     # Launch parameters
     rosbag_arg = DeclareLaunchArgument(
@@ -54,7 +54,7 @@ def generate_launch_description():
     )
 
     image_rotation = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_utils_image_rotation_launch)
+        PythonLaunchDescriptionSource(quadstack_utils_image_rotation_launch)
     )
 
     delayed_localization_vo_launch = TimerAction(
@@ -63,7 +63,7 @@ def generate_launch_description():
     )
 
     camera_frame_stabilizer = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_utils_image_stabilizer_launch)
+        PythonLaunchDescriptionSource(quadstack_utils_image_stabilizer_launch)
     )
 
     base_link_transform = Node(

@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 import jax
@@ -45,7 +46,7 @@ class MABLocomotion(Node):
         
         self.velocity_command_subscription = self.create_subscription(
             Twist,
-            "/hb40/velocity_command",
+            "/cmd_vel",
             self.velocity_command_callback,
             qos_profile=qos_profile)
         
@@ -88,7 +89,7 @@ class MABLocomotion(Node):
 
         self.mask_from_real_to_obssim = [3, 4, 5, 0, 1, 2, 6, 7, 8, 9, 10, 11, 12]
         self.mask_from_xmlsim_to_real = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 0]
-        self.mask_from_xmlsim_to_obssim = [10, 11, 12, 7, 8, 9, 1, 2, 3, 4, 5, 6, 0]
+        self.mask_from_xmlsim_to_obssim = [10, 11, 12, 7, 8, 9, 1, 2, 3, 4, 5, 6, 0]            
 
         self.previous_action = np.zeros(13)
 
@@ -98,12 +99,14 @@ class MABLocomotion(Node):
         package_share_directory = get_package_share_directory('mab_locomotion')
 
         if self.robot == "silver_badger":
-            neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_default_dr_silver_badger.model")
+            neural_network_path = os.path.join(package_share_directory, 'resource', "E24__SBG__plane__default_domain_rand__v1.model")
+            self.action_space = 13
             # neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_hard_dr_silver_badger.model")
             # neural_network_path = os.path.join(package_share_directory, 'resource', "plane.model")
             # neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_silver_badger.model")
         elif self.robot == "honey_badger":
-            neural_network_path = os.path.join(package_share_directory, 'resource', "plane_new_honey_badger.model")
+            neural_network_path = os.path.join(package_share_directory, 'resource', "E24__HBG__plane__default_domain_rand__v1.model")
+            self.action_space = 12
 
         splitted_path = neural_network_path.split("/")
         checkpoint_dir = "/".join(splitted_path[:-1]) if len(splitted_path) > 1 else "."
@@ -111,14 +114,22 @@ class MABLocomotion(Node):
 
         shutil.unpack_archive(f"{checkpoint_dir}/{checkpoint_file_name}", f"{checkpoint_dir}/tmp", "zip")
         checkpoint_dir = f"{checkpoint_dir}/tmp"
-        jax_model_file_name = [f for f in os.listdir(checkpoint_dir) if f.endswith(".model")][0]
+        
+        if self.robot == "silver_badger":
+            jax_model_file_name = [f for f in os.listdir(checkpoint_dir) if f.endswith(".model")][0]
+        else:
+            jax_model_file_name = [f for f in os.listdir(checkpoint_dir) if "checkpoint" in f][0]
 
         check_point_handler = orbax.checkpoint.PyTreeCheckpointHandler(aggregate_filename=jax_model_file_name)
         checkpointer = orbax.checkpoint.Checkpointer(check_point_handler)
 
-        loaded_algorithm_config = checkpointer.restore(checkpoint_dir)["config_algorithm"]
+        if self.robot == "silver_badger":
+            loaded_algorithm_config = checkpointer.restore(checkpoint_dir)["config_algorithm"]
+        else:
+            with open(f"{checkpoint_dir}/config_algorithm.json", "r") as f:
+                loaded_algorithm_config = json.load(f)
 
-        self.policy = get_policy(loaded_algorithm_config)
+        self.policy = get_policy(loaded_algorithm_config, self.action_space)
 
         self.policy.apply = jax.jit(self.policy.apply)
 
@@ -195,7 +206,7 @@ class MABLocomotion(Node):
             # joint_command_msg.kp = self.kp
             # joint_command_msg.kd = self.kd
             joint_command_msg.kp = [50.0,] * 13
-            joint_command_msg.kd = [0.5,] * 13
+            joint_command_msg.kd = [5.0,] * 13
             joint_command_msg.t_pos = self.nominal_joint_positions.tolist()
             joint_command_msg.t_vel = [0.0,] * 13
             joint_command_msg.t_trq = [0.0,] * 13
@@ -219,6 +230,11 @@ class MABLocomotion(Node):
             ])
             
             action = jax.device_get(self.policy.apply(self.policy_state.params, observation))
+            
+            # Insert 0.0 for the spine joint
+            if self.robot == "honey_badger":
+                action = np.insert(action, 0, 0.0)
+                
             robot_action = action[self.mask_from_xmlsim_to_real]
 
             target_joint_positions = self.nominal_joint_positions + self.scaling_factor * robot_action

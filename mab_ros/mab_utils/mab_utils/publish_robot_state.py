@@ -14,8 +14,6 @@ class PublishRobotState(Node):
     def __init__(self):
         super().__init__('publish_robot_state')
 
-        # Joints in the correct order (as expected by hb40)
-        self.joints = ['fr_j0', 'fr_j1', 'fr_j2', 'fl_j0', 'fl_j1', 'fl_j2', 'rl_j0', 'rl_j1', 'rl_j2', 'rr_j0', 'rr_j1', 'rr_j2', 'sp_j0']
 
         self.pose_sub = self.create_subscription(
             Imu,
@@ -30,6 +28,16 @@ class PublishRobotState(Node):
             self.joint_callback,
             10
         )
+        
+        self.declare_parameter("robot", "silver_badger")
+        self.robot = self.get_parameter("robot").get_parameter_value().string_value
+        
+        # Joints in the correct order (as expected by hb40)
+        if self.robot == "silver_badger":
+            self.joints = ['fr_j0', 'fr_j1', 'fr_j2', 'fl_j0', 'fl_j1', 'fl_j2', 'rl_j0', 'rl_j1', 'rl_j2', 'rr_j0', 'rr_j1', 'rr_j2', 'sp_j0']
+        else:
+            self.joints = ['fr_j0', 'fr_j1', 'fr_j2', 'fl_j0', 'fl_j1', 'fl_j2', 'rl_j0', 'rl_j1', 'rl_j2', 'rr_j0', 'rr_j1', 'rr_j2', 'fixed_spine']
+            
 
         self.publisher = self.create_publisher(BridgeData, '/hb40/bridge_data', 10)
         timer_period = 0.01  # seconds (100 Hz)
@@ -58,6 +66,12 @@ class PublishRobotState(Node):
             self.current_joints_pos[joint_idx] = msg.position[i]
             self.current_joints_vel[joint_idx] = msg.velocity[i]
             self.current_joints_effort[joint_idx] = msg.effort[i]
+            
+        if self.robot == "honey_badger":
+            # Honey badger has a fixed spine joint, the controller expects 13 inputs
+            self.current_joints_pos[-1] = 0.0
+            self.current_joints_vel[-1] = 0.0
+            self.current_joints_effort[-1] = 0.0
 
         # self.publish_combined_message()
 
