@@ -13,6 +13,12 @@ def generate_launch_description():
         default_value='',
         description='The URDF file to use for kinematics odometry'
     )
+    
+    robot = DeclareLaunchArgument(
+        'robot',
+        default_value='silver_badger',
+        description='Choose the robot to spawn, silver_badger, honey_badger, a1, go1 or go2'
+    )
 
     kinematics_odometry = Node(
         package='legged_kinematics_odometry',
@@ -27,6 +33,7 @@ def generate_launch_description():
         executable='odom_publisher',
         name='odom_publisher',
         output='screen',
+        parameters=[{'robot': LaunchConfiguration('robot')}],
     )
     
     imu_gt_fd = Node(
@@ -38,6 +45,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         urdf,
+        robot,
         kinematics_odometry,
         imu_gt_fd,
         odom_publisher,

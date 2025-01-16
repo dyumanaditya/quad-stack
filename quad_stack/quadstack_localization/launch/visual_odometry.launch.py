@@ -48,6 +48,7 @@ def generate_launch_description():
     # Combine the pose values into the initial_pose string
     # With correct spacing and formatting
     initial_pose = [x_pose, ' ', y_pose, ' ', z_pose, ' ', '0 ', '0 ', '0']
+    frame_id = 'base_link' if LaunchConfiguration('robot') == 'silver_badger' or LaunchConfiguration('robot') == 'honey_badger' else 'base'
     
     rtabmap = Node(
         package='rtabmap_odom',
@@ -55,7 +56,7 @@ def generate_launch_description():
         name='rgbd_odometry',
         output='screen',
         parameters=[{
-            'frame_id': 'base_link',
+            'frame_id': frame_id,
             'approx_sync': True,
             'odom_frame_id': 'odom',
             'publish_tf': True,
@@ -119,7 +120,7 @@ def generate_launch_description():
 
     kinematics_odometry = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(kinematics_odom_pkg_share, 'launch', 'kinematics_odometry.launch.py')),
-        launch_arguments={'urdf': urdf_path_expr}.items()
+        launch_arguments={'urdf': urdf_path_expr, 'robot': LaunchConfiguration('robot')}.items()
     )
 
     odom_gt = Node(
@@ -164,7 +165,7 @@ def generate_launch_description():
         x_pose_arg,
         y_pose_arg,
         z_pose_arg,
-        # rtabmap,
+        rtabmap,
         # odom_gt,
         # odom_2d,
         kinematics_odometry,

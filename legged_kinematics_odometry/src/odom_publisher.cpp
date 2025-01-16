@@ -29,6 +29,8 @@ public:
         // gt_odom_subscriber_ = this->create_subscription<nav_msgs::msg::Odometry>(
         //     "/odom_gt", 10, std::bind(&OdomPublisherNode::odom_gt_callback, this, std::placeholders::_1));
 
+        robot = this->declare_parameter("robot", "");
+
         // Initialize publisher for odometry on "/odom_kinematics" topic
         odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom_kinematics", 10);
 
@@ -37,7 +39,15 @@ public:
 
         // Initialize the odometry message
         odom_msg_.header.frame_id = "odom_kinematics";      // Odometry frame
-        odom_msg_.child_frame_id = "base_link";  // Robot base frame
+
+        if (robot == "silver_badger" || robot == "honey_badger")
+        {
+            odom_msg_.child_frame_id = "base_link";  // Robot base frame
+        }
+        else
+        {
+            odom_msg_.child_frame_id = "base";  // Robot base frame
+        }
 
         // Initialize position and orientation
         first_time_ = true;
@@ -267,7 +277,14 @@ private:
         geometry_msgs::msg::TransformStamped odom_to_base_link;
         odom_to_base_link.header.stamp = msg->header.stamp;
         odom_to_base_link.header.frame_id = "odom_kinematics";
-        odom_to_base_link.child_frame_id = "base_link";
+        if (robot == "silver_badger" || robot == "honey_badger")
+        {
+            odom_to_base_link.child_frame_id = "base_link";
+        }
+        else
+        {
+            odom_to_base_link.child_frame_id = "base";
+        }
 
         odom_to_base_link.transform.translation.x = x_;
         odom_to_base_link.transform.translation.y = y_;
@@ -316,7 +333,14 @@ private:
         geometry_msgs::msg::TransformStamped odom_to_base_link;
         odom_to_base_link.header.stamp = stamp;
         odom_to_base_link.header.frame_id = "odom_kinematics";
-        odom_to_base_link.child_frame_id = "base_link";
+        if (robot == "silver_badger" || robot == "honey_badger")
+        {
+            odom_to_base_link.child_frame_id = "base_link";
+        }
+        else
+        {
+            odom_to_base_link.child_frame_id = "base";
+        }
 
         odom_to_base_link.transform.translation.x = x;
         odom_to_base_link.transform.translation.y = y;
@@ -435,6 +459,8 @@ private:
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     nav_msgs::msg::Odometry odom_msg_;
+
+    std::string robot;
 
     // Odometry state variables
     double x_;
