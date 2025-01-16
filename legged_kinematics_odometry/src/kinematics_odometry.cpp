@@ -364,7 +364,7 @@ void KinematicsOdometry::_computeBodyVelocity()
         body_angular_velocity = x.tail(3);
 
         //Norm of the linear velocity
-        std::cout << "Velocity Norm: " << body_linear_velocity.norm() << std::endl;
+        // std::cout << "Velocity Norm: " << body_linear_velocity.norm() << std::endl;
 
         // // Print the rank of A matrix
         // std::cout << "Buffer size" << leg_velocities_buffer_.size() << std::endl;
