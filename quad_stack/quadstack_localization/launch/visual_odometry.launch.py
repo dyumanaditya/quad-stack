@@ -164,7 +164,7 @@ def generate_launch_description():
         x_pose_arg,
         y_pose_arg,
         z_pose_arg,
-        rtabmap,
+        # rtabmap,
         # odom_gt,
         # odom_2d,
         kinematics_odometry,

@@ -57,8 +57,8 @@ def generate_launch_description():
     
     # For some robots the z_pose needs to be adjusted
     z_pose_sub = PythonExpression([
-        "str(max(float('", LaunchConfiguration('z_pose'), "'), 0.4)) "
-        "if '", LaunchConfiguration('robot'), "' == 'a1' "
+        "str(max(float('", LaunchConfiguration('z_pose'), "'), 0.5)) "
+        "if '", LaunchConfiguration('robot'), "' in ['a1', 'go1', 'go2'] "
         "else '", LaunchConfiguration('z_pose'), "'"
     ])
 

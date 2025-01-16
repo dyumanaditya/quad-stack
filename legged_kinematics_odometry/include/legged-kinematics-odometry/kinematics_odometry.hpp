@@ -67,6 +67,9 @@ private:
   std::vector<double> joint_velocities_;
   std::map<std::string, int> pinocchio_joint_map_;
 
+  // Array to store the names of feet for different robots
+  std::map<std::string, std::string> foot_names_;
+
   // Array to store imu data
   std::vector<double> imu_ang_vel_;
   std::vector<double> imu_orientation_;

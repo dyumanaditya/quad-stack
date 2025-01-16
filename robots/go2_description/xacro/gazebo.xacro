@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <robot>
     <!-- ros_control plugin -->
-    <gazebo>
+    <!-- <gazebo>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
             <robotNamespace>/go2_gazebo</robotNamespace>
             <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
         </plugin>
-    </gazebo>
+    </gazebo> -->
 
     <!-- Show the trajectory of trunk center. -->
     <!--gazebo>
@@ -31,12 +31,12 @@
         </plugin>
     </gazebo>
 
-    <gazebo>
+    <!-- <gazebo>
         <plugin filename="libgazebo_ros_force.so" name="gazebo_ros_force">
             <bodyName>trunk</bodyName>
             <topicName>/apply_force/trunk</topicName>
         </plugin>
-    </gazebo>
+    </gazebo> -->
 
     <gazebo reference="imu_link">
         <gravity>true</gravity>
@@ -59,13 +59,89 @@
     </gazebo>
 
 
-
-
-
-
-
     <!-- Foot contacts. -->
     <gazebo reference="FR_calf">
+        <sensor name="fr_foot_bumper" type="contact">
+        <selfCollide>true</selfCollide>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <material>Gazebo/Red</material>
+        <contact>
+            <collision>FR_calf_fixed_joint_lump__FR_foot_collision_1</collision>
+        </contact>
+        <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_fr_foot">
+            <ros>
+            <remapping>bumper_states:=feet_contact</remapping>
+            </ros>
+        </plugin>
+        </sensor>
+    </gazebo>
+    <gazebo reference="FL_calf">
+        <sensor name="fl_foot_bumper" type="contact">
+        <selfCollide>true</selfCollide>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <material>Gazebo/Red</material>
+        <contact>
+            <collision>FL_calf_fixed_joint_lump__FL_foot_collision_1</collision>
+        </contact>
+        <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_fl_foot">
+            <ros>
+            <remapping>bumper_states:=feet_contact</remapping>
+            </ros>
+        </plugin>
+        </sensor>
+    </gazebo>
+    <gazebo reference="RR_calf">
+        <sensor name="rr_foot_bumper" type="contact">
+        <selfCollide>true</selfCollide>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <material>Gazebo/Red</material>
+        <contact>
+            <collision>RR_calf_fixed_joint_lump__RR_foot_collision_1</collision>
+        </contact>
+        <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_rr_foot">
+            <ros>
+            <remapping>bumper_states:=feet_contact</remapping>
+            </ros>
+        </plugin>
+        </sensor>
+    </gazebo>
+    <gazebo reference="RL_calf">
+        <sensor name="rl_foot_bumper" type="contact">
+        <selfCollide>true</selfCollide>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <material>Gazebo/Red</material>
+        <contact>
+            <collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
+        </contact>
+        <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_rl_foot">
+            <ros>
+            <remapping>bumper_states:=feet_contact</remapping>
+            </ros>
+        </plugin>
+        </sensor>
+    </gazebo>
+
+    <!-- Ground truth odom-->
+    <gazebo>
+        <plugin filename="libgazebo_ros_p3d.so" name="gazebo_ros_p3d">
+        <ros>
+            <remapping>odom:=odom_gt</remapping>
+        </ros>
+        <body_name>base</body_name>
+        <frame_name>world</frame_name>
+        <update_rate>100</update_rate>
+        <xyz_offset>0 0 0</xyz_offset>
+        <rpy_offset>0 0 0</rpy_offset>
+        <gaussian_noise>0.0</gaussian_noise>
+        </plugin>
+    </gazebo>
+
+    <!-- OLD ORIGINAL FOOT CONTACT -->
+    <!-- <gazebo reference="FR_calf">
         <sensor name="FR_foot_contact" type="contact">
         <update_rate>100</update_rate>
         <plugin name="contactPlugin" filename="libunitreeFootContactPlugin.so"/>
@@ -100,10 +176,10 @@
             <collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
         </contact>
         </sensor>
-    </gazebo>
+    </gazebo> -->
 
     <!-- Visualization of Foot contacts. -->
-    <gazebo reference="FR_foot">
+    <!-- <gazebo reference="FR_foot">
         <visual>
             <plugin name="drawForcePlugin" filename="libunitreeDrawForcePlugin.so">
                 <topicName>FR_foot_contact</topicName>
@@ -130,7 +206,7 @@
                 <topicName>RL_foot_contact</topicName>
             </plugin>
         </visual>
-    </gazebo>
+    </gazebo> -->
 
     <!-- Gazebo neural control plugin -->
     <gazebo>

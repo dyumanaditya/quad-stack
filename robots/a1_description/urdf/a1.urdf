@@ -32,12 +32,12 @@
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
   <!-- ros_control plugin -->
-  <gazebo>
-    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
-      <robotNamespace>/a1_gazebo</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-    </plugin>
-  </gazebo>
+  <!-- <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/a1_gazebo</robotNamespace>
+            <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        </plugin>
+    </gazebo> -->
   <!-- Show the trajectory of trunk center. -->
   <gazebo>
     <plugin filename="libLinkPlot3DPlugin.so" name="3dplot">
@@ -60,12 +60,12 @@
             </plot>
         </plugin>
     </gazebo> -->
-  <gazebo>
-    <plugin filename="libgazebo_ros_force.so" name="gazebo_ros_force">
-      <bodyName>trunk</bodyName>
-      <topicName>/apply_force/trunk</topicName>
-    </plugin>
-  </gazebo>
+  <!-- <gazebo>
+        <plugin filename="libgazebo_ros_force.so" name="gazebo_ros_force">
+            <bodyName>trunk</bodyName>
+            <topicName>/apply_force/trunk</topicName>
+        </plugin>
+    </gazebo> -->
   <gazebo reference="imu_link">
     <gravity>true</gravity>
     <sensor name="imu_sensor" type="imu">
@@ -87,70 +87,149 @@
   </gazebo>
   <!-- Foot contacts. -->
   <gazebo reference="FR_calf">
-    <sensor name="FR_foot_contact" type="contact">
-      <update_rate>100</update_rate>
-      <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"/>
+    <sensor name="fr_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>100.0</updateRate>
+      <material>Gazebo/Red</material>
       <contact>
         <collision>FR_calf_fixed_joint_lump__FR_foot_collision_1</collision>
       </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_fr_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
     </sensor>
   </gazebo>
   <gazebo reference="FL_calf">
-    <sensor name="FL_foot_contact" type="contact">
-      <update_rate>100</update_rate>
-      <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"/>
+    <sensor name="fl_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>100.0</updateRate>
+      <material>Gazebo/Red</material>
       <contact>
         <collision>FL_calf_fixed_joint_lump__FL_foot_collision_1</collision>
       </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_fl_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
     </sensor>
   </gazebo>
   <gazebo reference="RR_calf">
-    <sensor name="RR_foot_contact" type="contact">
-      <update_rate>100</update_rate>
-      <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"/>
+    <sensor name="rr_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>100.0</updateRate>
+      <material>Gazebo/Red</material>
       <contact>
         <collision>RR_calf_fixed_joint_lump__RR_foot_collision_1</collision>
       </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_rr_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
     </sensor>
   </gazebo>
   <gazebo reference="RL_calf">
-    <sensor name="RL_foot_contact" type="contact">
-      <update_rate>100</update_rate>
-      <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"/>
+    <sensor name="rl_foot_bumper" type="contact">
+      <selfCollide>true</selfCollide>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>100.0</updateRate>
+      <material>Gazebo/Red</material>
       <contact>
         <collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
       </contact>
+      <plugin filename="libgazebo_ros_bumper.so" name="gazebo_ros_bumper_controller_rl_foot">
+        <ros>
+          <remapping>bumper_states:=feet_contact</remapping>
+        </ros>
+      </plugin>
     </sensor>
   </gazebo>
+  <!-- Ground truth odom-->
+  <gazebo>
+    <plugin filename="libgazebo_ros_p3d.so" name="gazebo_ros_p3d">
+      <ros>
+        <remapping>odom:=odom_gt</remapping>
+      </ros>
+      <body_name>base</body_name>
+      <frame_name>world</frame_name>
+      <update_rate>100</update_rate>
+      <xyz_offset>0 0 0</xyz_offset>
+      <rpy_offset>0 0 0</rpy_offset>
+      <gaussian_noise>0.0</gaussian_noise>
+    </plugin>
+  </gazebo>
+  <!-- OLD ORIGINAL FOOT CONTACT -->
+  <!-- <gazebo reference="FR_calf">
+        <sensor name="FR_foot_contact" type="contact">
+        <update_rate>100</update_rate>
+        <plugin name="contactPlugin" filename="libunitreeFootContactPlugin.so"/>
+        <contact>
+            <collision>FR_calf_fixed_joint_lump__FR_foot_collision_1</collision>
+        </contact>
+        </sensor>
+    </gazebo>
+    <gazebo reference="FL_calf">
+        <sensor name="FL_foot_contact" type="contact">
+        <update_rate>100</update_rate>
+        <plugin name="contactPlugin" filename="libunitreeFootContactPlugin.so"/>
+        <contact>
+            <collision>FL_calf_fixed_joint_lump__FL_foot_collision_1</collision>
+        </contact>
+        </sensor>
+    </gazebo>
+    <gazebo reference="RR_calf">
+        <sensor name="RR_foot_contact" type="contact">
+        <update_rate>100</update_rate>
+        <plugin name="contactPlugin" filename="libunitreeFootContactPlugin.so"/>
+        <contact>
+            <collision>RR_calf_fixed_joint_lump__RR_foot_collision_1</collision>
+        </contact>
+        </sensor>
+    </gazebo>
+    <gazebo reference="RL_calf">
+        <sensor name="RL_foot_contact" type="contact">
+        <update_rate>100</update_rate>
+        <plugin name="contactPlugin" filename="libunitreeFootContactPlugin.so"/>
+        <contact>
+            <collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
+        </contact>
+        </sensor>
+    </gazebo> -->
   <!-- Visualization of Foot contacts. -->
-  <gazebo reference="FR_foot">
-    <visual>
-      <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
-        <topicName>FR_foot_contact</topicName>
-      </plugin>
-    </visual>
-  </gazebo>
-  <gazebo reference="FL_foot">
-    <visual>
-      <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
-        <topicName>FL_foot_contact</topicName>
-      </plugin>
-    </visual>
-  </gazebo>
-  <gazebo reference="RR_foot">
-    <visual>
-      <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
-        <topicName>RR_foot_contact</topicName>
-      </plugin>
-    </visual>
-  </gazebo>
-  <gazebo reference="RL_foot">
-    <visual>
-      <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
-        <topicName>RL_foot_contact</topicName>
-      </plugin>
-    </visual>
-  </gazebo>
+  <!-- <gazebo reference="FR_foot">
+        <visual>
+            <plugin name="drawForcePlugin" filename="libunitreeDrawForcePlugin.so">
+                <topicName>FR_foot_contact</topicName>
+            </plugin>
+        </visual>
+    </gazebo>
+    <gazebo reference="FL_foot">
+        <visual>
+            <plugin name="drawForcePlugin" filename="libunitreeDrawForcePlugin.so">
+                <topicName>FL_foot_contact</topicName>
+            </plugin>
+        </visual>
+    </gazebo>
+    <gazebo reference="RR_foot">
+        <visual>
+            <plugin name="drawForcePlugin" filename="libunitreeDrawForcePlugin.so">
+                <topicName>RR_foot_contact</topicName>
+            </plugin>
+        </visual>
+    </gazebo>
+    <gazebo reference="RL_foot">
+        <visual>
+            <plugin name="drawForcePlugin" filename="libunitreeDrawForcePlugin.so">
+                <topicName>RL_foot_contact</topicName>
+            </plugin>
+        </visual>
+    </gazebo> -->
   <!-- Gazebo neural control plugin -->
   <gazebo>
     <plugin filename="libunitree_control.so" name="unitree_gazebo_plugin">
@@ -320,6 +399,279 @@
       <inertia ixx="0.0158533" ixy="-3.66e-05" ixz="-6.11e-05" iyy="0.0377999" iyz="-2.75e-05" izz="0.0456542"/>
     </inertial>
   </link>
+  <!-- <xacro:property name="d435_cam_roll" value="0"/> -->
+  <material name="aluminum">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+  <material name="plastic">
+    <color rgba="0.1 0.1 0.1 1"/>
+  </material>
+  <!-- camera body, with origin at bottom screw mount -->
+  <joint name="d435i_camera_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 0" xyz="0.30585500000000004 -0.012447000000000001 0.068583"/>
+    <parent link="trunk"/>
+    <child link="d435i_camera_bottom_screw_frame"/>
+  </joint>
+  <link name="d435i_camera_bottom_screw_frame"/>
+  <joint name="d435i_camera_link_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.010600000000000002 0.0175 0.0125"/>
+    <parent link="d435i_camera_bottom_screw_frame"/>
+    <child link="d435i_camera_link"/>
+  </joint>
+  <link name="d435i_camera_link">
+    <visual>
+      <!-- the mesh origin is at front plate in between the two infrared camera axes -->
+      <origin rpy="1.5707963267948966 0 1.5707963267948966" xyz="0.0043 -0.0175 0"/>
+      <geometry>
+        <mesh filename="package://realsense2_description/meshes/d435.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 -0.0175 0"/>
+      <geometry>
+        <box size="0.02505 0.09 0.025"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- The following are not reliable values, and should not be used for modeling -->
+      <mass value="0.072"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257"/>
+    </inertial>
+  </link>
+  <!-- camera depth joints and links -->
+  <joint name="d435i_camera_depth_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="d435i_camera_link"/>
+    <child link="d435i_camera_depth_frame"/>
+  </joint>
+  <link name="d435i_camera_depth_frame"/>
+  <joint name="d435i_camera_depth_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="d435i_camera_depth_frame"/>
+    <child link="d435i_camera_depth_optical_frame"/>
+  </joint>
+  <link name="d435i_camera_depth_optical_frame"/>
+  <!-- camera left IR joints and links -->
+  <joint name="d435i_camera_infra1_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0.0 0"/>
+    <parent link="d435i_camera_link"/>
+    <child link="d435i_camera_infra1_frame"/>
+  </joint>
+  <link name="d435i_camera_infra1_frame"/>
+  <joint name="d435i_camera_infra1_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="d435i_camera_infra1_frame"/>
+    <child link="d435i_camera_infra1_optical_frame"/>
+  </joint>
+  <link name="d435i_camera_infra1_optical_frame"/>
+  <!-- camera right IR joints and links -->
+  <joint name="d435i_camera_infra2_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 -0.05 0"/>
+    <parent link="d435i_camera_link"/>
+    <child link="d435i_camera_infra2_frame"/>
+  </joint>
+  <link name="d435i_camera_infra2_frame"/>
+  <joint name="d435i_camera_infra2_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="d435i_camera_infra2_frame"/>
+    <child link="d435i_camera_infra2_optical_frame"/>
+  </joint>
+  <link name="d435i_camera_infra2_optical_frame"/>
+  <!-- camera color joints and links -->
+  <joint name="d435i_camera_color_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0.015 0"/>
+    <parent link="d435i_camera_link"/>
+    <child link="d435i_camera_color_frame"/>
+  </joint>
+  <link name="d435i_camera_color_frame"/>
+  <joint name="d435i_camera_color_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="d435i_camera_color_frame"/>
+    <child link="d435i_camera_color_optical_frame"/>
+  </joint>
+  <link name="d435i_camera_color_optical_frame"/>
+  <link name="d435i_camera_accel_frame"/>
+  <link name="d435i_camera_accel_optical_frame"/>
+  <link name="d435i_camera_gyro_frame"/>
+  <link name="d435i_camera_gyro_optical_frame"/>
+  <joint name="d435i_camera_accel_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.01174 -0.00552 0.0051"/>
+    <parent link="d435i_camera_link"/>
+    <child link="d435i_camera_accel_frame"/>
+  </joint>
+  <joint name="d435i_camera_accel_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="d435i_camera_accel_frame"/>
+    <child link="d435i_camera_accel_optical_frame"/>
+  </joint>
+  <joint name="d435i_camera_gyro_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.01174 -0.00552 0.0051"/>
+    <parent link="d435i_camera_link"/>
+    <child link="d435i_camera_gyro_frame"/>
+  </joint>
+  <joint name="d435i_camera_gyro_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="d435i_camera_gyro_frame"/>
+    <child link="d435i_camera_gyro_optical_frame"/>
+  </joint>
+  <!-- Link for camera image and gazebe plugin-->
+  <link name="camera_image_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="camera_image_joint" type="fixed">
+    <parent link="trunk"/>
+    <child link="camera_image_link"/>
+    <!-- <origin rpy="0 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" /> -->
+    <origin rpy="-1.5707963267948966 0 0" xyz="0.320755 5.3e-05 0.068583"/>
+  </joint>
+  <link name="laser_frame"/>
+  <joint name="laser_joint" type="fixed">
+    <parent link="camera_image_link"/>
+    <child link="laser_frame"/>
+    <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
+  </joint>
+  <!-- <gazebo reference="camera_image_link"> -->
+  <gazebo reference="camera_image_link">
+    <self_collide>0</self_collide>
+    <enable_wind>0</enable_wind>
+    <kinematic>0</kinematic>
+    <gravity>1</gravity>
+    <!--<mu>1</mu>-->
+    <mu2>1</mu2>
+    <fdir1>0 0 0</fdir1>
+    <!--<slip1>0</slip1>
+            <slip2>0</slip2>-->
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <!--<max_vel>0.01</max_vel>
+            <min_depth>0</min_depth>-->
+    <sensor name="d435i_cameracolor" type="camera">
+      <camera name="d435i_camera">
+        <horizontal_fov>1.2112585008840648</horizontal_fov>
+        <image>
+          <!-- <width>1280</width>
+                        <height>720</height> -->
+          <width>640</width>
+          <height>480</height>
+          <format>RGB_INT8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>100</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>60</update_rate>
+      <visualize>1</visualize>
+    </sensor>
+    <sensor name="d435i_cameraired1" type="camera">
+      <camera name="d435i_camera">
+        <horizontal_fov>1.4870205226991688</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>L_INT8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>100</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.05</stddev>
+        </noise>
+      </camera>
+      <always_on>0</always_on>
+      <update_rate>0</update_rate>
+      <visualize>0</visualize>
+    </sensor>
+    <sensor name="d435i_cameraired2" type="camera">
+      <camera name="d435i_camera">
+        <horizontal_fov>1.4870205226991688</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>L_INT8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>100</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.05</stddev>
+        </noise>
+      </camera>
+      <always_on>0</always_on>
+      <update_rate>0</update_rate>
+      <visualize>0</visualize>
+    </sensor>
+    <sensor name="d435i_cameradepth" type="depth">
+      <camera name="d435i_camera">
+        <horizontal_fov>1.4870205226991688</horizontal_fov>
+        <image>
+          <!-- <width>1280</width>
+                        <height>720</height> -->
+          <width>640</width>
+          <height>480</height>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>100</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.100</stddev>
+        </noise>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>90</update_rate>
+      <visualize>0</visualize>
+    </sensor>
+  </gazebo>
+  <gazebo>
+    <plugin filename="librealsense_gazebo_plugin.so" name="/d435i_camera">
+      <prefix>d435i_camera</prefix>
+      <depthUpdateRate>90.0</depthUpdateRate>
+      <colorUpdateRate>60.0</colorUpdateRate>
+      <infraredUpdateRate>0.0</infraredUpdateRate>
+      <depthTopicName>/d435i_camera/depth/image_rect_raw</depthTopicName>
+      <depthCameraInfoTopicName>/d435i_camera/depth/camera_info</depthCameraInfoTopicName>
+      <colorTopicName>/d435i_camera/color/image_raw</colorTopicName>
+      <colorCameraInfoTopicName>/d435i_camera/color/camera_info</colorCameraInfoTopicName>
+      <infrared1TopicName>/d435i_camera/infra1/image_raw</infrared1TopicName>
+      <infrared1CameraInfoTopicName>/d435i_camera/infra1/camera_info</infrared1CameraInfoTopicName>
+      <infrared2TopicName>/d435i_camera/infra2/image_raw</infrared2TopicName>
+      <infrared2CameraInfoTopicName>/d435i_camera/infra2/camera_info</infrared2CameraInfoTopicName>
+      <colorOpticalframeName>d435i_camera_color_optical_frame</colorOpticalframeName>
+      <depthOpticalframeName>d435i_camera_depth_optical_frame</depthOpticalframeName>
+      <infrared1OpticalframeName>d435i_camera_infra1_frame</infrared1OpticalframeName>
+      <infrared2OpticalframeName>d435i_camera_infra2_frame</infrared2OpticalframeName>
+      <rangeMinDepth>0.2</rangeMinDepth>
+      <rangeMaxDepth>10.0</rangeMaxDepth>
+      <pointCloud>False</pointCloud>
+      <pointCloudTopicName>/d435i_camera/depth/color/points</pointCloudTopicName>
+      <pointCloudCutoff>0.25</pointCloudCutoff>
+      <pointCloudCutoffMax>9.0</pointCloudCutoffMax>
+    </plugin>
+  </gazebo>
+  <!-- Adjust color for gazebo-->
+  <gazebo reference="d435i_camera_link">
+    <material>Gazebo/Grey</material>
+  </gazebo>
   <joint name="imu_joint" type="fixed">
     <parent link="trunk"/>
     <child link="imu_link"/>
@@ -345,6 +697,22 @@
       </geometry>
     </collision>
   </link>
+  <!-- DON'T USE THIS, modified axes for locomotion policy -->
+  <!-- <xacro:leg name="FR" mirror="-1" mirror_dae="False" front_hind="1" front_hind_dae="True">
+        <origin rpy="0 0 0" xyz="${leg_offset_x} ${-leg_offset_y} 0"/>
+    </xacro:leg>
+
+    <xacro:leg name="FL" mirror="1" mirror_dae="True" front_hind="1" front_hind_dae="True">
+        <origin rpy="0 0 0" xyz="${leg_offset_x} ${leg_offset_y} 0"/>
+    </xacro:leg>
+
+    <xacro:leg name="RR" mirror="-1" mirror_dae="False" front_hind="-1" front_hind_dae="False">
+        <origin rpy="0 0 0" xyz="${-leg_offset_x} ${-leg_offset_y} 0"/>
+    </xacro:leg>
+
+    <xacro:leg name="RL" mirror="1" mirror_dae="True" front_hind="-1" front_hind_dae="False">
+        <origin rpy="0 0 0" xyz="${-leg_offset_x} ${leg_offset_y} 0"/>
+    </xacro:leg> -->
   <joint name="FR_hip_joint" type="revolute">
     <origin rpy="0 0 0" xyz="0.1805 -0.047 0"/>
     <parent link="trunk"/>
@@ -393,7 +761,7 @@
     <child link="FR_thigh"/>
     <axis xyz="0 -1 0"/>
     <dynamics damping="0" friction="0"/>
-    <limit effort="33.5" lower="-4.1887902047863905" upper="1.0471975511965976"  velocity="21"/>
+    <limit effort="33.5" lower="-4.1887902047863905" upper="1.0471975511965976" velocity="21"/>
   </joint>
   <link name="FR_thigh">
     <visual>

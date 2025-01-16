@@ -85,7 +85,7 @@ namespace gazebo
 
             // Create a timer to publish contact states
             auto publish_frequency = std::chrono::milliseconds(10);
-            // contact_timer_ = node_->create_wall_timer(publish_frequency, std::bind(&UnitreeGazeboControlPlugin::publishContactStates, this));
+            contact_timer_ = node_->create_wall_timer(publish_frequency, std::bind(&UnitreeGazeboControlPlugin::publishContactStates, this));
 
             // rclcpp::NodeOptions options;
             // options.parameter_overrides({{"use_sim_time", true}});

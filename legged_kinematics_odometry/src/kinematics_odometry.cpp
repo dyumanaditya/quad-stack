@@ -111,6 +111,22 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
         pinocchio_joint_map_[model_.names[i]] = i;
     }
 
+    // Initialize foot names
+    if (model_.name == "a1" || model_.name == "go1" || model_.name == "go2")
+    {
+        foot_names_["fl"] = "FL_foot";
+        foot_names_["fr"] = "FR_foot";
+        foot_names_["rl"] = "RL_foot";
+        foot_names_["rr"] = "RR_foot";
+    }
+    else
+    {
+        foot_names_["fl"] = "fl_foot";
+        foot_names_["fr"] = "fr_foot";
+        foot_names_["rl"] = "rl_foot";
+        foot_names_["rr"] = "rr_foot";
+    }
+
     // Initialize IMU data
     imu_orientation_.resize(4, 0.0);
     imu_ang_vel_.resize(3, 0.0);
@@ -134,19 +150,19 @@ void KinematicsOdometry::feetContactCallback(const gazebo_msgs::msg::ContactsSta
 
     if (contact_name.find("fl_foot") != std::string::npos)
     {
-        foot_in_contact_name = "fl_foot";
+        foot_in_contact_name = foot_names_["fl"];
     }
     else if (contact_name.find("fr_foot") != std::string::npos)
     {
-        foot_in_contact_name = "fr_foot";
+        foot_in_contact_name = foot_names_["fr"];
     }
     else if (contact_name.find("rl_foot") != std::string::npos)
     {
-        foot_in_contact_name = "rl_foot";
+        foot_in_contact_name = foot_names_["rl"];
     }
     else if (contact_name.find("rr_foot") != std::string::npos)
     {
-        foot_in_contact_name = "rr_foot";
+        foot_in_contact_name = foot_names_["rr"];
     }
 
     _computeLegVelocity(foot_in_contact_name);
@@ -168,7 +184,7 @@ void KinematicsOdometry::feetContactStateCallback(const hb40_commons::msg::Robot
     {
         if (leg_state.contact)
         {
-            foot_in_contact_name = leg_state.leg_name;
+            foot_in_contact_name = foot_names_[leg_state.leg_name.substr(0, 2)];
             _computeLegVelocity(foot_in_contact_name);
         }
     }
@@ -245,21 +261,21 @@ void KinematicsOdometry::_computeLegVelocity(std::string foot_in_contact_name)
 
     // Get the kinematic chain for the leg
     std::vector<std::string> kinematic_chain;
-    if (foot_in_contact_name == "fl_foot")
+    if (foot_in_contact_name == foot_names_["fl"])
     {
-        kinematic_chain = _getKinematicChain("fl_foot");
+        kinematic_chain = _getKinematicChain(foot_names_["fl"]);
     }
-    else if (foot_in_contact_name == "fr_foot")
+    else if (foot_in_contact_name == foot_names_["fr"])
     {
-        kinematic_chain = _getKinematicChain("fr_foot");
+        kinematic_chain = _getKinematicChain(foot_names_["fr"]);
     }
-    else if (foot_in_contact_name == "rl_foot")
+    else if (foot_in_contact_name == foot_names_["rl"])
     {
-        kinematic_chain = _getKinematicChain("rl_foot");
+        kinematic_chain = _getKinematicChain(foot_names_["rl"]);
     }
-    else if (foot_in_contact_name == "rr_foot")
+    else if (foot_in_contact_name == foot_names_["rr"])
     {
-        kinematic_chain = _getKinematicChain("rr_foot");
+        kinematic_chain = _getKinematicChain(foot_names_["rr"]);
     }
 
     // Find the relavant columns in the Jacobian
@@ -346,6 +362,9 @@ void KinematicsOdometry::_computeBodyVelocity()
         Eigen::VectorXd x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
         body_linear_velocity = x.head(3);
         body_angular_velocity = x.tail(3);
+
+        //Norm of the linear velocity
+        std::cout << "Velocity Norm: " << body_linear_velocity.norm() << std::endl;
 
         // // Print the rank of A matrix
         // std::cout << "Buffer size" << leg_velocities_buffer_.size() << std::endl;
