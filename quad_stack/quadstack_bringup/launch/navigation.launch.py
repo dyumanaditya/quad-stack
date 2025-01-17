@@ -11,16 +11,16 @@ from launch.conditions import LaunchConfigurationNotEquals, LaunchConfigurationE
 
 
 def generate_launch_description():
-    mab_bringup_pkg_dir = get_package_share_directory('mab_bringup')
-    mab_navigation_pkg_dir = get_package_share_directory('mab_navigation')
-    mab_localization_pkg_dir = get_package_share_directory('mab_localization')
-    mab_utils_pkg_dir = get_package_share_directory('mab_utils')
+    quadstack_bringup_pkg_dir = get_package_share_directory('quadstack_bringup')
+    quadstack_navigation_pkg_dir = get_package_share_directory('quadstack_navigation')
+    quadstack_localization_pkg_dir = get_package_share_directory('quadstack_localization')
+    quadstack_utils_pkg_dir = get_package_share_directory('quadstack_utils')
 
-    mab_bringup_teleop_launch = os.path.join(mab_bringup_pkg_dir, 'launch', 'mab_teleop.launch.py')
-    mab_navigation_launch = os.path.join(mab_navigation_pkg_dir, 'launch', 'navigation.launch.py')
-    mab_localization_vo_launch = os.path.join(mab_localization_pkg_dir, 'launch', 'visual_odometry.launch.py')
-    mab_localization_slam_launch = os.path.join(mab_localization_pkg_dir, 'launch', 'slam.launch.py')
-    mab_utils_image_rotation_launch = os.path.join(mab_utils_pkg_dir, 'launch', 'rotate_image.launch.py')
+    quadstack_bringup_teleop_launch = os.path.join(quadstack_bringup_pkg_dir, 'launch', 'teleop.launch.py')
+    quadstack_navigation_launch = os.path.join(quadstack_navigation_pkg_dir, 'launch', 'navigation.launch.py')
+    quadstack_localization_vo_launch = os.path.join(quadstack_localization_pkg_dir, 'launch', 'visual_odometry.launch.py')
+    quadstack_localization_slam_launch = os.path.join(quadstack_localization_pkg_dir, 'launch', 'slam.launch.py')
+    quadstack_utils_image_rotation_launch = os.path.join(quadstack_utils_pkg_dir, 'launch', 'rotate_image.launch.py')
 
     map_file_arg = DeclareLaunchArgument(
         'map',
@@ -31,18 +31,48 @@ def generate_launch_description():
     robot_arg = DeclareLaunchArgument(
         'robot',
         default_value='silver_badger',
-        description='Choose the robot to spawn, silver_badger or honey_badger'
+        description='Choose the robot to spawn, silver_badger, honey_badger, a1, go1 or go2'
+    )
+    
+    world_arg = DeclareLaunchArgument(
+        'world',
+        default_value='mab_house_tires.world',
+        description='Specify the Gazebo world file to load'
+    )
+    
+    x_pose_arg = DeclareLaunchArgument(
+        'x_pose',
+        default_value='-2.0',
+        description='X position of the robot at start'
+    )
+    
+    y_pose_arg = DeclareLaunchArgument(
+        'y_pose',
+        default_value='3.5',
+        description='Y position of the robot at start'
+    )
+    
+    z_pose_arg = DeclareLaunchArgument(
+        'z_pose',
+        default_value='0.1',
+        description='Z position of the robot at start'
+    )
+    
+    odom_gt_arg = DeclareLaunchArgument(
+        'odom_gt',
+        default_value='false',
+        description='Whether to use ground truth odometry'
     )
 
-    mab_localization_slam_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_localization_slam_launch),
+    quadstack_localization_slam_include_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(quadstack_localization_slam_launch),
         launch_arguments={
             'map': LaunchConfiguration('map'),
         }.items()
     )
 
     mab_bringup_teleop_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_bringup_teleop_launch),
+        PythonLaunchDescriptionSource(quadstack_bringup_teleop_launch),
         # condition=LaunchConfigurationEquals('map', '')
         launch_arguments={
             'robot': LaunchConfiguration('robot')
@@ -50,7 +80,7 @@ def generate_launch_description():
     )
 
     mab_navigation_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_navigation_launch)
+        PythonLaunchDescriptionSource(quadstack_navigation_launch)
     )
     
     delayed_navigation_launch = TimerAction(
@@ -59,11 +89,11 @@ def generate_launch_description():
     )
 
     mab_localization_vo_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_localization_vo_launch)
+        PythonLaunchDescriptionSource(quadstack_localization_vo_launch)
     )
 
     image_rotation = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_utils_image_rotation_launch)
+        PythonLaunchDescriptionSource(quadstack_utils_image_rotation_launch)
     )
     
     delayed_localization_vo_launch = TimerAction(
@@ -72,8 +102,8 @@ def generate_launch_description():
     )
 
     delayed_localization_slam_launch = TimerAction(
-        period=12.0,
-        actions=[mab_localization_slam_include_launch]
+        period=15.0,
+        actions=[quadstack_localization_slam_include_launch]
     )
 
     use_sim_time_arg = DeclareLaunchArgument(
@@ -87,7 +117,7 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output={'both': 'log'},
-        arguments=['-d', os.path.join(mab_bringup_pkg_dir, 'rviz', 'mab_nav.rviz')],
+        arguments=['-d', os.path.join(quadstack_bringup_pkg_dir, 'rviz', 'quadstack_nav.rviz')],
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]
     )
 
@@ -103,6 +133,11 @@ def generate_launch_description():
         map_file_arg,
         use_sim_time_arg,
         robot_arg,
+        world_arg,
+        x_pose_arg,
+        y_pose_arg,
+        z_pose_arg,
+        odom_gt_arg,
 
         mab_bringup_teleop_include_launch,
         delayed_navigation_launch,

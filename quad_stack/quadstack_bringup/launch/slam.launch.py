@@ -85,7 +85,10 @@ def generate_launch_description():
     )
     
     mab_localization_slam_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(mab_localization_slam_launch)
+        PythonLaunchDescriptionSource(mab_localization_slam_launch),
+        launch_arguments={
+            'robot': LaunchConfiguration('robot'),
+        }.items()
     )
 
     image_rotation = IncludeLaunchDescription(
@@ -118,7 +121,7 @@ def generate_launch_description():
     )
 
     odom_gt = Node(
-        package='mab_utils',
+        package='quadstack_utils',
         executable='odom_gt',
         name='odom_gt',
         output='screen',
