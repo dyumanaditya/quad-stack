@@ -48,7 +48,9 @@ def generate_launch_description():
     # Combine the pose values into the initial_pose string
     # With correct spacing and formatting
     initial_pose = [x_pose, ' ', y_pose, ' ', z_pose, ' ', '0 ', '0 ', '0']
-    frame_id = 'base_link' if LaunchConfiguration('robot') == 'silver_badger' or LaunchConfiguration('robot') == 'honey_badger' else 'base'
+    frame_id = PythonExpression([
+        "'base_link' if '", LaunchConfiguration('robot'), "' in ['silver_badger', 'honey_badger'] else 'base'"
+    ])
     
     rtabmap = Node(
         package='rtabmap_odom',

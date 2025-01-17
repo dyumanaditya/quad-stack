@@ -6571,10 +6571,6 @@
       <pose>-8.46994 2.44152 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>814 847000000</sim_time>
-      <real_time>725 272815453</real_time>
-      <wall_time>1723726935 587077058</wall_time>
-      <iterations>638812</iterations>
       <model name='cafe_table'>
         <pose>-2.93733 6.47299 0 0 -0 0</pose>
         <scale>1 1 1</scale>

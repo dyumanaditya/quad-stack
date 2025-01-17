@@ -2,19 +2,30 @@ import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 
 def generate_launch_description():
-    pkg_name = "mab_localization"
-    utils_pkg_name = "mab_utils"
+    pkg_name = "quadstack_localization"
+    utils_pkg_name = "quadstack_utils"
     pkg_share = get_package_share_directory(pkg_name)
     utils_pkg_share = get_package_share_directory(utils_pkg_name)
-    laser_settings_file = os.path.join(pkg_share, 'resource', 'laser.yaml')
+    # laser_settings_file = os.path.join(pkg_share, 'resource', 'laser.yaml')
     slam_settings_file = os.path.join(pkg_share, 'resource', 'slam_toolbox_params.yaml')
 
+    robot_arg = DeclareLaunchArgument(
+        'robot',
+        default_value='silver_badger',
+        description='Choose the robot to spawn, silver_badger, honey_badger, a1, go1 or go2'
+    )
+    
+    # Set base_frame dynamically based on the robot argument
+    base_frame = PythonExpression([
+        "'base_link' if '", LaunchConfiguration('robot'), "' in ['silver_badger', 'honey_badger'] else 'base'"
+    ])
 
     depth_to_laser = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(utils_pkg_share, 'launch', 'depth_to_laser.launch.py'))
@@ -45,7 +56,10 @@ def generate_launch_description():
         executable='sync_slam_toolbox_node',
         name='slam_toolbox',
         output='screen',
-        parameters=[slam_settings_file]
+        parameters=[
+            slam_settings_file,  # Pass the settings file as a string
+            {'base_frame': base_frame}  # Pass the dynamic base_frame parameter as a dictionary
+        ]
     )
 
     rtabmap_slam = Node(
@@ -99,6 +113,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        robot_arg,
         depth_to_laser,
         slam,
         # rtabmap_slam,
