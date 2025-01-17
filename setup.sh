@@ -45,5 +45,8 @@ sudo apt-get install -y ros-humble-rcl-interfaces
 
 pip install -U "jax[cuda12]"
 
+pip install numpy==1.26.4
+sudo apt install ros-humble-pinocchio
+
 
 echo "Installation of all packages for mab_ros is complete!"
