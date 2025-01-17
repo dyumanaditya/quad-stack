@@ -1,4 +1,4 @@
-# quad-stack
+# QuadStack
 Software stack MAB and Unitree Quadrupeds
 
 <div style="display: flex; justify-content: space-between;">
