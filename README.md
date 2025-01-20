@@ -1,5 +1,10 @@
 # QuadStack
-Software stack MAB and Unitree Quadrupeds
+Software stack MAB and Unitree Quadrupeds for 
+
+- Neural locomotion
+- Visual Inertial Kinematic aided odometry
+- SLAM
+- Navigation and Planning
 
 <div style="display: flex; justify-content: space-between;">
     <img src="./media/1.png" alt="Image 1" width="150" style="margin-right: 10px;">
