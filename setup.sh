@@ -42,6 +42,7 @@ sudo apt-get install -y ros-humble-tf2-ros ros-humble-tf2-tools
 sudo apt install -y ros-humble-tf-transformations
 
 sudo apt-get install -y ros-humble-rcl-interfaces
+sudo apt install ros-humble-rosidl-generator-dds-idl
 
 pip install -U "jax[cuda12]"
 
@@ -49,4 +50,4 @@ pip install numpy==1.26.4
 sudo apt install ros-humble-pinocchio
 
 
-echo "Installation of all packages for mab_ros is complete!"
+echo "Installation of all packages for quad-stack is complete!"

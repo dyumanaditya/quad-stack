@@ -6,6 +6,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.conditions import IfCondition
 
 
 
@@ -40,6 +41,12 @@ def generate_launch_description():
         description='Z position of the robot at start'
     )
     
+    use_kinematics_odom_arg = DeclareLaunchArgument(
+        'use_kinematics_odom',
+        default_value='true',
+        description='Use kinematics odometry'
+    )
+    
     # Use LaunchConfiguration to fetch the values of the launch arguments
     x_pose = LaunchConfiguration('x_pose')
     y_pose = LaunchConfiguration('y_pose')
@@ -52,47 +59,36 @@ def generate_launch_description():
         "'base_link' if '", LaunchConfiguration('robot'), "' in ['silver_badger', 'honey_badger'] else 'base'"
     ])
     
+    # Whether to use kinematics odometry or not
+    use_kinematics_odom = LaunchConfiguration('use_kinematics_odom')
+    kinematics_frame = PythonExpression([
+        "'odom_kinematics' if '", use_kinematics_odom,
+        "' == 'true' else ''"
+    ])
+    
+    vo_params = PythonExpression([
+        "'vo_params_real.yaml' if '", LaunchConfiguration('real_robot'), "' == 'true' else 'vo_params_sim.yaml'"
+    ])
+    vo_settings_file = [os.path.join(pkg_share, 'resource', ''), vo_params]
+
+    
     rtabmap = Node(
         package='rtabmap_odom',
         executable='rgbd_odometry',
         name='rgbd_odometry',
         output='screen',
-        parameters=[{
+        parameters=
+        [
+            {
             'frame_id': frame_id,
-            'approx_sync': True,
-            'odom_frame_id': 'odom',
-            'publish_tf': True,
-            'initial_pose': '0 0 0 0 0 0',
-            # 'initial_pose': '-2.0 3.5 0 0 0 0',
-            # 'initial_pose': initial_pose,
-            'publish_null_when_lost': False,
-            # 'odom_frame_id': 'odom_turtlebot3',
-            # 'queue_size': 1000,
-            # 'wait_for_transform': 1.0,
-            'approx_sync_max_interval': 0.05,
-            # 'sensor_data_compression_format': 'jpeg',
-            # 'topic_queue_size': 1000,
-            'Odom/Strategy': '0', # Frame to map or Frame to frame
-            'Vis/CorType': '0', # Features Matching or Optical flow
-            'OdomF2M/MaxSize': '1200', # Max features
-            'Vis/MaxFeatures': '700', # Max features extracted from image
-            'wait_imu_to_init': True,
-            'guess_frame_id': 'odom_kinematics',
-        }],
+            'guess_frame_id': kinematics_frame,  
+            },
+            vo_settings_file
+        ],
         remappings=[
-            # ('/rgb/image', '/d435i_camera/color/image_raw/rotated'),
-            # ('/depth/image', '/d435i_camera/depth/image_raw/rotated'),
-            # ('/rgb/camera_info', '/d435i_camera/color/camera_info/rotated')
             ('/rgb/image', '/d435i_camera/color/image_raw'),
             ('/depth/image', '/d435i_camera/depth/image_rect_raw'),
             ('/rgb/camera_info', '/d435i_camera/color/camera_info'),
-            # ('/rgb/image', '/d435i_camera/color/image_raw/stabilized'),
-            # ('/depth/image', '/d435i_camera/depth/image_rect_raw/stabilized'),
-            # ('/rgb/camera_info', '/d435i_camera/color/camera_info'),
-            # ('/depth/image', '/d435i_camera/depth/image_raw'),
-            # ('/rgb/image', '/waffle_cam/color/image_raw'),
-            # ('/depth/image', '/waffle_cam/depth/image_raw'),
-            # ('/rgb/camera_info', '/waffle_cam/color/camera_info')
             ('/imu', '/imu/out'),
         ]
     )
@@ -123,7 +119,8 @@ def generate_launch_description():
 
     kinematics_odometry = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(kinematics_odom_pkg_share, 'launch', 'kinematics_odometry.launch.py')),
-        launch_arguments={'urdf': urdf_path_expr, 'robot': LaunchConfiguration('robot')}.items()
+        launch_arguments={'urdf': urdf_path_expr, 'robot': LaunchConfiguration('robot'), 'real_robot': LaunchConfiguration('real_robot')}.items(),
+        condition=IfCondition(use_kinematics_odom)
     )
 
     odom_gt = Node(
@@ -155,12 +152,30 @@ def generate_launch_description():
         parameters=[ekf_settings_file],
     )
 
-    # rtabmap_vis = Node(
-    #     package='rtabmap_viz',
-    #     executable='rtabmap_viz',
-    #     name='rtabmapviz',
-    #     output='screen',
-    # )
+    rtabmap_vis = Node(
+        package='rtabmap_viz',
+        executable='rtabmap_viz',
+        name='rtabmapviz',
+        output='screen',
+    )
+    
+    rtabmap_slam = Node(
+        package='rtabmap_slam',
+        executable='rtabmap',
+        name='rtabmap',
+        output='screen',
+        parameters=[{
+            'frame_id': 'base',
+            'approx_sync': True,
+            'odom_frame_id': 'odom',
+        }],
+        remappings=[
+            ('/rgb/image', '/d435i_camera/color/image_raw'),
+            ('/depth/image', '/d435i_camera/depth/image_rect_raw'),
+            ('/rgb/camera_info', '/d435i_camera/color/camera_info'),
+            ('/imu', '/imu/out'),
+        ]
+    )
 
 
     return LaunchDescription([
@@ -168,6 +183,7 @@ def generate_launch_description():
         x_pose_arg,
         y_pose_arg,
         z_pose_arg,
+        use_kinematics_odom_arg,
         rtabmap,
         # odom_gt,
         # odom_2d,
@@ -175,4 +191,5 @@ def generate_launch_description():
         # imu_covariance,
         # ekf_filter,
         # rtabmap_vis,
+        # rtabmap_slam
     ])

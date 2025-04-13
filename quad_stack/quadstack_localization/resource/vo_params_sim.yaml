@@ -1,0 +1,23 @@
+rgbd_odometry:
+  ros__parameters:
+    approx_sync: true
+    odom_frame_id: odom
+    publish_tf: true
+    initial_pose: '0 0 0 0 0 0'
+    # 'initial_pose': '-2.0 3.5 0 0 0 0',
+    publish_null_when_lost: false
+    # 'queue_size': 1000,
+    # 'wait_for_transform': 1.0,
+    approx_sync_max_interval: 0.05
+    # 'sensor_data_compression_format': 'jpeg',
+    # 'topic_queue_size': 1000,
+    Odom/Strategy: '1' # Frame to map or Frame to frame
+    Vis/CorType: '0' # Features Matching or Optical flow
+    OdomF2M/MaxSize: '800' # Max features
+    Vis/MaxFeatures: '1000' # Max features extracted from image
+    # 'OdomF2M/MaxSize': '2000', # Max features
+    # 'Vis/MaxFeatures': '1000', # Max features extracted from image
+    # 'Odom/MinInliers': '10', # Min inliers
+    
+    Odom/ResetCountdown: '1' # Reset the odometry after 1 frame
+    # 'wait_imu_to_init': True,

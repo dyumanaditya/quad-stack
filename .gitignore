@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 
 quad_stack/quadstack_gazebo/worlds/test_worlds/*
+quad_stack/quadstack_gazebo/worlds/aws-robomaker-small-warehouse-world/*
+quad_stack/quadstack_gazebo/worlds/aws-robomaker-small-house-world/*

@@ -5,8 +5,9 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <gazebo_msgs/msg/contacts_state.hpp>
 #include <sensor_msgs/msg/imu.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/twist_with_covariance_stamped.hpp>
 #include <hb40_commons/msg/robot_state.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 
 // EMA Filter class for smoothing velocities
 class EMAFilter {
@@ -42,7 +43,7 @@ private:
   void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
 
   // Velocity publisher
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr velocity_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr velocity_pub_;
   void publishVelocity();
   void _computeLegVelocity(std::string foot_in_contact_name);
   void _computeBodyVelocity();
@@ -67,8 +68,17 @@ private:
   std::vector<double> joint_velocities_;
   std::map<std::string, int> pinocchio_joint_map_;
 
+  // Store the joint states time stamp
+  builtin_interfaces::msg::Time joint_states_timestamp_;
+
   // Array to store the names of feet for different robots
   std::map<std::string, std::string> foot_names_;
+
+  // Store covariance matrix for linear velocity
+  std::array<double, 36> covariance_msg;
+
+  // Whether we are using a real robot or simulation
+  bool real_robot_;
 
   // Array to store imu data
   std::vector<double> imu_ang_vel_;

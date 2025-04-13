@@ -22,6 +22,7 @@ setup(
     entry_points={
         'console_scripts': [
             'publish_robot_state = mab_utils.publish_robot_state:main',
+            'silver_badger_real_robot_relay = mab_utils.silver_badger_real_robot_relay:main',
         ],
     },
 )

@@ -22,11 +22,11 @@
         <xacro:property name="d435_cam_depth_pz" value="${d435_cam_height/2}"/>
 
         <!-- Camera position in 3D-->
-        <xacro:property name="d435_cam_x" value="0.320755"/>
+        <xacro:property name="d435_cam_x" value="0.370755"/>
         <xacro:property name="d435_cam_y" value="0.000053"/>
         <xacro:property name="d435_cam_z" value="0.068583"/>
-        <xacro:property name="d435_cam_roll" value="${-M_PI/2}"/>
-        <!-- <xacro:property name="d435_cam_roll" value="0"/> -->
+        <!-- <xacro:property name="d435_cam_roll" value="${-M_PI/2}"/> -->
+        <xacro:property name="d435_cam_roll" value="0.0"/>
 
         <!-- Initialize camera-->
         <xacro:include filename="$(find realsense2_description)/urdf/_d435i.urdf.xacro"/>

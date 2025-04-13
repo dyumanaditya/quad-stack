@@ -27,6 +27,10 @@ def generate_launch_description():
         f"'{nav2_mab_file}' if '", LaunchConfiguration('robot'),
         "' in ['silver_badger', 'honey_badger'] else '", nav2_unitree_file, "'"
     ])
+    
+    frame_id = PythonExpression([
+        "'base_link' if '", LaunchConfiguration('robot'), "' in ['silver_badger', 'honey_badger'] else 'base'"
+    ])
 
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
@@ -58,7 +62,6 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'navigation_launch.py')),
         # PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'bringup_launch.py')),
         launch_arguments={
-            'use_sim_time': use_sim_time,
             'params_file': nav2_settings_file,
         }.items()
     )
@@ -85,7 +88,11 @@ def generate_launch_description():
         executable='amcl',
         name='amcl',
         output='screen',
-        parameters=[amcl_settings_file]
+        parameters=[
+            {'base_frame_id': frame_id},
+            amcl_settings_file
+        ],
+        condition=LaunchConfigurationNotEquals('map', '')
     )
         
 
@@ -96,8 +103,9 @@ def generate_launch_description():
         parameters=[{'yaml_filename': LaunchConfiguration('map')}]
     )
 
-    lifecycle_nodes = ['map_server']
-    # lifecycle_nodes = ['map_server', 'amcl']
+    lifecycle_nodes = PythonExpression([
+        "['map_server', 'amcl'] if '", LaunchConfiguration('map'), "' != '' else ['map_server']"
+    ])
     use_sim_time = True
     autostart = True
 
@@ -132,10 +140,10 @@ def generate_launch_description():
         map_file_arg,
         # nav2,
         nav2_navigation,
-        # nav2_amcl,
+        nav2_amcl,
         laser,
         map_server,
         life_cycle_manager,
         # nav2_localization_conditional,
-        velocity_relay,
+        # velocity_relay,
     ])

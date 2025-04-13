@@ -14,7 +14,11 @@ def generate_launch_description():
     pkg_share = get_package_share_directory(pkg_name)
     utils_pkg_share = get_package_share_directory(utils_pkg_name)
     # laser_settings_file = os.path.join(pkg_share, 'resource', 'laser.yaml')
-    slam_settings_file = os.path.join(pkg_share, 'resource', 'slam_toolbox_params.yaml')
+    
+    slam_params = PythonExpression([
+        "'slam_toolbox_params_real.yaml' if '", LaunchConfiguration('real_robot'), "' == 'true' else 'slam_toolbox_params_sim.yaml'"
+    ])
+    slam_settings_file = [os.path.join(pkg_share, 'resource', ''), slam_params]
 
     robot_arg = DeclareLaunchArgument(
         'robot',
@@ -28,28 +32,22 @@ def generate_launch_description():
     ])
 
     depth_to_laser = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(utils_pkg_share, 'launch', 'depth_to_laser.launch.py'))
+        PythonLaunchDescriptionSource(os.path.join(utils_pkg_share, 'launch', 'depth_to_laser.launch.py')),
+        launch_arguments={
+            'robot': LaunchConfiguration('robot'),
+            'rosbag': LaunchConfiguration('rosbag'),
+            'real_robot': LaunchConfiguration('real_robot'),
+            'use_laser_stabilization': LaunchConfiguration('use_laser_stabilization')
+        }.items()
     )
 
-    # depth_to_laser = Node(
-    #     package='depthimage_to_laserscan',
-    #     executable='depthimage_to_laserscan_node',
-    #     name='depthimage_to_laserscan',
-    #     output='screen',
-    #     parameters=[laser_settings_file],
-    #     remappings=[
-    #         ('depth', '/d435i_camera/depth/image_raw/rotated'),
-    #         ('depth_camera_info', '/d435i_camera/depth/camera_info/rotated'),
-    #         # ('depth', '/d435i_camera/depth/image_raw'),
-    #         # ('depth_camera_info', '/d435i_camera/depth/camera_info'),
-    #         # ('depth', '/d435i_camera/depth/stabilized_image'),
-    #         # ('depth_camera_info', '/d435i_camera/depth/stabilized_camera_info'),
-    #         # ('depth', '/waffle_cam/depth/image_raw'),
-    #         # ('depth_camera_info', '/waffle_cam/depth/camera_info'),
-    #         ('scan', '/scan')
-    #     ]
-    # )
-
+    # Whether to add kinematics induced velocity constraints to the map
+    use_vel_map_constraints_arg = LaunchConfiguration('use_vel_map_constraints')
+    use_vel_map_constraints = PythonExpression([
+        "True if '", use_vel_map_constraints_arg,
+        "' == 'true' else False"
+    ])
+    
     # SLAM Node
     slam = Node(
         package='slam_toolbox',
@@ -58,7 +56,10 @@ def generate_launch_description():
         output='screen',
         parameters=[
             slam_settings_file,  # Pass the settings file as a string
-            {'base_frame': base_frame}  # Pass the dynamic base_frame parameter as a dictionary
+            {
+            'base_frame': base_frame,
+            'use_velocity_constraints': use_vel_map_constraints,
+            }
         ]
     )
 

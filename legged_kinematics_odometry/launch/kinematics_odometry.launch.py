@@ -25,7 +25,7 @@ def generate_launch_description():
         executable='kinematics_odometry',
         name='legged_kinematics_odometry',
         output='screen',
-        parameters=[{'urdf': LaunchConfiguration('urdf'), 'use_sim_time': True}],
+        parameters=[{'urdf': LaunchConfiguration('urdf'), 'use_sim_time': True, 'real_robot': LaunchConfiguration('real_robot')}],
     )
 
     odom_publisher = Node(

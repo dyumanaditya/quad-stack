@@ -18,7 +18,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'publish_robot_state = unitree_utils.publish_robot_state:main'
+            'publish_robot_state = unitree_utils.publish_robot_state:main',
+            'go2_real_robot_relay = unitree_utils.go2_real_robot_relay:main',
         ],
     },
 )

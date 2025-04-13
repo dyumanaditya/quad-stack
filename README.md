@@ -38,6 +38,13 @@ Here are the commands to run the package. The following launch arguments are sup
 - `x_pose`, `y_pose`, `z_pose`
 - `map` (absolute path of a map yaml file) if you are running navigation and want to use a pre-made map
 
+## Using Gazebo World Packages
+If you are using a gazebo world that has a separate directory for models, you will need to run the following before launching
+
+```bash
+export GAZEBO_MODEL_PATH=<path-to-model-folder>
+```
+
 
 ### Spawning the robot
 

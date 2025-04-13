@@ -74,11 +74,11 @@ def generate_launch_description():
     os.environ['GAZEBO_PLUGIN_PATH'] = plugin_paths
 
     # Launch Gazebo with a world file
-    world_pkg = 'turtlebot3_gazebo'
+    world_pkg = 'quadstack_gazebo'
     # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house.world')
     world_file = os.path.join(gazebo_pkg_share, 'worlds', 'mab_house_tires.world')
     # world_file = os.path.join(gazebo_pkg_share, 'worlds', 'empty_world.world')
-    gazebo_models_path = os.path.join(get_package_share_directory(world_pkg), 'models')
+    gazebo_models_path = os.path.join(get_package_share_directory(world_pkg), 'worlds', 'aws-robomaker-small-warehouse-world', 'models')
     # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path + ':' + os.environ["GAZEBO_MODEL_PATH"]
     # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
     
@@ -86,7 +86,7 @@ def generate_launch_description():
     world = LaunchConfiguration('world')
     world_file_path = [os.path.join(gazebo_pkg_share, 'worlds', ''), world]
     # world_folder_path = os.path.join(gazebo_pkg_share, 'worlds/')
-    # print(world_folder_path)
+    # print(world_file_path)
     gazebo = ExecuteProcess(
         # cmd=['gazebo', world_file_path, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
         cmd=['gazebo', '--verbose ', world_file_path, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],

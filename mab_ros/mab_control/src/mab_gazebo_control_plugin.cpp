@@ -164,7 +164,7 @@ namespace gazebo
                         // joints_[j]->SetPosition(0, msg->t_pos[i]);
                         // Print the name of the joint
                         // std::string j_name = joints_[j]->GetName();
-                        // RCLCPP_INFO(node_->get_logger(), "Joint %s: Applying torque %f", j_name.c_str(), torque);
+                        // RCLCPP_INFO(node_->get_logger(), "Joint %s: pos %f", joints_[j]->GetScopedName().c_str(), msg->t_pos[i]);
                         break;
                     }
                 }
@@ -188,9 +188,14 @@ namespace gazebo
             robot_state.leg.clear();
 
             // Get the contact state for each foot
+            int cnt = 0;
             for (auto &contact_sensor : contact_sensors_)
             {
                 std::string leg_name = contact_sensor.first;
+                if (!contact_sensor.second) {
+                    RCLCPP_ERROR(node_->get_logger(), "Contact sensor %s is NULL", leg_name.c_str());
+                    continue;
+                }
                 sensors::ContactSensorPtr contact_sensor_ptr = contact_sensor.second;
 
                 // Check if the foot is in contact
@@ -202,7 +207,11 @@ namespace gazebo
                 // Retrieve the contact force
                 if (is_contact)
                 {
-                    physics::Contact contact = contact_sensor_ptr->Contacts(contact_sensor_ptr->GetCollisionName(0)).begin()->second;
+                    physics::Contact& contact = contact_sensor_ptr->Contacts(contact_sensor_ptr->GetCollisionName(0)).begin()->second;
+                    if (!contact.wrench) {
+                        RCLCPP_WARN(node_->get_logger(), "Wrench data is missing for contact on sensor %s", leg_name.c_str());
+                        continue;
+                    }
                     ignition::math::Vector3d force = contact.wrench[0].body1Force;
                     leg_state.foot_force_est.x = force.X();
                     leg_state.foot_force_est.y = force.Y();
@@ -220,6 +229,7 @@ namespace gazebo
 
             // Publish the contact state
             contact_state_publisher_->publish(robot_state);
+            cnt++;
         }
 
         bool detectContact(sensors::ContactSensorPtr contact_sensor)
@@ -227,6 +237,10 @@ namespace gazebo
             for (unsigned int i = 0; i < contact_sensor->GetCollisionCount(); i++)
             {
                 std::string collision_name = contact_sensor->GetCollisionName(i);
+                if (collision_name.empty()) {
+                    RCLCPP_ERROR(node_->get_logger(), "No valid collision name for sensor");
+                    continue;
+                }
                 std::map<std::string, physics::Contact> contacts = contact_sensor->Contacts(collision_name);
                 if (contacts.size() > 0)
                 {

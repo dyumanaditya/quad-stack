@@ -24,6 +24,9 @@ from rclpy.clock import Clock, ClockType
 class MABLocomotion(Node):
     def __init__(self):
         super().__init__("mab_locomotion")
+        
+        # Make Jax use cpu
+        jax.config.update("jax_platform_name", "cpu")
 
         self.is_real_robot = False
         self.is_tuda_robot = True
@@ -160,10 +163,11 @@ class MABLocomotion(Node):
 
         self.nn_active = True
 
-        print(f"Robot ready. Using device: {jax.default_backend()}")
+        self.get_logger().info(f"Robot ready. Using device: {jax.default_backend()}")
 
         # timer_period = 0.01  # 100 Hz
         timer_period = 0.02  # 50 Hz
+        # timer_period = 0.05  # 20 Hz
         self.system_clock = Clock(clock_type=ClockType.SYSTEM_TIME)
         self.timer = self.create_timer(timer_period, self.timer_callback, clock=self.system_clock)
 
@@ -199,14 +203,19 @@ class MABLocomotion(Node):
             use_policy = True
         else:
             use_policy = False
+            
 
         joint_command_msg = JointCommand()
         if not use_policy:
             joint_command_msg.header.stamp = self.get_clock().now().to_msg()
-            # joint_command_msg.kp = self.kp
-            # joint_command_msg.kd = self.kd
-            joint_command_msg.kp = [50.0,] * 13
-            joint_command_msg.kd = [5.0,] * 13
+            if self.robot == "honey_badger":
+                kp = 100.0
+                kd = 5.0
+            else:
+                kp = 50.0
+                kd = 5.0
+            joint_command_msg.kp = [kp,] * 13
+            joint_command_msg.kd = [kd,] * 13
             joint_command_msg.t_pos = self.nominal_joint_positions.tolist()
             joint_command_msg.t_vel = [0.0,] * 13
             joint_command_msg.t_trq = [0.0,] * 13

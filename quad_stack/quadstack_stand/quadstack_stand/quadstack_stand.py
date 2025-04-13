@@ -23,15 +23,12 @@ class QuadstackStand(Node):
         elif self.robot == 'a1':
             self.publisher_ = self.create_publisher(JointCommand, '/a1/joint_commandHighPrio', 10)
             self.target_positions = [-0.1, -0.8, 1.5, 0.1, 0.8, -1.5, 0.1, -1.0, 1.5, -0.1, 1.0, -1.5]
-            # self.target_positions = [0.1, 0.8, -1.5, 0.1, 0.8, -1.5, -0.1, 1.0, -1.5, -0.1, 1.0, -1.5]
         elif self.robot == 'go1':
             self.publisher_ = self.create_publisher(JointCommand, '/go1/joint_commandHighPrio', 10)
             self.target_positions = [-0.1, -0.8, 1.5, 0.1, 0.8, -1.5, 0.1, -1.0, 1.5, -0.1, 1.0, -1.5]
-            # self.target_positions = [0.1, 0.8, -1.5, 0.1, 0.8, -1.5, -0.1, 1.0, -1.5, -0.1, 1.0, -1.5]
         elif self.robot == 'go2':
             self.publisher_ = self.create_publisher(JointCommand, '/go2/joint_commandHighPrio', 10)
             self.target_positions = [-0.1, -0.8, 1.5, 0.1, 0.8, -1.5, 0.1, -1.0, 1.5, -0.1, 1.0, -1.5]
-            # self.target_positions = [0.1, 0.8, -1.5, 0.1, 0.8, -1.5, -0.1, 1.0, -1.5, -0.1, 1.0, -1.5]
         else:
             raise ValueError("Invalid robot name: {}".format(self.robot))
         

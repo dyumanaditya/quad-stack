@@ -70,10 +70,11 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
         "/imu_gt_fd", qos_most_recent, std::bind(&KinematicsOdometry::imuCallback, this, std::placeholders::_1));
     // "/imu/out", qos_most_recent, std::bind(&KinematicsOdometry::imuCallback, this, std::placeholders::_1));
 
-    velocity_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("/base_lin_vel", 10);
+    velocity_pub_ = this->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>("/base_lin_vel", 10);
     timer_ = this->create_wall_timer(5ms, std::bind(&KinematicsOdometry::publishVelocity, this));
 
     std::string urdf = this->declare_parameter("urdf", "");
+    real_robot_ = this->declare_parameter("real_robot", false);
 
     if (urdf.empty())
     {
@@ -98,6 +99,21 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
     {
         std::cout << "Joint " << i << " has name " << model_.names[i] << std::endl;
     }
+
+    // Initialize covariance matrix depending on the model
+    Eigen::Matrix3d linear_covariance;
+    linear_covariance << 0.1, 0.0,       0.0,
+                         0.0,        0.1, 0.0,
+                         0.0,        0.0,       0.05;
+
+    Eigen::Matrix<double, 6, 6> covariance = Eigen::Matrix<double, 6, 6>::Zero();
+    covariance.block<3, 3>(0, 0) = linear_covariance;
+    covariance.block<3, 3>(3, 3) = Eigen::Matrix3d::Zero();
+    for (size_t i = 0; i < 6; i++) {
+        for (size_t j = 0; j < 6; j++) {
+          covariance_msg[i * 6 + j] = covariance(i, j);  // Row-major order.
+        }
+    }              
 
     // Initialize joint states (we don't care about the first "universe" joint)
     pinocchio_joint_names_ = model_.names;
@@ -195,6 +211,9 @@ void KinematicsOdometry::jointStateCallback(const sensor_msgs::msg::JointState::
     joint_states_ = msg->position;
     joint_states_names_ = msg->name;
     joint_velocities_ = msg->velocity;
+
+    // Store timestamp
+    joint_states_timestamp_ = msg->header.stamp;
 }
 
 std::vector<std::string> KinematicsOdometry::_getKinematicChain(const std::string &link_name)
@@ -339,6 +358,7 @@ void KinematicsOdometry::_computeBodyVelocity()
     if (least_squares)
     {
 
+        int nLegs = leg_velocities_buffer_.size();
         Eigen::MatrixXd A = Eigen::MatrixXd::Zero(6 * leg_velocities_buffer_.size(), 6);
         Eigen::VectorXd b = Eigen::VectorXd::Zero(6 * leg_velocities_buffer_.size());
 
@@ -358,8 +378,43 @@ void KinematicsOdometry::_computeBodyVelocity()
             i++;
         }
 
+        // Define the square-root weight matrix W_half (block-diagonal)
+        // For each leg, the first 3 rows (foot velocity measurement) use a weight of 1 for x, y, and z.
+        // The IMU constraints (next 3 rows) are given a lower weight.
+        Eigen::MatrixXd W_half = Eigen::MatrixXd::Zero(6 * nLegs, 6 * nLegs);
+        double imu_weight = 1.0;  // Lower weight for the IMU angular velocity regularization
+        // double imu_weight = 0.8;  // Lower weight for the IMU angular velocity regularization
+
+        for (int i = 0; i < nLegs; i++) {
+            // For foot velocity measurement (first 3 rows)
+            W_half(6 * i + 0, 6 * i + 0) = 1.0;  // x
+            W_half(6 * i + 1, 6 * i + 1) = 1.0;  // y
+            W_half(6 * i + 2, 6 * i + 2) = 1.0;  // z
+
+            // For IMU angular velocity regularization (next 3 rows) with less importance
+            W_half(6 * i + 3, 6 * i + 3) = imu_weight;
+            W_half(6 * i + 4, 6 * i + 4) = imu_weight;
+            W_half(6 * i + 5, 6 * i + 5) = imu_weight;
+        }
+
+        // Apply the weight matrix to both A and b to form the weighted least squares problem
+        Eigen::MatrixXd A_weighted = W_half * A;
+        Eigen::VectorXd b_weighted = W_half * b;
+
+        // Solve the weighted least squares problem: A_weighted * x = b_weighted
+        Eigen::VectorXd x;
+        if (real_robot_)
+        {
+            x = A_weighted.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_weighted);
+        }
+        else
+        {
+            x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+        }
+        // Eigen::VectorXd x = A_weighted.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_weighted);
+
         // Solve the least squares problem Ax = b
-        Eigen::VectorXd x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+        // Eigen::VectorXd x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
         body_linear_velocity = x.head(3);
         body_angular_velocity = x.tail(3);
 
@@ -413,18 +468,28 @@ void KinematicsOdometry::publishVelocity()
 
     _computeBodyVelocity();
 
-    geometry_msgs::msg::TwistStamped velocity_msg;
+    geometry_msgs::msg::TwistWithCovarianceStamped velocity_msg;
 
     // Publish the velocity
-    velocity_msg.header.stamp = this->get_clock()->now();
+    // Use the joint state message timestamp
+    if (real_robot_)
+    {
+        velocity_msg.header.stamp = joint_states_timestamp_;
+    }
+    else
+    {
+        velocity_msg.header.stamp = this->get_clock()->now();
+    }
     velocity_msg.header.frame_id = "base_link";
-    velocity_msg.twist.linear.x = body_linear_velocity(0);
-    velocity_msg.twist.linear.y = body_linear_velocity(1);
-    velocity_msg.twist.linear.z = body_linear_velocity(2);
+    velocity_msg.twist.twist.linear.x = body_linear_velocity(0);
+    velocity_msg.twist.twist.linear.y = body_linear_velocity(1);
+    velocity_msg.twist.twist.linear.z = body_linear_velocity(2);
 
-    velocity_msg.twist.angular.x = body_angular_velocity(0);
-    velocity_msg.twist.angular.y = body_angular_velocity(1);
-    velocity_msg.twist.angular.z = body_angular_velocity(2);
+    velocity_msg.twist.twist.angular.x = body_angular_velocity(0);
+    velocity_msg.twist.twist.angular.y = body_angular_velocity(1);
+    velocity_msg.twist.twist.angular.z = body_angular_velocity(2);
+
+    velocity_msg.twist.covariance = covariance_msg;
 
     velocity_pub_->publish(velocity_msg);
 

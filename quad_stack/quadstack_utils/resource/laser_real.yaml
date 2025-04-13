@@ -1,0 +1,13 @@
+depthimage_to_laserscan:
+  ros__parameters:
+    # scan_height: 200
+    scan_height: 30
+    range_min: 0.2
+    range_max: 8.0
+    scan_time: 0.01
+    output_frame: "laser_frame"
+    # use_imu_stabilization: true
+    # output_frame: "laser_frame_projected"
+    # output_frame: "base_footprint"
+    # output_frame: "base_link"
+    # output_frame: "camera_rgb_frame"

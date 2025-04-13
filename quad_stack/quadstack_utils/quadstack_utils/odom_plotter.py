@@ -1,9 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import TwistWithCovarianceStamped
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import TwistStamped
 from sensor_msgs.msg import JointState
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -38,7 +37,7 @@ class OdometryPlotter(Node):
             10)
         
         self.base_lin_vel_subscriber = self.create_subscription(
-            TwistStamped,
+            TwistWithCovarianceStamped,
             '/base_lin_vel',
             self.base_lin_vel_callback,
             10)
@@ -49,12 +48,6 @@ class OdometryPlotter(Node):
             # '/joint_states_filtered',
             '/joint_states',
             self.joint_state_callback,
-            10)
-        
-        self.base_lin_vel_subscriber = self.create_subscription(
-            TwistStamped,
-            '/base_lin_vel',
-            self.base_lin_vel_callback,
             10)
         
         # Subscriber for /joint_states
@@ -139,9 +132,9 @@ class OdometryPlotter(Node):
         
     def base_lin_vel_callback(self, msg):
         # Extract linear velocities
-        self.vel_x.append(msg.twist.linear.x)
-        self.vel_y.append(msg.twist.linear.y)
-        self.vel_z.append(msg.twist.linear.z)
+        self.vel_x.append(msg.twist.twist.linear.x)
+        self.vel_y.append(msg.twist.twist.linear.y)
+        self.vel_z.append(msg.twist.twist.linear.z)
         
     def joint_state_callback(self, msg):
         if not self.joint_names:

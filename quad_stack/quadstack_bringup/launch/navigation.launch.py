@@ -5,8 +5,8 @@ from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration
-from launch.conditions import LaunchConfigurationNotEquals, LaunchConfigurationEquals
+from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.conditions import LaunchConfigurationNotEquals, IfCondition, LaunchConfigurationEquals
 
 
 
@@ -22,6 +22,12 @@ def generate_launch_description():
     quadstack_localization_slam_launch = os.path.join(quadstack_localization_pkg_dir, 'launch', 'slam.launch.py')
     quadstack_utils_image_rotation_launch = os.path.join(quadstack_utils_pkg_dir, 'launch', 'rotate_image.launch.py')
 
+    rosbag_arg = DeclareLaunchArgument(
+        'rosbag',
+        default_value='false',
+        description='Play a rosbag or load a simulation'
+    )
+    
     map_file_arg = DeclareLaunchArgument(
         'map',
         default_value='',
@@ -32,6 +38,12 @@ def generate_launch_description():
         'robot',
         default_value='silver_badger',
         description='Choose the robot to spawn, silver_badger, honey_badger, a1, go1 or go2'
+    )
+    
+    real_robot_arg = DeclareLaunchArgument(
+        'real_robot',
+        default_value='false',
+        description='Rosbag of real robot, or simulation'
     )
     
     world_arg = DeclareLaunchArgument(
@@ -63,15 +75,37 @@ def generate_launch_description():
         default_value='false',
         description='Whether to use ground truth odometry'
     )
+    
+    use_kinematics_odom_arg = DeclareLaunchArgument(
+        'use_kinematics_odom',
+        default_value='true',
+        description='Use kinematics odometry'
+    )
+    
+    use_vel_map_constraints_arg = DeclareLaunchArgument(
+        'use_vel_map_constraints',
+        default_value='true',
+        description='Add velocity constraints to the map'
+    )
+    
+    use_laser_stabilization_arg = DeclareLaunchArgument(
+        'use_laser_stabilization',
+        default_value='true',
+        description='Whether to stabilize the laser scan based on IMU data'
+    )
 
     quadstack_localization_slam_include_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(quadstack_localization_slam_launch),
         launch_arguments={
-            'map': LaunchConfiguration('map'),
+            'robot': LaunchConfiguration('robot'),
+            'rosbag': LaunchConfiguration('rosbag'),
+            'real_robot': LaunchConfiguration('real_robot'),
+            'use_vel_map_constraints': LaunchConfiguration('use_vel_map_constraints'),
+            'use_laser_stabilization': LaunchConfiguration('use_laser_stabilization')
         }.items()
     )
 
-    mab_bringup_teleop_include_launch = IncludeLaunchDescription(
+    quadstack_bringup_teleop_include_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(quadstack_bringup_teleop_launch),
         # condition=LaunchConfigurationEquals('map', '')
         launch_arguments={
@@ -79,17 +113,26 @@ def generate_launch_description():
         }.items()
     )
 
-    mab_navigation_include_launch = IncludeLaunchDescription(
+    quadstack_navigation_include_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(quadstack_navigation_launch)
     )
     
     delayed_navigation_launch = TimerAction(
         period=5.0,
-        actions=[mab_navigation_include_launch]
+        actions=[quadstack_navigation_include_launch]
     )
 
-    mab_localization_vo_include_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(quadstack_localization_vo_launch)
+    quadstack_localization_vo_include_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(quadstack_localization_vo_launch),
+        launch_arguments={
+            'x_pose': LaunchConfiguration('x_pose'),
+            'y_pose': LaunchConfiguration('y_pose'),
+            'z_pose': LaunchConfiguration('z_pose'),
+            'robot': LaunchConfiguration('robot'),
+            'use_kinematics_odom': LaunchConfiguration('use_kinematics_odom'),
+            'rosbag': LaunchConfiguration('rosbag'),
+            'real_robot': LaunchConfiguration('real_robot')
+        }.items()
     )
 
     image_rotation = IncludeLaunchDescription(
@@ -98,7 +141,7 @@ def generate_launch_description():
     
     delayed_localization_vo_launch = TimerAction(
         period=12.0,
-        actions=[mab_localization_vo_include_launch]
+        actions=[quadstack_localization_vo_include_launch]
     )
 
     delayed_localization_slam_launch = TimerAction(
@@ -128,29 +171,74 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
     )
     
+    sb_real_rosbag_condition = IfCondition(
+        PythonExpression(
+            [
+                '"', LaunchConfiguration('robot'), '" == "silver_badger" and "',
+                LaunchConfiguration('rosbag'), '" == "true" and "',
+                LaunchConfiguration('real_robot'), '" == "true"'
+                
+            ]
+        )
+    )
+    
+    go2_real_rosbag_condition = IfCondition(
+        PythonExpression(
+            [
+                '"', LaunchConfiguration('robot'), '" == "go2" and "',
+                LaunchConfiguration('rosbag'), '" == "true" and "',
+                LaunchConfiguration('real_robot'), '" == "true"'
+            ]
+        )
+    )
+    
+    silver_badger_real_robot_relay = Node(
+        package='mab_utils',
+        executable='silver_badger_real_robot_relay',
+        name='silver_badger_real_robot_relay',
+        output='screen',
+        condition=sb_real_rosbag_condition
+    )
+    
+    go2_real_robot_relay = Node(
+        package='unitree_utils',
+        executable='go2_real_robot_relay',
+        name='go2_real_robot_relay',
+        output='screen',
+        condition=go2_real_rosbag_condition
+    )
+    
     # Only if map is not provided, we launch the slam. Otherwise we do navigation on the received map
     return LaunchDescription([
         map_file_arg,
         use_sim_time_arg,
+        rosbag_arg,
         robot_arg,
         world_arg,
+        real_robot_arg,
+        use_kinematics_odom_arg,
+        use_vel_map_constraints_arg,
+        use_laser_stabilization_arg,
         x_pose_arg,
         y_pose_arg,
         z_pose_arg,
         odom_gt_arg,
 
-        mab_bringup_teleop_include_launch,
+        silver_badger_real_robot_relay,
+        go2_real_robot_relay,
+
+        quadstack_bringup_teleop_include_launch,
         delayed_navigation_launch,
         delayed_localization_vo_launch,
         image_rotation,
         rviz,
 
-        GroupAction(
-            actions=[
-                map_odom_transform_publisher,
-            ],
-            condition=LaunchConfigurationNotEquals('map', '')
-        ),
+        # GroupAction(
+        #     actions=[
+        #         map_odom_transform_publisher,
+        #     ],
+        #     condition=LaunchConfigurationNotEquals('map', '')
+        # ),
         GroupAction(
             actions=[
                 delayed_localization_slam_launch,

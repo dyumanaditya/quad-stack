@@ -31,6 +31,10 @@ setup(
             'fake_imu = quadstack_utils.fake_imu:main',
             'odom_gt = quadstack_utils.odom_gt:main',
             'odom_plotter = quadstack_utils.odom_plotter:main',
+            'publish_velocity_path = quadstack_utils.publish_velocity_path:main',
+            'publish_tf_on_topic = quadstack_utils.publish_tf_on_topic:main',
+            'compute_leg_odom_covariance = quadstack_utils.compute_leg_odom_covariance:main',
+            'plot_header_time = quadstack_utils.plot_header_time:main',
         ],
     },
 )
