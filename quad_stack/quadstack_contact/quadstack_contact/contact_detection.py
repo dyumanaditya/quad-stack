@@ -1,6 +1,6 @@
 import numpy as np
 import pinocchio as pino
-from pathlib import Path
+import yaml
 
 def skewSym(x):
     return np.array([
@@ -205,8 +205,18 @@ def dis_ob_tau_zaxis(tau, gm_measured, gm, est_f_z, q, v, pino_model, pino_data,
     est_f[np.delete(np.arange(12), idx)] = f_xy_gt
     return gm, est_f   
 
+from functools import reduce
 class ContactDetector(object):
     def __init__(self, bandwidth=30, nv=19, freq=200, alg="mixing", pino_model=None, pino_data=None):
+        # load the yaml file for hyperparameters
+        with open("./config/contact_param.yaml", "r") as f:
+            config = yaml.safe_load(f)
+            bandwidth = config["bandwidth"]
+            alpha = config["alpha"]
+            threshold = config["threshold"]
+        alpha = reduce(lambda a, b: a | b, alpha) # merge the list of dicts into one dict
+        threshold = reduce(lambda a, b: a | b, threshold)
+        
         bandwidth = [bandwidth] * nv
         bandwidth = np.array(bandwidth)
         L1 = np.diag(2 * bandwidth)
@@ -225,13 +235,8 @@ class ContactDetector(object):
         # setting for filtering
         self.est_f_filtered_prev = np.zeros(12)
         self.foot_names = ["fl_foot", "fr_foot", "rl_foot", "rr_foot"]
-        self.alpha = {"fl_foot": 0.3, "fr_foot": 0.2, "rl_foot": 0.15, "rr_foot": 0.15}
-        self.threshold = {
-                            "fl_foot": 18.,
-                            "fr_foot": 24,
-                            "rl_foot": 24,
-                            "rr_foot": 24,
-                        }
+        self.alpha = alpha
+        self.threshold = threshold
 
     def apply_contact_force_estimation(self, q, v, tau):
         M = pino.crba(self.pino_model, self.pino_data, q)

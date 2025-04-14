@@ -1,0 +1,13 @@
+threshold:
+  - fl_foot: 52.3
+  - fr_foot: 25
+  - rl_foot: 12
+  - rr_foot: 28
+
+alpha:
+  - fl_foot: 0.2
+  - fr_foot: 0.2
+  - rl_foot: 0.1
+  - rr_foot: 0.1
+
+bandwidth: 30
