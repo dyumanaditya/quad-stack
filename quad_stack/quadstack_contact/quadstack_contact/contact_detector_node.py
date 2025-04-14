@@ -186,6 +186,9 @@ class ContactDetectorNode(Node):
             leg_msg.foot_pos_body = est_force_filtered_msg
 
             robot_state_msg.leg.append(leg_msg)
+        
+        # Publish the contact state message
+        self.contact_state_publisher.publish(robot_state_msg)
     
 def main(args=None):
     rclpy.init(args=args)
