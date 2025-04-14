@@ -190,7 +190,7 @@ class ContactDetectorNode(Node):
             est_force_filtered_msg.x = float(est_f_filtered_cur_foot[0])
             est_force_filtered_msg.y = float(est_f_filtered_cur_foot[1])
             est_force_filtered_msg.z = float(est_f_filtered_cur_foot[2])
-            leg_msg.foot_pos_body = est_force_filtered_msg
+            leg_msg.foot_force_est_filter = est_force_filtered_msg
 
             robot_state_msg.leg.append(leg_msg)
         
