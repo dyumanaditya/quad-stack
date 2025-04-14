@@ -10,4 +10,16 @@ alpha:
   - rl_foot: 0.1
   - rr_foot: 0.1
 
+foot_pos_z_threshold:
+  - fl_foot: 0.024
+  - fr_foot: 0.022
+  - rl_foot: 0.020
+  - rr_foot: 0.01
+
+foot_pos_z_alpha:
+  - fl_foot: 0.3
+  - fr_foot: 0.3
+  - rl_foot: 0.3
+  - rr_foot: 0.3
+
 bandwidth: 30

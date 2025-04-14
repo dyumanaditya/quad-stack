@@ -157,6 +157,10 @@ class ContactDetectorNode(Node):
         # Generate the input for the contact detector
         q, v, tau = gen_pino_input(self.joint_pos, self.joint_vel, self.joint_tau, self.pos, self.ori, self.lin_vel, self.ang_vel, self.joint_names_pin, self.joint_names_ros)
         est_f, est_f_filtered, contact_states = self.contact_detector.apply_contact_detection(q, v, tau)
+        
+        # Get the peusdo ground truth of the contact states
+        contact_states_gt = self.contact_detector.apply_contact_detection_gt(q)
+        
         # Create the RobotState message
         robot_state_msg = RobotState()
         robot_state_msg.header.stamp = self.get_clock().now().to_msg()
@@ -170,6 +174,9 @@ class ContactDetectorNode(Node):
             leg_msg = LegState()
             leg_msg.leg_name = foot_name
             leg_msg.contact = bool(contact_state)
+            
+            contact_state_gt = contact_states_gt[foot_name]
+            leg_msg.contact_gt = bool(contact_state_gt)
             
             est_f_cur_foot = est_f[i*3: i*3 + 3]
             est_force_msg = Vector3()

@@ -1,6 +1,7 @@
 import numpy as np
 import pinocchio as pino
 import yaml
+from pathlib import Path
 
 def skewSym(x):
     return np.array([
@@ -148,6 +149,19 @@ def err_mapping_func(err, alg="hg", k_hg=1, k_sliding=1, use_soft_sign=True):
     else:
         raise NotImplementedError
 
+def compute_feet_positions(pino_model, pino_data, q):
+    # compute the feet positions of the foot frames
+    foot_names = ["fl_foot", "fr_foot", "rl_foot", "rr_foot"]
+    foot_pos = {}
+    for i in range(len(foot_names)):
+        foot_name = foot_names[i]
+        pino.forwardKinematics(pino_model, pino_data, q)
+        pino.updateFramePlacements(pino_model, pino_data)
+        foot_frame = pino_model.getFrameId(foot_name)
+        foot_tran = pino_data.oMf[foot_frame].translation.copy()
+        foot_pos[foot_name] = np.array(foot_tran)
+    return foot_pos
+
 def dis_ob_tau_zaxis(tau, gm_measured, gm, est_f_z, q, v, pino_model, pino_data, gain_param, dt, alg="hg"):
     """
         For the observer only estimate the z-axis force
@@ -208,14 +222,19 @@ def dis_ob_tau_zaxis(tau, gm_measured, gm, est_f_z, q, v, pino_model, pino_data,
 from functools import reduce
 class ContactDetector(object):
     def __init__(self, bandwidth=30, nv=19, freq=200, alg="mixing", pino_model=None, pino_data=None):
+        yaml_path = Path(__file__).resolve().parent / "config" / "contact_param.yaml"
         # load the yaml file for hyperparameters
-        with open("./config/contact_param.yaml", "r") as f:
+        with open(f"{yaml_path}", "r") as f:
             config = yaml.safe_load(f)
             bandwidth = config["bandwidth"]
             alpha = config["alpha"]
             threshold = config["threshold"]
+            foot_pos_z_threshold = config["foot_pos_z_threshold"]
+            foot_pos_z_alpha = config["foot_pos_z_alpha"]
         alpha = reduce(lambda a, b: a | b, alpha) # merge the list of dicts into one dict
         threshold = reduce(lambda a, b: a | b, threshold)
+        foot_pos_z_threshold = reduce(lambda a, b: a | b, foot_pos_z_threshold)
+        foot_pos_z_alpha = reduce(lambda a, b: a | b, foot_pos_z_alpha)
         
         bandwidth = [bandwidth] * nv
         bandwidth = np.array(bandwidth)
@@ -237,6 +256,9 @@ class ContactDetector(object):
         self.foot_names = ["fl_foot", "fr_foot", "rl_foot", "rr_foot"]
         self.alpha = alpha
         self.threshold = threshold
+        self.foot_pos_z_threshold = foot_pos_z_threshold
+        self.foot_pos_z_filtered = {"fl_foot": 0, "fr_foot": 0, "rl_foot": 0, "rr_foot": 0}
+        self.foot_pos_z_alpha = foot_pos_z_alpha
 
     def apply_contact_force_estimation(self, q, v, tau):
         M = pino.crba(self.pino_model, self.pino_data, q)
@@ -260,3 +282,20 @@ class ContactDetector(object):
             contact_state = est_f_filtered[idx] > self.threshold[foot_name]
             contact_states[foot_name] = contact_state
         return est_f, est_f_filtered, contact_states
+    
+    def apply_contact_detection_gt(self, q):
+        feet_pos = compute_feet_positions(self.pino_model, self.pino_data, q)
+        contact_states = {}
+        for i in range(len(self.foot_names)):
+            foot_name = self.foot_names[i]
+            foot_pos = feet_pos[foot_name]
+            foot_pos_z = foot_pos[2]
+            alpha = self.foot_pos_z_alpha[foot_name]
+            foot_pos_z_filtered_prev = self.foot_pos_z_filtered[foot_name]
+            foot_pos_z_filtered = alpha * foot_pos_z + (1 - alpha) * foot_pos_z_filtered_prev
+            self.foot_pos_z_filtered[foot_name] = foot_pos_z_filtered
+        
+            thre = self.foot_pos_z_threshold[foot_name]
+            in_contact = foot_pos_z_filtered < thre
+            contact_states[foot_name] = in_contact
+        return contact_states
