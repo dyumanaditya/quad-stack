@@ -1,4 +1,6 @@
 from setuptools import find_packages, setup
+import os
+from glob import glob
 
 package_name = 'quadstack_contact'
 
@@ -11,6 +13,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/contact_detector.launch.py']),
+        (os.path.join('share', package_name, 'resource'), glob('resource/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

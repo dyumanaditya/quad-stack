@@ -158,14 +158,6 @@ def generate_launch_description():
         condition=go2_rosbag_condition
     )
 
-    # launch the contact detector node
-    contact_detector = Node(
-        package='quadstack_contact',
-        executable='contact_detector_node',
-        name='contact_detector_node',
-        output='screen',
-        parameters=[{'robot': LaunchConfiguration('robot')}],
-    ),
 
     return LaunchDescription([
         rosbag_arg,
@@ -183,7 +175,6 @@ def generate_launch_description():
         # camera_frame_stabilizer,
         silver_badger_real_robot_relay,
         go2_real_robot_relay,
-        # contact_detector,
     ])
 
 if __name__ == '__main__':

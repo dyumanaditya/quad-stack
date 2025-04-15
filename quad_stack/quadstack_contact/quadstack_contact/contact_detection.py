@@ -1,7 +1,9 @@
 import numpy as np
 import pinocchio as pino
 import yaml
-from pathlib import Path
+import os
+from ament_index_python.packages import get_package_share_directory
+
 
 def skewSym(x):
     return np.array([
@@ -222,7 +224,8 @@ def dis_ob_tau_zaxis(tau, gm_measured, gm, est_f_z, q, v, pino_model, pino_data,
 from functools import reduce
 class ContactDetector(object):
     def __init__(self, bandwidth=30, nv=19, freq=200, alg="mixing", pino_model=None, pino_data=None):
-        yaml_path = Path(__file__).resolve().parent / "config" / "contact_param.yaml"
+        yaml_path = os.path.join(get_package_share_directory('quadstack_contact'), 'resource', 'contact_param.yaml')
+        # yaml_path = Path(__file__).resolve().parent / "config" / "contact_param.yaml"
         # load the yaml file for hyperparameters
         with open(f"{yaml_path}", "r") as f:
             config = yaml.safe_load(f)

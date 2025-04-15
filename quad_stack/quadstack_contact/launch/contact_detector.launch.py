@@ -12,7 +12,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'robot',
             default_value='silver_badger',
-            description='Choose the robot to spawn'
+            description='Choose the robot to spawn, silver_badger, honey_badger'
         ),
         Node(
             package='quadstack_contact',
