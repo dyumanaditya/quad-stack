@@ -206,7 +206,7 @@ void KinematicsOdometry::feetContactStateCallback(const hb40_commons::msg::Robot
 
     for (auto leg_state : msg->leg)
     {
-        if (leg_state.contact_gt)
+        if (leg_state.contact)
         {
             foot_in_contact_name = foot_names_[leg_state.leg_name.substr(0, 2)];
             _computeLegVelocity(foot_in_contact_name);
