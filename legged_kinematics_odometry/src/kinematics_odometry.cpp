@@ -56,11 +56,20 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
     rclcpp::QoS qos_most_recent(rclcpp::KeepLast(1));
     rclcpp::QoS qos_contacts(rclcpp::KeepLast(5));
 
-    // feet_contact_sub_ = this->create_subscription<gazebo_msgs::msg::ContactsState>(
-    //     "/feet_contact", qos_contacts, std::bind(&KinematicsOdometry::feetContactCallback, this, std::placeholders::_1));
+    std::string urdf = this->declare_parameter("urdf", "");
+    real_robot_ = this->declare_parameter("real_robot", false);
 
+    std::string feet_contact_topic;
+    if (real_robot_)
+    {
+        feet_contact_topic = "/estimated_contact_state";
+    }
+    else
+    {
+        feet_contact_topic = "/feet_contact_state";
+    }
     feet_contact_state_sub_ = this->create_subscription<hb40_commons::msg::RobotState>(
-        "/feet_contact_state", qos_contacts, std::bind(&KinematicsOdometry::feetContactStateCallback, this, std::placeholders::_1));
+        feet_contact_topic, qos_contacts, std::bind(&KinematicsOdometry::feetContactStateCallback, this, std::placeholders::_1));
 
     joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
         "/joint_states", qos_most_recent, std::bind(&KinematicsOdometry::jointStateCallback, this, std::placeholders::_1));
@@ -73,8 +82,7 @@ KinematicsOdometry::KinematicsOdometry() : Node("kinematics_odometry")
     velocity_pub_ = this->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>("/base_lin_vel", 10);
     timer_ = this->create_wall_timer(5ms, std::bind(&KinematicsOdometry::publishVelocity, this));
 
-    std::string urdf = this->declare_parameter("urdf", "");
-    real_robot_ = this->declare_parameter("real_robot", false);
+    
 
     if (urdf.empty())
     {
@@ -198,7 +206,7 @@ void KinematicsOdometry::feetContactStateCallback(const hb40_commons::msg::Robot
 
     for (auto leg_state : msg->leg)
     {
-        if (leg_state.contact)
+        if (leg_state.contact_gt)
         {
             foot_in_contact_name = foot_names_[leg_state.leg_name.substr(0, 2)];
             _computeLegVelocity(foot_in_contact_name);
@@ -382,8 +390,8 @@ void KinematicsOdometry::_computeBodyVelocity()
         // For each leg, the first 3 rows (foot velocity measurement) use a weight of 1 for x, y, and z.
         // The IMU constraints (next 3 rows) are given a lower weight.
         Eigen::MatrixXd W_half = Eigen::MatrixXd::Zero(6 * nLegs, 6 * nLegs);
-        double imu_weight = 1.0;  // Lower weight for the IMU angular velocity regularization
-        // double imu_weight = 0.8;  // Lower weight for the IMU angular velocity regularization
+        // double imu_weight = 1.0;  // Lower weight for the IMU angular velocity regularization
+        double imu_weight = 0.8;  // Lower weight for the IMU angular velocity regularization
 
         for (int i = 0; i < nLegs; i++) {
             // For foot velocity measurement (first 3 rows)
@@ -406,6 +414,7 @@ void KinematicsOdometry::_computeBodyVelocity()
         if (real_robot_)
         {
             x = A_weighted.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_weighted);
+            // x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
         }
         else
         {
@@ -463,6 +472,7 @@ void KinematicsOdometry::publishVelocity()
     // Return if there is nothing in the buffer or if there are less than 2 feet in contact
     if (leg_velocities_buffer_.empty() || leg_velocities_buffer_.size() < 2)
     {
+        RCLCPP_WARN(this->get_logger(), "Not enough legs in contact to compute body velocity");
         return;
     }
 

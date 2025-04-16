@@ -116,6 +116,15 @@ def generate_launch_description():
         LaunchConfiguration('robot'),
         "', '')"
     ])
+    
+    # launch the contact detector node
+    contact_detector = Node(
+        package='quadstack_contact',
+        executable='contact_detector_node',
+        name='contact_detector_node',
+        output='screen',
+        parameters=[{'robot': LaunchConfiguration('robot')}],
+    )
 
     kinematics_odometry = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(kinematics_odom_pkg_share, 'launch', 'kinematics_odometry.launch.py')),
@@ -187,6 +196,7 @@ def generate_launch_description():
         rtabmap,
         # odom_gt,
         # odom_2d,
+        contact_detector,
         kinematics_odometry,
         # imu_covariance,
         # ekf_filter,

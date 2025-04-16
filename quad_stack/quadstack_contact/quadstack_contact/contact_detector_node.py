@@ -3,6 +3,7 @@ from hb40_commons.msg import BridgeData
 from hb40_commons.msg import RobotState, LegState
 from geometry_msgs.msg import Vector3
 from ament_index_python.packages import get_package_share_directory
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 import os
 import pinocchio as pino
 from scipy.spatial.transform import Rotation as R
@@ -53,12 +54,18 @@ class ContactDetectorNode(Node):
         self.declare_parameter('robot', 'silver_badger')
         self.robot = self.get_parameter('robot').value
         
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,  # Matches publisher
+            durability=QoSDurabilityPolicy.VOLATILE,  # Matches publisher
+            depth=10  # Depth is unknown, so we set a reasonable value
+        )
+        
         # Subscribe to the /joint_states and /odom topics
         self.bridge_data_subscriber = self.create_subscription(
             BridgeData,
             '/hb40/bridge_data',
             self.bridge_data_callback,
-            10
+            qos_profile
         )
         
         self.odom_subscriber = self.create_subscription(
@@ -86,6 +93,7 @@ class ContactDetectorNode(Node):
         self.joint_tau = None
         odom_freq = 200 # 120
         self.dt = 1 / odom_freq
+        self.init_odom_values()
         self._init_pino_model_data()
         self.contact_detector = ContactDetector(alg="mixing", pino_model=self.pino_model, pino_data=self.pino_data, nv=self.pino_model.nv, freq=odom_freq)
         
@@ -135,6 +143,24 @@ class ContactDetectorNode(Node):
         # Retrieve odometry data
         self.pos = np.array([msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z], dtype=np.float64)
         self.ori = np.array([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w], dtype=np.float64)
+        
+        # Compute the twists
+        if self.pos_prev is None or self.ori_prev is None:
+            self.lin_vel = np.zeros(3)
+            self.ang_vel = np.zeros(3)
+        else:
+            pose_cur = [self.pos, self.ori]
+            pose_prev = [self.pos_prev, self.ori_prev]
+            self.lin_vel, self.ang_vel = compute_twist(pose_cur, pose_prev, self.dt)
+        
+        # Update the previous pose
+        self.pos_prev = self.pos
+        self.ori_prev = self.ori
+        
+    def init_odom_values(self):
+         # Retrieve odometry data
+        self.pos = np.array([0.0, 0.0, 0.0], dtype=np.float64)
+        self.ori = np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float64)
         
         # Compute the twists
         if self.pos_prev is None or self.ori_prev is None:

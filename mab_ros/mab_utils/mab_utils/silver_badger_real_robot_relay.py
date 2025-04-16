@@ -30,13 +30,6 @@ class BridgeDataProcessor(Node):
             qos_profile)
         
         # Subscribe to camera info to get the time header
-        self.robot_state_sub = self.create_subscription(
-            RobotState,
-            '/hb40/robot_state',
-            self.robot_state_callback,
-            qos_profile)
-        
-        # Subscribe to camera info to get the time header
         self.cam_info_sub = self.create_subscription(
             CameraInfo,
             '/d435i_camera/depth/camera_info',
@@ -54,7 +47,7 @@ class BridgeDataProcessor(Node):
         # timer to publish static transforms
         # self.publish_static_transforms()
         # self.create_timer(0.002, self.publish_static_transforms)
-        self.published_transforms = False
+        # self.published_transforms = False
         
     
     def publish_static_transforms(self, stamp):
@@ -63,10 +56,10 @@ class BridgeDataProcessor(Node):
         # if self.cam_info_header is None:
         #     return
         
-        if self.published_transforms:
-            return
+        # if self.published_transforms:
+        #     return
         
-        self.published_transforms = True
+        # self.published_transforms = True
         
         # self.published_transforms = True
         # stamp = self.cam_info_header.stamp
@@ -132,10 +125,7 @@ class BridgeDataProcessor(Node):
         self.tf_broadcaster.sendTransform([base_to_body, laser_to_body, body_to_imu, body_to_cam_optical_frame])
     
     def bridge_data_callback(self, msg: BridgeData):
-        if self.robot_state_header is None:
-            return
-        
-        stamp = self.robot_state_header.stamp
+        stamp = msg.header.stamp
         
         self.publish_static_transforms(stamp)
         
@@ -158,9 +148,6 @@ class BridgeDataProcessor(Node):
         imu_msg.linear_acceleration = msg.linear_acceleration
         
         self.imu_publisher.publish(imu_msg)
-        
-    def robot_state_callback(self, msg: RobotState):
-        self.robot_state_header = msg.header
         
     def cam_info_callback(self, msg: CameraInfo):
         self.cam_info_header = msg.header
