@@ -13,8 +13,8 @@ rgbd_odometry:
     # 'topic_queue_size': 1000,
     Odom/Strategy: '1' # Frame to map or Frame to frame
     Vis/CorType: '0' # Features Matching or Optical flow
-    OdomF2M/MaxSize: '800' # Max features
-    Vis/MaxFeatures: '1000' # Max features extracted from image
+    OdomF2M/MaxSize: '500' # Max features
+    Vis/MaxFeatures: '700' # Max features extracted from image
     # 'OdomF2M/MaxSize': '2000', # Max features
     # 'Vis/MaxFeatures': '1000', # Max features extracted from image
     # 'Odom/MinInliers': '10', # Min inliers
