@@ -250,6 +250,8 @@ class ContactDetector(object):
         self.alg = alg
         self.gm_est = np.zeros(nv)
         self.est_f_z = np.zeros(4)
+        self.est_f = np.zeros(12)
+        self.est_f_filtered = np.zeros(12)
         self.zaxis_index = np.array([2, 5, 8, 11])
         self.pino_model = pino_model
         self.pino_data = pino_data
@@ -289,16 +291,23 @@ class ContactDetector(object):
     def apply_contact_detection_gt(self, q):
         feet_pos = compute_feet_positions(self.pino_model, self.pino_data, q)
         contact_states = {}
+        feet_pos_filtered = {"fl_foot": np.zeros(3), "fr_foot": np.zeros(3), "rl_foot": np.zeros(3), "rr_foot": np.zeros(3)}
         for i in range(len(self.foot_names)):
             foot_name = self.foot_names[i]
+            foot_pos_filtered = np.zeros(3)
             foot_pos = feet_pos[foot_name]
             foot_pos_z = foot_pos[2]
             alpha = self.foot_pos_z_alpha[foot_name]
             foot_pos_z_filtered_prev = self.foot_pos_z_filtered[foot_name]
-            foot_pos_z_filtered = alpha * foot_pos_z + (1 - alpha) * foot_pos_z_filtered_prev
+            foot_pos_z_filtered =  (1 - alpha) * foot_pos_z_filtered_prev + alpha * foot_pos_z
             self.foot_pos_z_filtered[foot_name] = foot_pos_z_filtered
         
             thre = self.foot_pos_z_threshold[foot_name]
             in_contact = foot_pos_z_filtered < thre
             contact_states[foot_name] = in_contact
-        return contact_states
+
+            # update the foot position
+            foot_pos_filtered[2] = foot_pos_z_filtered
+            feet_pos_filtered[foot_name] = foot_pos_filtered
+            
+        return feet_pos, feet_pos_filtered, contact_states

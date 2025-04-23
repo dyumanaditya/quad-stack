@@ -11,6 +11,7 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from quadstack_contact.contact_detection import ContactDetector
+from collections import deque
 
 def compute_twist(pose_cur, pose_prev, dt):
     pos_cur, quat_cur = pose_cur
@@ -85,13 +86,23 @@ class ContactDetectorNode(Node):
         # Timer to periodically check for contact
         self.timer = self.create_timer(1 / 500, self.check_contact)
         
-        # Initialize variables
+        # Initialize buffer for odometry data
         self.pos_prev = None
         self.ori_prev = None
+        self.pos_buffer = deque(maxlen=10)
+        self.ori_buffer = deque(maxlen=10)
+        self.odom_timestamp = deque(maxlen=10)
+        
+        # Initilize buffer for joint states
         self.joint_pos = None
         self.joint_vel = None
         self.joint_tau = None
-        odom_freq = 200 # 120
+        self.joint_pos_buffer = deque(maxlen=50)
+        self.joint_vel_buffer = deque(maxlen=50)
+        self.joint_tau_buffer = deque(maxlen=50)
+        self.joint_states_timestamp = deque(maxlen=50)
+        
+        odom_freq = 100 # 120
         self.dt = 1 / odom_freq
         self.init_odom_values()
         self._init_pino_model_data()
@@ -136,6 +147,13 @@ class ContactDetectorNode(Node):
         self.joint_vel = np.array(msg.joint_velocity, dtype=np.float64)
         self.joint_tau = np.array(msg.joint_effort, dtype=np.float64)
         
+        # Save the data and timestamp in a buffer
+        self.joint_pos_buffer.append(self.joint_pos)
+        self.joint_vel_buffer.append(self.joint_vel)
+        self.joint_tau_buffer.append(self.joint_tau)
+        timestamp = self.get_clock().now().to_msg()
+        self.joint_states_timestamp.append(timestamp)
+        
     def odom_callback(self, msg):
         # Process odometry data
         self.odom = msg
@@ -157,6 +175,12 @@ class ContactDetectorNode(Node):
         self.pos_prev = self.pos
         self.ori_prev = self.ori
         
+        # Update the buffer and timestamp buffer
+        self.pos_buffer.append(self.pos)
+        self.ori_buffer.append(self.ori)
+        timestamp = self.get_clock().now().to_msg()
+        self.odom_timestamp.append(timestamp)
+        
     def init_odom_values(self):
          # Retrieve odometry data
         self.pos = np.array([0.0, 0.0, 0.0], dtype=np.float64)
@@ -175,22 +199,70 @@ class ContactDetectorNode(Node):
         self.pos_prev = self.pos
         self.ori_prev = self.ori
         
+    def check_input(self, cur_timestamp):
+        # Search in the joint states buffer for the closest timestamp
+        closest_idx = None
+        closest_diff = float('inf')
+        for i, timestamp in enumerate(self.joint_states_timestamp):
+            diff = abs((cur_timestamp.sec + cur_timestamp.nanosec * 1e-9) - (timestamp.sec + timestamp.nanosec * 1e-9))
+            if diff < closest_diff:
+                closest_diff = diff
+                closest_idx = i
+        if closest_idx is None:
+            self.get_logger().warn("No joint states data available")
+            return
+        joint_pos = self.joint_pos_buffer[closest_idx]
+        joint_vel = self.joint_vel_buffer[closest_idx]
+        joint_tau = self.joint_tau_buffer[closest_idx]
+        
+        # Search in the odom buffer for the closest timestamp
+        closest_idx = None
+        closest_diff = float('inf')
+        for i, timestamp in enumerate(self.odom_timestamp):
+            diff = abs((cur_timestamp.sec + cur_timestamp.nanosec * 1e-9) - (timestamp.sec + timestamp.nanosec * 1e-9))
+            if diff < closest_diff:
+                closest_diff = diff
+                closest_idx = i
+        if closest_idx is None:
+            self.get_logger().warn("No odometry data available")
+            return
+        pos = self.pos_buffer[closest_idx]
+        ori = self.ori_buffer[closest_idx]
+        pos_prev = self.pos_buffer[closest_idx - 1] if closest_idx > 0 else self.pos_buffer[closest_idx]
+        ori_prev = self.ori_buffer[closest_idx - 1] if closest_idx > 0 else self.ori_buffer[closest_idx]
+        
+        # Compute the twists
+        lin_vel, ang_vel = compute_twist([pos, ori], [pos_prev, ori_prev], self.dt)
+        return joint_pos, joint_vel, joint_tau, pos, ori, lin_vel, ang_vel
+        
     def check_contact(self):
         if self.joint_pos is None or self.joint_vel is None or self.joint_tau is None:
             return
         if self.pos_prev is None or self.ori_prev is None:
             return
+        
+        cur_timestamp = self.get_clock().now().to_msg()
+        
+        # # Get the closest joint states and odometry data
+        # joint_pos, joint_vel, joint_tau, pos, ori, lin_vel, ang_vel = self.check_input(cur_timestamp)
+        # q, v, tau = gen_pino_input(joint_pos, joint_vel, joint_tau, pos, ori, lin_vel, ang_vel, self.joint_names_pin, self.joint_names_ros)
+        
         # Generate the input for the contact detector
         q, v, tau = gen_pino_input(self.joint_pos, self.joint_vel, self.joint_tau, self.pos, self.ori, self.lin_vel, self.ang_vel, self.joint_names_pin, self.joint_names_ros)
         est_f, est_f_filtered, contact_states = self.contact_detector.apply_contact_detection(q, v, tau)
         
         # Get the peusdo ground truth of the contact states
-        contact_states_gt = self.contact_detector.apply_contact_detection_gt(q)
+        feet_pos, feet_pos_filtered, contact_states_gt = self.contact_detector.apply_contact_detection_gt(q)
         
         # Create the RobotState message
         robot_state_msg = RobotState()
-        robot_state_msg.header.stamp = self.get_clock().now().to_msg()
+        robot_state_msg.header.stamp = cur_timestamp
         robot_state_msg.header.frame_id = "base_link"
+        
+        # Fill in the robot state message
+        robot_state_msg.joint_pos = [float(q[i]) for i in range(len(q))]
+        robot_state_msg.joint_vel = [float(v[i]) for i in range(len(v))]
+        robot_state_msg.joint_torque = [float(tau[i]) for i in range(len(tau))]
         
         # Fill in the contact state message
         for i in range(len(self.foot_names)):
@@ -217,6 +289,20 @@ class ContactDetectorNode(Node):
             est_force_filtered_msg.y = float(est_f_filtered_cur_foot[1])
             est_force_filtered_msg.z = float(est_f_filtered_cur_foot[2])
             leg_msg.foot_force_est_filter = est_force_filtered_msg
+
+            foot_pos = feet_pos[foot_name]
+            foot_pos_msg = Vector3()
+            foot_pos_msg.x = float(foot_pos[0])
+            foot_pos_msg.y = float(foot_pos[1])
+            foot_pos_msg.z = float(foot_pos[2])
+            leg_msg.foot_pos = foot_pos_msg
+            
+            foot_pos_filtered = feet_pos_filtered[foot_name]
+            foot_pos_filtered_msg = Vector3()   
+            foot_pos_filtered_msg.x = float(foot_pos_filtered[0])
+            foot_pos_filtered_msg.y = float(foot_pos_filtered[1])
+            foot_pos_filtered_msg.z = float(foot_pos_filtered[2])
+            leg_msg.foot_pos_filter = foot_pos_filtered_msg
 
             robot_state_msg.leg.append(leg_msg)
         
