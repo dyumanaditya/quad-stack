@@ -4,6 +4,18 @@ threshold:
   - rl_foot: 8
   - rr_foot: 8
 
+  # The threshold for the foot contact force:
+  # 1. The first set of values work for all bags;
+  # fl_foot: 1
+  # fr_foot: 8
+  # rl_foot: 1
+  # rr_foot: 8
+  # 2. The second set of values work for all bags except bag_g;
+  # fl_foot: 8
+  # fr_foot: 8
+  # rl_foot: 8
+  # rr_foot: 8
+
 alpha:
   - fl_foot: 0.2
   - fr_foot: 0.2
