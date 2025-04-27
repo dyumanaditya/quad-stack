@@ -182,7 +182,7 @@ class ContactDetectorNode(Node):
         self.odom_timestamp.append(timestamp)
         
     def init_odom_values(self):
-         # Retrieve odometry data
+        # Retrieve odometry data
         self.pos = np.array([0.0, 0.0, 0.0], dtype=np.float64)
         self.ori = np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float64)
         

@@ -1,6 +1,6 @@
 threshold:
-  - fl_foot: 15
-  - fr_foot: 15
+  - fl_foot: 8
+  - fr_foot: 8
   - rl_foot: 8
   - rr_foot: 8
 
