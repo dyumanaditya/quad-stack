@@ -9,34 +9,10 @@
 </p>
 
 <p align="center">
-  <a href="#">
-    <img
-      src="https://img.shields.io/badge/⚙️-Neural%20Locomotion-blue?style=flat-square&labelColor=lightgrey"
-      alt="Neural Locomotion"
-      height="20"
-    />
-  </a>
-  <a href="#">
-    <img
-      src="https://img.shields.io/badge/🎥-VIO%20Odometry-blue?style=flat-square&labelColor=lightgrey"
-      alt="Visual Inertial Kinematic Aided Odometry"
-      height="20"
-    />
-  </a>
-  <a href="#">
-    <img
-      src="https://img.shields.io/badge/🗺️-SLAM-blue?style=flat-square&labelColor=lightgrey"
-      alt="SLAM"
-      height="20"
-    />
-  </a>
-  <a href="#">
-    <img
-      src="https://img.shields.io/badge/🤖-Navigation%2C%20Planning%20%26%20Exploration-blue?style=flat-square&labelColor=lightgrey"
-      alt="Navigation, Planning & Exploration"
-      height="20"
-    />
-  </a>
+  <a href="#"><img src="https://img.shields.io/badge/⚙️-Neural%20Locomotion-blue?style=flat-square" alt="Neural Locomotion" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/🎥-VIO%20Odometry-blue?style=flat-square" alt="Visual Inertial Kinematic Aided Odometry" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/🗺️-SLAM-blue?style=flat-square" alt="SLAM" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/🤖-Navigation%2C%20Planning%20%26%20Exploration-blue?style=flat-square" alt="Navigation, Planning & Exploration" /></a>
 </p>
 
 ---
