@@ -35,6 +35,7 @@ setup(
             'publish_tf_on_topic = quadstack_utils.publish_tf_on_topic:main',
             'compute_leg_odom_covariance = quadstack_utils.compute_leg_odom_covariance:main',
             'plot_header_time = quadstack_utils.plot_header_time:main',
+            'plot_leg_odom_with_gt = quadstack_utils.plot_leg_odom_with_gt:main',
         ],
     },
 )

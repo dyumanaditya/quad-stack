@@ -150,7 +150,7 @@ class LowStateProcessor(Node):
         for i in range(4):  # Order: FR, FL, RR, RL
             leg_msg = LegState()
             leg_msg.leg_name = self.leg_names[i]
-            leg_msg.contact = bool(msg.foot_force[i] > 40)  # contact detection based on foot force
+            leg_msg.contact = bool(msg.foot_force[i] > 50)  # contact detection based on foot force
             leg_msg.foot_force_est = Vector3(x=0.0, y=0.0, z=float(msg.foot_force[i]))
             
             robot_msg.leg.append(leg_msg)

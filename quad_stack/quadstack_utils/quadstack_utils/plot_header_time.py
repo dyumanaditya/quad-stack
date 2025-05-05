@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Import the message type. For this example, we assume both topics publish messages
 # that contain a header similar to nav_msgs/Odometry.
 from nav_msgs.msg import Odometry
-from hb40_commons.msg import RobotState
+from hb40_commons.msg import RobotState, BridgeData
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 
 
@@ -26,14 +26,14 @@ class PlotHeaderTimeNode(Node):
         # Subscribe to the '/optitrack/odom' topic.
         self.create_subscription(
             Odometry,
-            '/optitrack/odom',
+            '/d435i_camera/depth/image_rect_raw',
             self.odom_callback,
             10)
 
         # Subscribe to the '/hb40/robot_state' topic.
         self.create_subscription(
-            RobotState,
-            '/hb40/robot_state',
+            BridgeData,
+            '/hb40/bridge_data',
             self.robot_state_callback,
             qos_profile)
 
@@ -53,9 +53,9 @@ class PlotHeaderTimeNode(Node):
     def plot_times(self):
         plt.figure()
         # Plot times from /optitrack/odom in red
-        plt.scatter(self.odom_times, [1]*len(self.odom_times), color='red', label='/optitrack/odom')
+        plt.scatter(self.odom_times, [1]*len(self.odom_times), color='red', label='/d435i_camera/depth/image_rect_raw')
         # Plot times from /hb40/robot_state in blue
-        plt.scatter(self.robot_state_times, [1]*len(self.robot_state_times), color='blue', label='/hb40/robot_state')
+        plt.scatter(self.robot_state_times, [1]*len(self.robot_state_times), color='blue', label='/hb40/bridge_data')
 
         plt.xlabel("Header Time (seconds)")
         plt.ylabel("Value")

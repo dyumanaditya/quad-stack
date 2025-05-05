@@ -46,7 +46,7 @@ class BridgeDataProcessor(Node):
         
         # timer to publish static transforms
         # self.publish_static_transforms()
-        # self.create_timer(0.002, self.publish_static_transforms)
+        # self.create_timer(0.05, self.publish_static_transforms)
         # self.published_transforms = False
         
     
@@ -126,6 +126,7 @@ class BridgeDataProcessor(Node):
     
     def bridge_data_callback(self, msg: BridgeData):
         stamp = msg.header.stamp
+        self.robot_state_header = stamp
         
         self.publish_static_transforms(stamp)
         

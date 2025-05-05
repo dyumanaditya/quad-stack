@@ -407,7 +407,7 @@
   </material>
   <!-- camera body, with origin at bottom screw mount -->
   <joint name="d435i_camera_joint" type="fixed">
-    <origin rpy="0.0 0 0" xyz="0.35585500000000003 -0.012447000000000001 0.068583"/>
+    <origin rpy="0.0 0 0" xyz="0.25585500000000005 -0.012447000000000001 0.01"/>
     <parent link="trunk"/>
     <child link="d435i_camera_bottom_screw_frame"/>
   </joint>
@@ -526,7 +526,7 @@
     <parent link="trunk"/>
     <child link="camera_image_link"/>
     <!-- <origin rpy="0 0 0" xyz="${d435_cam_x} ${d435_cam_y} ${d435_cam_z}" /> -->
-    <origin rpy="0.0 0 0" xyz="0.370755 5.3e-05 0.068583"/>
+    <origin rpy="0.0 0 0" xyz="0.270755 5.3e-05 0.01"/>
   </joint>
   <link name="laser_frame"/>
   <joint name="laser_joint" type="fixed">

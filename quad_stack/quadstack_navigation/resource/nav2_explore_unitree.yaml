@@ -2,7 +2,7 @@ bt_navigator:
   ros__parameters:
     use_sim_time: True
     global_frame: map
-    robot_base_frame: base_link
+    robot_base_frame: base
     odom_topic: /odom
     bt_loop_duration: 10
     default_server_timeout: 20
@@ -62,10 +62,10 @@ controller_server:
       min_vel_y: 0.0
       max_vel_x: 0.2
       max_vel_y: 0.0
-      max_vel_theta: 0.7
+      max_vel_theta: 1.4
       min_speed_xy: 0.0
       max_speed_xy: 0.20
-      min_speed_theta: -0.7
+      min_speed_theta: -1.4
       acc_lim_x: 2.5
       acc_lim_y: 0.0
       acc_lim_theta: 2.0
@@ -189,7 +189,7 @@ local_costmap:
       update_frequency: 5.0
       publish_frequency: 2.0
       global_frame: odom
-      robot_base_frame: base_link
+      robot_base_frame: base
       rolling_window: true
       width: 5
       height: 5
@@ -232,7 +232,7 @@ global_costmap:
       update_frequency: 1.0
       publish_frequency: 1.0
       global_frame: map
-      robot_base_frame: base_link
+      robot_base_frame: base
       robot_radius: 0.7
       resolution: 0.05
       track_unknown_space: true
@@ -319,7 +319,7 @@ smoother_server:
   ros__parameters:
     costmap_topic: global_costmap/costmap_raw
     footprint_topic: global_costmap/published_footprint
-    robot_base_frame: base_link
+    robot_base_frame: base
     transform_timeout: 0.1
     smoother_plugins: ["simple_smoother"]
     simple_smoother:
@@ -348,7 +348,7 @@ behavior_server:
       plugin: "nav2_behaviors/AssistedTeleop"
     local_frame: odom
     global_frame: map
-    robot_base_frame: base_link
+    robot_base_frame: base
     transform_tolerance: 0.1
     simulate_ahead_time: 2.0
     max_rotational_vel: 1.0
@@ -386,7 +386,7 @@ waypoint_follower:
 #   ros__parameters:
 #     use_sim_time: true
 #     # base_frame_id: "base_footprint"
-#     base_frame_id: "base_link"
+#     base_frame_id: "base"
 #     odom_frame_id: "odom"
 #     cmd_vel_in_topic: "cmd_vel_smoothed"
 #     cmd_vel_out_topic: "cmd_vel"
@@ -425,7 +425,7 @@ waypoint_follower:
 #     undock_linear_tolerance: 0.05
 #     undock_angular_tolerance: 0.1
 #     max_retries: 3
-#     base_frame: "base_link"
+#     base_frame: "base"
 #     fixed_frame: "odom"
 #     dock_backwards: false
 #     dock_prestaging_tolerance: 0.5
@@ -466,7 +466,7 @@ waypoint_follower:
 #   ros__parameters:
 #     use_sim_time: true
 #     # base_frame_id: "base_footprint"
-#     base_frame_id: "base_link"
+#     base_frame_id: "base"
 #     odom_frame_id: "odom"
 #     map_frame_id: "map"
 #     # scan_frame_id: "base_scan"  # tb4_loopback_simulator.launch.py remaps to 'rplidar_link'

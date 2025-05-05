@@ -24,6 +24,9 @@ from rclpy.clock import Clock, ClockType
 class UnitreeLocomotion(Node):
     def __init__(self):
         super().__init__("unitree_locomotion")
+        
+        # Make Jax use cpu/gpu
+        jax.config.update("jax_platform_name", "cpu")
 
         self.is_real_robot = False
         self.is_tuda_robot = True

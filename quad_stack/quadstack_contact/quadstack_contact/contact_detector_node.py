@@ -79,7 +79,7 @@ class ContactDetectorNode(Node):
         # Publisher for the contact state
         self.contact_state_publisher = self.create_publisher(
             RobotState,
-            '/estimated_contact_state',
+            '/feet_contact_state',
             10
         )
         

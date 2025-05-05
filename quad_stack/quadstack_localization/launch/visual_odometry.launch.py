@@ -118,12 +118,19 @@ def generate_launch_description():
     ])
     
     # launch the contact detector node
+    use_contact_detector = PythonExpression([
+        "'true' if '", LaunchConfiguration('robot'),
+        "' in ['silver_badger', 'honey_badger'] and '",
+        LaunchConfiguration('real_robot'),
+        "' == 'true' else 'false'"
+    ])
     contact_detector = Node(
         package='quadstack_contact',
         executable='contact_detector_node',
         name='contact_detector_node',
         output='screen',
         parameters=[{'robot': LaunchConfiguration('robot')}],
+        condition=IfCondition(use_contact_detector)
     )
 
     kinematics_odometry = IncludeLaunchDescription(

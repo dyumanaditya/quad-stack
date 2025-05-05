@@ -34,8 +34,23 @@ slam_toolbox:
     use_scan_matching: true
     # minimum_travel_distance: 0.5
     minimum_travel_distance: 0.1
-    # minimum_travel_heading: 0.5
-    loop_match_minimum_chain_size: 3
+    # minimum_travel_heading: 0.001
+    minimum_travel_heading: 0.02
+    # loop_match_minimum_chain_size: 1
+    # loop_match_minimum_chain_size: 10
+    loop_match_minimum_chain_size: 7
+
+    # link_scan_maximum_distance: 100.0
+    # loop_search_maximum_distance: 100.0
+
+    # loop_match_minimum_response_coarse: 0.35  # ↓ allow weaker coarse matches
+    # loop_match_minimum_response_fine:   0.45  # ↓ allow weaker fine matches
+
+    # loop_search_space_dimension: 8.0        # ← increase this
+    # loop_search_space_resolution: 0.05
+    # loop_search_space_smear_deviation: 0.03
+
+
     # loop_match_minimum_chain_size: 10
     # loop_match maximum_variance_coarse: 0.3
     # loop_match minimum_response_coarse: 0.6

@@ -25,7 +25,7 @@ class MABLocomotion(Node):
     def __init__(self):
         super().__init__("mab_locomotion")
         
-        # Make Jax use cpu
+        # Make Jax use cpu/gpu
         jax.config.update("jax_platform_name", "cpu")
 
         self.is_real_robot = False
