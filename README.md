@@ -13,28 +13,28 @@
     <img
       src="https://img.shields.io/badge/⚙️-Neural%20Locomotion-blue?style=flat-square&labelColor=lightgrey"
       alt="Neural Locomotion"
-      height="30"
+      height="20"
     />
   </a>
   <a href="#">
     <img
       src="https://img.shields.io/badge/🎥-VIO%20Odometry-blue?style=flat-square&labelColor=lightgrey"
       alt="Visual Inertial Kinematic Aided Odometry"
-      height="30"
+      height="20"
     />
   </a>
   <a href="#">
     <img
       src="https://img.shields.io/badge/🗺️-SLAM-blue?style=flat-square&labelColor=lightgrey"
       alt="SLAM"
-      height="30"
+      height="20"
     />
   </a>
   <a href="#">
     <img
       src="https://img.shields.io/badge/🤖-Navigation%2C%20Planning%20%26%20Exploration-blue?style=flat-square&labelColor=lightgrey"
       alt="Navigation, Planning & Exploration"
-      height="30"
+      height="20"
     />
   </a>
 </p>
