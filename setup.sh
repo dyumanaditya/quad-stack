@@ -56,4 +56,7 @@ git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-house-worl
 # Clone the modified slam package
 git clone https://github.com/dyumanaditya/slam_toolbox
 
+# Clone explore package
+git clone https://github.com/dyumanaditya/m-explore-ros2
+
 echo "Installation of all packages for quad-stack is complete!"
