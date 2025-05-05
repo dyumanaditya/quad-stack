@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="media/quadstack-logo-v1.png" alt="QuadStack Logo" width="180" />
+  <img src="media/quadstack-logo-v1.png" alt="QuadStack Logo" width="200" />
 </p>
 
 <h1 align="center">QuadStack</h1>
@@ -25,15 +25,30 @@
 - **Navigation, Planning & Exploration**  
 
 
+## Install & Setup
+To clone
+
+```bash
+git clone https://github.com/dyumanaditya/quad-stack --recursive
+```
+
+To install all the necessary dependencies run the following
+
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+
 
 ## Robots
 
 This repository supports the 
-- MAB Silver Badger 
-- MAB Honey Badger
-- Unitree A1
-- Unitree Go1
-- Unitree Go2  
+- MAB Silver Badger (`silver_badger`)
+- MAB Honey Badger (`honey_badger`)
+- Unitree A1 (`a1`)
+- Unitree Go1 (`go1`)
+- Unitree Go2 (`go2`)
 
 <div style="display: flex; justify-content: space-between;">
     <img src="./media/1.png" alt="Image 1" width="150" style="margin-right: 10px;">
@@ -42,6 +57,13 @@ This repository supports the
     <img src="./media/4.png" alt="Image 4" width="150" style="margin-right: 10px;">
     <img src="./media/5.png" alt="Image 5" width="150">
 </div>
+
+
+To bringup a particular robot add the argument
+
+```bash
+robot:=<name>
+```
 
 ## Worlds
 By default there are two main worlds:
@@ -73,20 +95,24 @@ world:=aws-robomaker-small-warehouse-world/worlds/no_roof_small_warehouse.world
 world:=aws-robomaker-small-house-world/worlds/small_house.world
 ```
 
+Custom worlds can be used similarly.
 
-## Install & Setup
-To clone
 
-```bash
-git clone https://github.com/dyumanaditya/quad-stack --recursive
-```
+## Neural Teleoperation
 
-To install all the necessary dependencies run the following
 
-```bash
-chmod +x setup.sh
-./setup.sh
-```
+
+## Visual Odometry
+
+
+## SLAM
+
+
+## Navigation
+
+
+## Autonomous Exploration
+
 
 ## Usage
 
