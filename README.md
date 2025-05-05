@@ -1,10 +1,39 @@
-# QuadStack
-Software stack MAB and Unitree Quadrupeds for 
+<p align="center">
+  <img src="media/quadstack-logo-v1.png" alt="QuadStack Logo" width="180" />
+</p>
 
-- Neural locomotion
-- Visual Inertial Kinematic aided odometry
-- SLAM
-- Navigation and Planning
+<h1 align="center">QuadStack</h1>
+
+<p align="center">
+  Software stack for MAB and Unitree quadrupeds, powering robust localization, mapping and navigation:
+</p>
+
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/⚙️-Neural%20Locomotion-blue?style=flat-square" alt="Neural Locomotion" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/🎥-VIO%20Odometry-blue?style=flat-square" alt="Visual Inertial Kinematic Aided Odometry" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/🗺️-SLAM-blue?style=flat-square" alt="SLAM" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/🤖-Navigation%20%26%20Planning-blue?style=flat-square" alt="Navigation, Planning & Exploration" /></a>
+</p>
+
+---
+
+## Features
+
+- **Neural locomotion**  
+- **Visual Inertial Kinematic aided odometry**  
+- **Velocity Constrained SLAM**  
+- **Navigation, Planning & Exploration**  
+
+
+
+## Robots
+
+This repository supports the 
+- MAB Silver Badger 
+- MAB Honey Badger
+- Unitree A1
+- Unitree Go1
+- Unitree Go2  
 
 <div style="display: flex; justify-content: space-between;">
     <img src="./media/1.png" alt="Image 1" width="150" style="margin-right: 10px;">
@@ -14,14 +43,44 @@ Software stack MAB and Unitree Quadrupeds for
     <img src="./media/5.png" alt="Image 5" width="150">
 </div>
 
-# Install
+## Worlds
+By default there are two main worlds:
+
+- AWS Small Warehouse
+- AWS Small House
+
+You can add more worlds by putting them inside the [`quadstack_gazebo/worlds`](quad_stack/quadstack_gazebo/worlds/) folder. To launch the simulation with the AWS worlds, follow the next steps
+
+### Export the model Path
+**AWS Warehouse**
+```bash
+export GAZEBO_MODEL_PATH=/home/ws/src/quad-stack/quad_stack/quadstack_gazebo/worlds/aws-robomaker-small-warehouse-world/models
+```
+
+**AWS House**
+```bash
+export GAZEBO_MODEL_PATH=/home/ws/src/quad-stack/quad_stack/quadstack_gazebo/worlds/aws-robomaker-small-house-world/models
+```
+
+### Add the world argument on bringup
+**AWS Warehouse**
+```bash
+world:=aws-robomaker-small-warehouse-world/worlds/no_roof_small_warehouse.world
+```
+
+**AWS House**
+```bash
+world:=aws-robomaker-small-house-world/worlds/small_house.world
+```
+
+
+## Install & Setup
 To clone
 
 ```bash
 git clone https://github.com/dyumanaditya/quad-stack --recursive
 ```
 
-# Setup
 To install all the necessary dependencies run the following
 
 ```bash
@@ -29,7 +88,7 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-# Usage
+## Usage
 
 Here are the commands to run the package. The following launch arguments are supported
 
@@ -68,4 +127,11 @@ ros2 launch quadstack_bringup odometry.launch.py robot:=silver_badger
 **Note:** Replace the map path by your absolute path, this is just an example
 ```bash
 ros2 launch quadstack_bringup navigation.launch.py map:=/home/ws/src/quad-stack/quad_stack/quadstack_localization/maps/turtlebot_map.yaml robot:=a1
+```
+
+## Bibtex
+If you use this in your work please cite
+
+```bibtex
+comming soon
 ```
