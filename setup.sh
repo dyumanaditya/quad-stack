@@ -9,8 +9,8 @@ sudo apt install -y ros-humble-gazebo-ros-pkgs ros-humble-gazebo-ros
 # Install nlohmann-json3-dev
 sudo apt install -y nlohmann-json3-dev
 
-# Install TurtleBot3 packages
-sudo apt install -y ros-humble-turtlebot3*
+# # Install TurtleBot3 packages
+# sudo apt install -y ros-humble-turtlebot3*
 
 # Install Python3 and pip
 sudo apt install -y python3 python3-pip
@@ -49,5 +49,11 @@ pip install -U "jax[cuda12]"
 pip install numpy==1.26.4
 sudo apt install ros-humble-pinocchio
 
+# Clone AWS worlds (warehouse only works on branch ros1)
+git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-small-warehouse-world quad_stack/quadstack_gazebo/worlds/
+git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-house-world quad_stack/quadstack_gazebo/worlds/
+
+# Clone the modified slam package
+git clone https://github.com/dyumanaditya/slam_toolbox
 
 echo "Installation of all packages for quad-stack is complete!"
