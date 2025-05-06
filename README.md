@@ -159,5 +159,13 @@ ros2 launch quadstack_bringup navigation.launch.py map:=/home/ws/src/quad-stack/
 If you use this in your work please cite
 
 ```bibtex
-comming soon
+@misc{aditya2025robustlocalizationmappingnavigation,
+      title={Robust Localization, Mapping, and Navigation for Quadruped Robots}, 
+      author={Dyuman Aditya and Junning Huang and Nico Bohlinger and Piotr Kicki and Krzysztof Walas and Jan Peters and Matteo Luperto and Davide Tateo},
+      year={2025},
+      eprint={2505.02272},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2505.02272}, 
+}
 ```
