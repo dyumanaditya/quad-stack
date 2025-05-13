@@ -65,6 +65,8 @@ To bringup a particular robot add the argument
 robot:=<name>
 ```
 
+To specify the initial position of the robot in the world, use the `x_pose` and `y_pose` arguments when launching.
+
 ## Worlds
 By default there are two main worlds:
 
@@ -99,61 +101,82 @@ Custom worlds can be used similarly.
 
 
 ## Neural Teleoperation
+To teleoperate the robot to collect rosbags or for any other purpose, use the following command. You can specify the `robot` and `world` parameter as described in the previous section
 
+```bash
+ros2 launch quadstack_bringup teleop.launch.py
+```
 
 
 ## Visual Odometry
+To launch visual odometry, the main launch line is as follows
+
+```bash
+ros2 launch quadstack_bringup odometry.launch.py
+```
+
+Along with this, there are several command line arguments that can be specified:
+
+1. `robot` as usual
+2. `world` as usual
+3. `x_pose`, `y_pose` as usual for the initial robot position
+4. `use_kinematics_odom` (bool, default=`true`): this allows you to use leg odometry to reset the VO if it gets lost.
+5. `rosbag` (bool, default=`false`): this specifies whether a rosbag is going to be played after launching instead of real time simulation
+6. `real_robot` (bool, default=`false`, only works when rosbag=`true` and `robot:=silver_badger/go2`): this specifies if the rosbag is from a real robot or from simulation
 
 
 ## SLAM
+To launch SLAM, the main launch line is as follows
+
+```bash
+ros2 launch quadstack_bringup slam.launch.py
+```
+
+Along with this and similar to the VO launch, there are several command line arguments that can be specified:
+
+1. `robot` as usual
+2. `world` as usual
+3. `x_pose`, `y_pose` as usual for the initial robot position
+4. `use_kinematics_odom` (bool, default=`true`): this allows you to use leg odometry to reset the VO if it gets lost.
+5. `rosbag` (bool, default=`false`): this specifies whether a rosbag is going to be played after launching instead of real time simulation
+6. `real_robot` (bool, default=`false`, only works when rosbag=`true` and `robot:=silver_badger/go2`): this specifies if the rosbag is from a real robot or from simulation
+7. `use_laser_stabilization` (bool, default=`true`): whether to stabilize laser scan from depth images based on IMU values
+8. `use_vel_map_constraints` (bool, default=`true`): whether to add leg odometry computed velocity constraints to the SLAM factor graph.
+
 
 
 ## Navigation
+To launch navigation, the main launch line is as follows
+
+```bash
+ros2 launch quadstack_bringup navigation.launch.py
+```
+
+There are two ways to perform navigation:
+
+1. Navigation and SLAM
+2. Navigation on a known map
+
+If option 1. is used, then the launch arguments are the same as in the SLAM launch section. If not, there is an additional argument:
+
+`map` (string, default=`''`): Allows you to specify the path to a known `yaml` map. To use this option specify the full absolute path to the map.
+
 
 
 ## Autonomous Exploration
+Autononous exploration is the combined process of navigation and mapping an unknown environment. We use a frontier based exploration strategy implemented [here](https://github.com/robo-friends/m-explore-ros2). This repository should have already been installed as part of the setup process.
 
 
-## Usage
-
-Here are the commands to run the package. The following launch arguments are supported
-
-- `robot` (silver_badger, honey_badger, a1, go1, go2)
-- `world` (the name of any world file in the [gazebo worlds folder](./quad_stack/quadstack_gazebo/worlds/))
-- `x_pose`, `y_pose`, `z_pose`
-- `map` (absolute path of a map yaml file) if you are running navigation and want to use a pre-made map
-
-## Using Gazebo World Packages
-If you are using a gazebo world that has a separate directory for models, you will need to run the following before launching
-
+Launch the navigation, and in another terminal launch the following
 ```bash
-export GAZEBO_MODEL_PATH=<path-to-model-folder>
+ros2 launch explore_lite explore.launch.py
 ```
 
+A separate set of SLAM and navigation parameters for exploration are available:
 
-### Spawning the robot
+1.For Navigation params: [this line](https://github.com/dyumanaditya/quad-stack/blob/main/quad_stack/quadstack_navigation/launch/navigation.launch.py#L24) needs to be changed to use the file `nav2_unitree_explore.yaml` (similarly for the mab robots).
+2. For SLAM params: [this line](https://github.com/dyumanaditya/quad-stack/blob/main/quad_stack/quadstack_localization/launch/slam.launch.py#L19) needs to be changed to use the file `slam_toolbox_params_explore_sim.yaml`.
 
-```bash
-ros2 launch quadstack_bringup spawn_robot.launch.py world:=empty_world.world robot:=a1
-```
-
-### Teleoperating the robot
-
-```bash
-ros2 launch quadstack_bringup teleop.launch.py world:=empty_world.world robot:=a1
-```
-
-### Visual and Legged Odometry
-
-```bash
-ros2 launch quadstack_bringup odometry.launch.py robot:=silver_badger
-```
-
-### Navigation Stack
-**Note:** Replace the map path by your absolute path, this is just an example
-```bash
-ros2 launch quadstack_bringup navigation.launch.py map:=/home/ws/src/quad-stack/quad_stack/quadstack_localization/maps/turtlebot_map.yaml robot:=a1
-```
 
 ## Bibtex
 If you use this in your work please cite
