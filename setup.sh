@@ -21,6 +21,10 @@ pip3 install flax
 pip3 install opencv-python
 pip3 install transforms3d
 pip3 install matplotlib
+pip3 install catkin-pkg
+pip3 install empy==3.3.4
+pip3 install lark
+pip3 install lxml
 
 # Install xterm
 sudo apt install -y xterm
@@ -41,16 +45,16 @@ sudo apt install -y ros-humble-rtabmap*
 sudo apt-get install -y ros-humble-tf2-ros ros-humble-tf2-tools
 sudo apt install -y ros-humble-tf-transformations
 
-sudo apt-get install -y ros-humble-rcl-interfaces
-sudo apt install ros-humble-rosidl-generator-dds-idl
+sudo apt-get install -y ros-humble-rcl-interfaces ros-humble-point-cloud-transport
+sudo apt install -y ros-humble-rosidl-generator-dds-idl
 
 pip install -U "jax[cuda12]"
 
 pip install numpy==1.26.4
-sudo apt install ros-humble-pinocchio
+sudo apt install -y ros-humble-pinocchio
 
 # Clone AWS worlds (warehouse only works on branch ros1)
-git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-small-warehouse-world quad_stack/quadstack_gazebo/worlds/
+git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-warehouse-world quad_stack/quadstack_gazebo/worlds/
 git clone -b ros2 https://github.com/aws-robotics/aws-robomaker-small-house-world quad_stack/quadstack_gazebo/worlds/
 
 # Clone the modified slam package
@@ -60,3 +64,4 @@ git clone https://github.com/dyumanaditya/slam_toolbox
 git clone https://github.com/dyumanaditya/m-explore-ros2
 
 echo "Installation of all packages for quad-stack is complete!"
+
